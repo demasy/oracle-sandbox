@@ -12,7 +12,7 @@
 docker pull container-registry.oracle.com/database/free:latest
 ```
 
-##### Custom Configurations
+##### Run Docker with Custom Configurations
 ```
 docker run -d --name oracle-free \
   -p 1521:1521 -p 5500:5500 \
