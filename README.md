@@ -44,6 +44,7 @@ docker rm -f oracle-free
 docker exec -it oracle-free bash
 ```
 
+Using SQL*Plus
 ```
 sqlplus / as sysdba
 ```
