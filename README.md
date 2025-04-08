@@ -20,6 +20,22 @@ docker run -d --name oracle-free \
   container-registry.oracle.com/database/free:latest
 ```
 
+### Stop the Container
+```
+docker stop oracle-free
+```
+
+### Start the Container
+```
+docker start oracle-free
+```
+
+### Remove the Container
+```
+docker rm -f oracle-free
+```
+
+
 ### Connect to the Database
 
 ##### Shell into the Container
