@@ -7,12 +7,12 @@
 
 ### Docker
 
-Pull Command for Latest
+##### Pull Command for Latest
 ```
 docker pull container-registry.oracle.com/database/free:latest
 ```
 
-Custom Configurations
+##### Custom Configurations
 ```
 docker run -d --name oracle-free \
   -p 1521:1521 -p 5500:5500 \
