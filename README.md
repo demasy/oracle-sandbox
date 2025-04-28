@@ -51,6 +51,6 @@ sqlplus / as sysdba
 
 ##### Using Oracle SQLcl
 ```
-./sql sys/Demasy@1986@localhost:1521/FREE as sysdba
+./sql ${username}/${password}@localhost:1521/FREE as sysdba
 ```
 
