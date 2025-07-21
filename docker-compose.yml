@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  demasylabs-oracle-database:
+    image: container-registry.oracle.com/database/free:latest
+    container_name: oracle-database-23ai
+    ports:
+      - "127.0.0.1:1521:1521"
+      - "127.0.0.1:5500:5500"
+    environment:
+      - TZ=Asia/Riyadh
+      - DATABASE_NAME=DEMASY
+      - ORACLE_PWD=${ORACLE_PWD}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "echo 'SELECT 1;' | sqlplus -s system/${ORACLE_PWD}@localhost:1521/FREE || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - demasylabs_network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "3g"
+
+  demasylabs-oracle-server:
+    build:
+      context: ./
+      args:
+        SRC_ORACLE_SQLCL: https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip
+        SRC_ORACLE_APEX: https://download.oracle.com/otn_software/apex/apex-latest.zip
+    container_name: demasy-server
+    ports:
+      - "3000:3000"
+    depends_on:
+      - demasylabs-oracle-database
+    environment:
+      - TZ=Asia/Riyadh
+      - DEMASYLABS_DB_CLIENT=/opt/oracle/instantclient
+      - DEMASYLABS_DB_CONNECT_STRING=oracle-database-23ai:1521/FREE
+      - DEMASYLABS_DB_HOST=oracle-database-23ai
+      - DEMASYLABS_DB_PORT=1521
+      - DEMASYLABS_DB_SERVICE=FREE
+      - DEMASYLABS_DB_SID=FREE
+      - DEMASYLABS_DB_USER=system
+      - DEMASYLABS_DB_PASS=${ORACLE_PWD}
+      - DEMASYLABS_DB_POOL_MIN=1
+      - DEMASYLABS_DB_POOL_MAX=5
+      - DEMASYLABS_DB_POOL_INCREMENT=1
+    env_file:
+      - .env
+    networks:
+      - demasylabs_network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "512M"
+
+networks:
+  demasylabs_network:
+    driver: bridge
+    internal: true
