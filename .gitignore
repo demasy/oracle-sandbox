@@ -1,4 +1,37 @@
+# macOS
 .DS_Store
-libs
+
+# Linux
+*~
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Node
 node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Environment files
+.env
+
+# Editor directories and files
+.vscode/
+.idea/
+
+# Build output
+dist/
+coverage/
+
+# Test output
+test-output/
+
+# Oracle binaries/libs (if not custom code)
+libs
+
+# Optional: lock file (if you want reproducible builds, REMOVE this line)
 package-lock.json
