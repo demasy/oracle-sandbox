@@ -5,8 +5,8 @@ services:
     image: container-registry.oracle.com/database/free:latest
     container_name: oracle-database-23ai
     ports:
-      - "127.0.0.1:1521:1521"
-      - "127.0.0.1:5500:5500"
+      - "1521:1521"
+      - "5500:5500"
     environment:
       - TZ=Asia/Riyadh
       - DATABASE_NAME=DEMASY
@@ -70,4 +70,3 @@ services:
 networks:
   demasylabs_network:
     driver: bridge
-    internal: true
