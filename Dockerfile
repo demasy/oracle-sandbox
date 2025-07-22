@@ -18,8 +18,11 @@ COPY ./app.js ./app.js
 COPY ./src ./src
 COPY ["LICENSE", "./"]
 
-COPY ./src/scripts/database/connect.sh /usr/demasy/scripts/connect.sh
 COPY ./libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient
+
+RUN mkdir -p /usr/demasy/scripts && \
+    curl -L -o /usr/demasy/scripts/connect.sh https://gist.githubusercontent.com/demasy/e913cdc3bf9897bc0374543d416d4d2d/raw/oracle-sqlcl-connect.sh && \
+    chmod +x /usr/demasy/scripts/connect.sh
 
 RUN curl -L -o sqlcl.zip "$SRC_ORACLE_SQLCL" && \
   unzip sqlcl.zip -d /opt/oracle && \
