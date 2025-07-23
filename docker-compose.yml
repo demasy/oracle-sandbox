@@ -57,6 +57,9 @@ services:
       - DEMASYLABS_DB_POOL_MIN=1
       - DEMASYLABS_DB_POOL_MAX=5
       - DEMASYLABS_DB_POOL_INCREMENT=1
+    volumes:
+      - demasylabs_logs:/home/oracle/logs
+    restart: unless-stopped
     env_file:
       - .env
     networks:
@@ -70,3 +73,6 @@ services:
 networks:
   demasylabs_network:
     driver: bridge
+
+volumes:
+  demasylabs_logs:
