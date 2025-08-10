@@ -1,11 +1,22 @@
-# Oracle Database Docker Environment
+# Oracle Database Lab Environment
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white)
 ![Node.js](https://img.shields.io/badge/node.js-6DA55F?style=flat&logo=node.js&logoColor=white)
+[![Database](https://img.shields.io/badge/Database-23c-blue.svg)](https://www.oracle.com/database/free/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/demasy/oracle-database/pulls)
 
-A production-ready Oracle Database environment with a Node.js-based management server, fully containerized using Docker.
+> Welcome to Demasy Labs' Oracle Database Development Environment – your gateway to hands-on database exploration and learning.
+
+A streamlined development environment featuring Oracle Database 23c Free Edition, engineered for educational purposes and practical experimentation. This containerized solution combines Oracle's latest free database offering with an intuitive Node.js management interface, providing a comprehensive platform for:
+
+- 🎓 **Learning**: Ideal for database administration and development tutorials
+- 🔬 **Experimentation**: Perfect sandbox for testing database features and concepts
+- 💻 **Development**: Complete environment for application prototyping and testing
+- 🛠 **Training**: Structured setup for database workshops and courses
+
+Built and maintained by Demasy Labs, this environment ensures a consistent, reproducible database workspace across any development machine.
 
 ## 🎯 Features
 
@@ -61,38 +72,72 @@ The environment consists of two main containerized services:
 | Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
 | Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
 
-## 🚀 Quick Start
+## 🚀 Quick Start Guide
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/demasy/oracle-database.git
-   cd oracle-database
-   ```
+### 📥 Installation
 
-2. **Configure Environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your secure password
-   ```
+##### Clone Repository
+```bash
+git clone https://github.com/demasy/oracle-database.git
+cd oracle-database
+```
 
-3. **Build Services**
-   ```bash
-   docker-compose build --no-cache
-   ```
+### ⚙️ Configuration
 
-4. **Launch Environment**
-   ```bash
-   # Interactive mode
-   docker compose up
+##### Set Up Environment File
+```bash
+# Copy example environment file
+cp .env.example .env
 
-   # Or in detached mode
-   docker compose up -d
-   ```
+# Edit .env file with your settings
+# Required variables:
+# ORACLE_PWD=your_secure_password
+```
 
-5. **Verify Health**
-   ```bash
-   curl http://localhost:3000/health
-   ```
+### 🏗 Build Process
+
+##### Build Docker Services
+```bash
+# Clean build without cache
+docker-compose build --no-cache
+```
+
+### 🌟 Launch
+
+##### Start Services
+```bash
+# Option 1: Interactive Mode (view logs in terminal)
+docker compose up
+
+# Option 2: Detached Mode (run in background)
+docker compose up -d
+```
+
+### ✅ Verification
+
+##### Check Database Status
+```bash
+# Wait for database initialization (approx. 5-10 minutes)
+docker logs -f oracle-database-23ai
+```
+
+##### Verify Server Health
+```bash
+# HTTP endpoint health check
+curl http://localhost:3000/health
+
+# Expected response:
+# {"status":"healthy","timestamp":"YYYY-MM-DD HH:mm:ss"}
+```
+
+##### Test Database Connection
+```bash
+# Connect to management server
+docker exec -it demasy-server bash
+
+# Run SQLcl connection test
+sqlcl
+```
 
 ## ⚙️ Service Management
 
