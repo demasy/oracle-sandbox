@@ -36,11 +36,45 @@ Built and maintained by Demasy Labs, this environment ensures a consistent, repr
 - 4GB+ available memory
 - 10GB+ free disk space
 
-### Environment Configuration
-Create a `.env` file in the project root:
+### 🔐 Environment Configuration
+
+The environment configuration is managed through a `.env` file in the project root directory. This file contains all necessary settings for both the database and management server.
+
+#### Required Variables
 ```bash
-# Required
-ORACLE_PWD=your_secure_password  # Database system password
+# Oracle Database Credentials
+ORACLE_PWD=your_secure_password     # System/SYS password (required)
+
+# Time Zone Configuration
+TZ=Asia/Riyadh                      # Container timezone
+
+# Database Configuration
+DATABASE_NAME=DEMASY                # Oracle database name
+```
+
+#### Optional Variables (Preconfigured)
+```bash
+# Database Connection Settings
+DEMASYLABS_DB_HOST=oracle-database-23ai
+DEMASYLABS_DB_PORT=1521
+DEMASYLABS_DB_SERVICE=FREE
+DEMASYLABS_DB_SID=FREE
+DEMASYLABS_DB_USER=system
+
+# Connection Pool Configuration
+DEMASYLABS_DB_POOL_MIN=1           # Minimum connections
+DEMASYLABS_DB_POOL_MAX=5           # Maximum connections
+DEMASYLABS_DB_POOL_INCREMENT=1     # Connection increment
+
+# Oracle Client Configuration
+DEMASYLABS_DB_CLIENT=/opt/oracle/instantclient
+```
+
+#### Security Notes
+- Store sensitive credentials securely
+- Never commit `.env` file to version control
+- Use strong passwords for database accounts
+- Keep environment files restricted (600 permissions)
 
 ## 🏗 Architecture
 
