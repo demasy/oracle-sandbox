@@ -5,7 +5,11 @@
 ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white)
 [![Database](https://img.shields.io/badge/Database-23c-blue.svg)](https://www.oracle.com/database/free/)
 
+<br>
+
 > Welcome to **Demasy Labs** Oracle Database Development Environment – your gateway to hands-on database exploration and learning.
+
+<br>
 
 A streamlined development environment featuring Oracle Database 23c Free Edition, engineered for educational purposes and practical experimentation. This containerized solution combines Oracle's latest free database offering with an intuitive Node.js management interface, providing a comprehensive platform for:
 
@@ -16,93 +20,7 @@ A streamlined development environment featuring Oracle Database 23c Free Edition
 
 Built and maintained by Demasy Labs, this environment ensures a consistent, reproducible database workspace across any development machine.
 
-## 🎯 Features
-
-- Oracle Free Database 23c
-- Node.js-based management server
-- Oracle SQLcl integration
-- Automated health monitoring
-- Connection pooling
-- Custom networking
-- Resource management
-- Persistent logging
-
-## 📋 Prerequisites
-
-- Docker Engine 24.0.0+
-- Docker Compose v2.20.0+
-- 4GB+ available memory
-- 10GB+ free disk space
-
-### 🔐 Environment Configuration
-
-The environment configuration is managed through a `.env` file in the project root directory. This file contains all necessary settings for both the database and management server.
-
-#### Required Variables
-```bash
-# Oracle Database Credentials
-ORACLE_PWD=your_secure_password     # System/SYS password (required)
-
-# Time Zone Configuration
-TZ=Asia/Riyadh                      # Container timezone
-
-# Database Configuration
-DATABASE_NAME=DEMASY                # Oracle database name
-```
-
-#### Optional Variables (Preconfigured)
-```bash
-# Database Connection Settings
-DEMASYLABS_DB_HOST=oracle-database-23ai
-DEMASYLABS_DB_PORT=1521
-DEMASYLABS_DB_SERVICE=FREE
-DEMASYLABS_DB_SID=FREE
-DEMASYLABS_DB_USER=system
-
-# Connection Pool Configuration
-DEMASYLABS_DB_POOL_MIN=1           # Minimum connections
-DEMASYLABS_DB_POOL_MAX=5           # Maximum connections
-DEMASYLABS_DB_POOL_INCREMENT=1     # Connection increment
-
-# Oracle Client Configuration
-DEMASYLABS_DB_CLIENT=/opt/oracle/instantclient
-```
-
-#### Security Notes
-- Store sensitive credentials securely
-- Never commit `.env` file to version control
-- Use strong passwords for database accounts
-- Keep environment files restricted (600 permissions)
-
-## 🏗 Architecture
-
-The environment consists of two main containerized services:
-
-### Database Service
-`demasylabs-oracle-database`
-
-| Component | Details |
-|-----------|---------|
-| Base Image | Oracle Free Database 23c |
-| Container Name | `oracle-database-23ai` |
-| Database Name | DEMASY |
-| Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
-| Network | 192.168.1.10 |
-| Resources | • CPU: 1 core<br>• Memory: 3GB |
-| Health Check | Every 30s via SQL connectivity test |
-
-### Management Server
-`demasylabs-oracle-server`
-
-| Component | Details |
-|-----------|---------|
-| Base Image | Node.js 20.19.4 |
-| Container Name | `demasy-server` |
-| Exposed Port | 3000 (API & Health Check) |
-| Network | 192.168.1.20 |
-| Resources | • CPU: 1 core<br>• Memory: 512MB |
-| Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
-| Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
+<br>
 
 ## 🚀 Quick Start Guide
 
@@ -116,14 +34,17 @@ cd oracle-database
 
 ### ⚙️ Configuration
 
-##### Set Up Environment File
+##### Configure Environment
 ```bash
-# Copy example environment file
+# 1. Create environment file
 cp .env.example .env
 
-# Edit .env file with your settings
-# Required variables:
-# ORACLE_PWD=your_secure_password
+# 2. Set required values in .env:
+ORACLE_PWD=your_secure_password   # Database admin password
+TZ=Asia/Riyadh                    # Your timezone
+DATABASE_NAME=DEMASY              # Your database name
+
+# Note: Keep this file secure and never commit to git
 ```
 
 ### 🏗 Build Process
@@ -170,6 +91,82 @@ docker exec -it demasy-server bash
 # Run SQLcl connection test
 sqlcl
 ```
+
+<br>
+
+## 🎯 Features
+
+- Oracle Free Database 23c
+- Node.js-based management server
+- Oracle SQLcl integration
+- Automated health monitoring
+- Connection pooling
+- Custom networking
+- Resource management
+- Persistent logging
+
+<br>
+
+## 📋 Prerequisites
+
+- Docker Engine 24.0.0+
+- Docker Compose v2.20.0+
+- 4GB+ available memory
+- 10GB+ free disk space
+
+<br>
+
+<br>
+
+### 🔐 Environment Setup
+
+```bash
+# Copy template and edit
+cp .env.example .env
+
+# Required Settings
+ORACLE_PWD=your_secure_password     # Database system password
+TZ=Asia/Riyadh                      # Timezone
+DATABASE_NAME=DEMASY                # Database name
+
+# Connection Settings (preconfigured)
+DEMASYLABS_DB_HOST=oracle-database-23ai
+DEMASYLABS_DB_PORT=1521
+DEMASYLABS_DB_SERVICE=FREE
+DEMASYLABS_DB_POOL_MAX=5
+```
+
+> 🔒 **Security**: Never commit `.env` file to version control
+
+## 🏗 Architecture
+
+The environment consists of two main containerized services:
+
+### Database Service
+`demasylabs-oracle-database`
+
+| Component | Details |
+|-----------|---------|
+| Base Image | Oracle Free Database 23c |
+| Container Name | `oracle-database-23ai` |
+| Database Name | DEMASY |
+| Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
+| Network | 192.168.1.10 |
+| Resources | • CPU: 1 core<br>• Memory: 3GB |
+| Health Check | Every 30s via SQL connectivity test |
+
+### Management Server
+`demasylabs-oracle-server`
+
+| Component | Details |
+|-----------|---------|
+| Base Image | Node.js 20.19.4 |
+| Container Name | `demasy-server` |
+| Exposed Port | 3000 (API & Health Check) |
+| Network | 192.168.1.20 |
+| Resources | • CPU: 1 core<br>• Memory: 512MB |
+| Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
+| Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
 
 ## ⚙️ Service Management
 
