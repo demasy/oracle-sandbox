@@ -1,9 +1,9 @@
 # Oracle Database Lab Environment
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white)
 [![Database](https://img.shields.io/badge/Database-23c-blue.svg)](https://www.oracle.com/database/free/)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 
 <br>
 
@@ -18,7 +18,7 @@ A streamlined development environment featuring Oracle Database 23c Free Edition
 - 💻 **Development**: Complete environment for application prototyping and testing
 - 🛠 **Training**: Structured setup for database workshops and courses
 
-Built and maintained by Demasy Labs, this environment ensures a consistent, reproducible database workspace across any development machine.
+Built and maintained by **Demasy**, this environment ensures a consistent, reproducible database workspace across any development machine.
 
 <br>
 
