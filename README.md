@@ -3,9 +3,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white)
-![Node.js](https://img.shields.io/badge/node.js-6DA55F?style=flat&logo=node.js&logoColor=white)
 [![Database](https://img.shields.io/badge/Database-23c-blue.svg)](https://www.oracle.com/database/free/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/demasy/oracle-database/pulls)
 
 > Welcome to Demasy Labs' Oracle Database Development Environment – your gateway to hands-on database exploration and learning.
 
@@ -22,7 +20,7 @@ Built and maintained by Demasy Labs, this environment ensures a consistent, repr
 
 - Oracle Free Database 23c
 - Node.js-based management server
-- Oracle SQLcl and APEX integration
+- Oracle SQLcl integration
 - Automated health monitoring
 - Connection pooling
 - Custom networking
