@@ -5,7 +5,7 @@
 ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white)
 [![Database](https://img.shields.io/badge/Database-23c-blue.svg)](https://www.oracle.com/database/free/)
 
-> Welcome to Demasy Labs' Oracle Database Development Environment – your gateway to hands-on database exploration and learning.
+> Welcome to **Demasy Labs** Oracle Database Development Environment – your gateway to hands-on database exploration and learning.
 
 A streamlined development environment featuring Oracle Database 23c Free Edition, engineered for educational purposes and practical experimentation. This containerized solution combines Oracle's latest free database offering with an intuitive Node.js management interface, providing a comprehensive platform for:
 
