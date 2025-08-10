@@ -58,12 +58,39 @@ docker-compose build --no-cache
 ### 🌟 Launch
 
 ##### Start Services
+
+###### Option 1: Launch All Services
 ```bash
-# Option 1: Interactive Mode (view logs in terminal)
+# Start in interactive mode (with logs)
 docker compose up
 
-# Option 2: Detached Mode (run in background)
+# Or in detached mode (background)
 docker compose up -d
+```
+
+###### Option 2: Start Database Only
+```bash
+# Start database in background
+docker compose up -d demasylabs-oracle-database
+
+# View initialization progress
+docker logs -f oracle-database-23ai
+```
+
+###### Option 3: Start Management Server Only
+```bash
+# Start server in background
+docker compose up -d demasylabs-oracle-server
+
+# View server logs
+docker logs -f demasy-server
+```
+
+###### Option 4: Development Mode
+```bash
+# Start database in background, server in foreground
+docker compose up -d demasylabs-oracle-database
+docker compose up demasylabs-oracle-server
 ```
 
 ### ✅ Verification
