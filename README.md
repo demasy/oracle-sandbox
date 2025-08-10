@@ -1,24 +1,35 @@
-# Oracle Database Lab Environment
+# 🛠 Oracle Database Development Environment
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white)
-[![Database](https://img.shields.io/badge/Database-23c-blue.svg)](https://www.oracle.com/database/free/)
+[![Database](https://img.shields.io/badge/Oracle%20DB-23c-blue.svg)](https://www.oracle.com/database/free/)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/demasy/oracle-database/pulls)
+
+<div align="center">
+  <h3>🚀 Explore, Learn, and Build with Oracle Database 23c</h3>
+  <p><i>A modern containerized environment for database development and learning</i></p>
+</div>
 
 <br>
 
-> Welcome to **Demasy Labs** Oracle Database Development Environment – your gateway to hands-on database exploration and learning.
+This development environment combines Oracle Database 23c Free Edition with modern tooling for an optimal learning and development experience:
 
-<br>
+**Core Components:**
+- 📦 **Oracle Database 23c** - Latest features and capabilities
+- 🔧 **Node.js Management Server** - Modern API and monitoring
+- 🐳 **Docker Containers** - Consistent and portable setup
+- ⚡ **SQLcl Integration** - Advanced database interaction tools
 
-A streamlined development environment featuring Oracle Database 23c Free Edition, engineered for educational purposes and practical experimentation. This containerized solution combines Oracle's latest free database offering with an intuitive Node.js management interface, providing a comprehensive platform for:
+**Perfect For:**
+- � **Development** - Rapid prototyping and application development
+- 🔬 **Testing** - Isolated environment for feature testing
+- � **Learning** - Hands-on database administration practice
+- 🏫 **Training** - Structured workshops and courses
+- 🧪 **Research** - Database feature exploration and testing
 
-- 🎓 **Learning**: Ideal for database administration and development tutorials
-- 🔬 **Experimentation**: Perfect sandbox for testing database features and concepts
-- 💻 **Development**: Complete environment for application prototyping and testing
-- 🛠 **Training**: Structured setup for database workshops and courses
-
-Built and maintained by [Demasy](https://github.com/demasy), this environment ensures a consistent, reproducible database workspace across any development machine.
+Designed and maintained by [Demasy](https://github.com/demasy) to provide a consistent, reproducible database workspace across any development machine.
 
 <br>
 
