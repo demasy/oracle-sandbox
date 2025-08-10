@@ -99,17 +99,72 @@ The environment consists of two main containerized services:
 ### Container Operations
 
 #### Database Service
-```bash
-# Lifecycle Management
-docker stop oracle-database-23ai    # Stop the database
-docker start oracle-database-23ai   # Start the database
-docker restart oracle-database-23ai # Restart the database
-docker rm -f oracle-database-23ai   # Remove the container
 
-# Access & Monitoring
-docker exec -it oracle-database-23ai bash  # Shell access
-docker logs oracle-database-23ai    # View logs
-docker logs -f oracle-database-23ai # Follow logs
+##### Stop Database
+```bash
+docker stop oracle-database-23ai
+```
+
+##### Start Database
+```bash
+docker start oracle-database-23ai
+```
+
+##### Restart Database
+```bash
+docker restart oracle-database-23ai
+```
+
+##### Remove Database Container
+```bash
+docker rm -f oracle-database-23ai
+```
+
+##### Access Database Shell
+```bash
+docker exec -it oracle-database-23ai bash
+```
+
+##### View Database Logs
+```bash
+# View all logs
+docker logs oracle-database-23ai
+
+# Follow logs in real-time
+docker logs -f oracle-database-23ai
+
+# View last 100 lines
+docker logs --tail 100 oracle-database-23ai
+
+# View logs with timestamps
+docker logs -t oracle-database-23ai
+```
+
+##### Monitor Database
+```bash
+# View container details
+docker inspect oracle-database-23ai
+
+# View resource usage
+docker stats oracle-database-23ai
+
+# Check container health
+docker inspect --format='{{.State.Health.Status}}' oracle-database-23ai
+```
+
+##### Database Port Status
+```bash
+# Check if database port is listening
+netstat -an | grep 1521
+
+# Check Enterprise Manager Express port
+netstat -an | grep 5500
+```
+
+##### Backup Database
+```bash
+# Create a backup of the container
+docker commit oracle-database-23ai oracle-db-backup:$(date +%Y%m%d)
 ```
 
 #### Management Server
