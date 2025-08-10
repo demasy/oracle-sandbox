@@ -45,18 +45,40 @@ cd oracle-database
 
 ### ⚙️ Configuration
 
-##### Configure Environment
+##### Set Up Environment
 ```bash
-# 1. Create environment file
+# Create configuration file from template
 cp .env.example .env
-
-# 2. Set required values in .env:
-ORACLE_PWD=your_secure_password   # Database admin password
-TZ=Asia/Riyadh                    # Your timezone
-DATABASE_NAME=DEMASY              # Your database name
-
-# Note: Keep this file secure and never commit to git
+chmod 600 .env        # Set secure file permissions
 ```
+
+##### Configure Database
+```bash
+# Required Settings
+ORACLE_PWD=your_secure_password      # Database admin (SYS/SYSTEM) password
+DATABASE_NAME=DEMASY                 # Your database name (max 8 chars)
+
+# Regional Settings
+TZ=Asia/Riyadh                      # Container timezone
+```
+
+##### Optional Settings
+```bash
+# Connection Pool (defaults shown)
+DEMASYLABS_DB_POOL_MIN=1            # Minimum connections
+DEMASYLABS_DB_POOL_MAX=5            # Maximum connections
+DEMASYLABS_DB_POOL_INCREMENT=1      # Growth increment
+
+# Network Settings (defaults shown)
+DEMASYLABS_DB_PORT=1521             # Database listener port
+DEMASYLABS_DB_SERVICE=FREE          # Service name
+```
+
+> 🔒 **Security Notes:**
+> - Use a strong password (min. 8 chars, mixed case, numbers, symbols)
+> - Never commit `.env` to version control
+> - Keep file permissions restricted to owner only
+> - Change default passwords after first login
 
 ### 🏗 Build Process
 
