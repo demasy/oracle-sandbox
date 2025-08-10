@@ -18,7 +18,7 @@ A streamlined development environment featuring Oracle Database 23c Free Edition
 - 💻 **Development**: Complete environment for application prototyping and testing
 - 🛠 **Training**: Structured setup for database workshops and courses
 
-Built and maintained by **Demasy**, this environment ensures a consistent, reproducible database workspace across any development machine.
+Built and maintained by [Demasy](https://github.com/demasy), this environment ensures a consistent, reproducible database workspace across any development machine.
 
 <br>
 
@@ -407,4 +407,19 @@ Note: The health check runs automatically every 30 seconds as part of the contai
 - Subnet: 192.168.1.0/24
 - Database IP: 192.168.1.10
 - Server IP: 192.168.1.20
+
+---
+
+## 👤 Author
+
+**Ahmed El Demasy**
+- GitHub: [@demasy](https://github.com/demasy)
+
+---
+
+<div align="center">
+
+Built with ❤️ by [Demasy](https://github.com/demasy)
+
+</div>
 
