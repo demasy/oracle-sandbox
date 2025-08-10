@@ -113,17 +113,51 @@ docker logs -f oracle-database-23ai # Follow logs
 ```
 
 #### Management Server
-```bash
-# Lifecycle Management
-docker stop demasy-server    # Stop the server
-docker start demasy-server   # Start the server
-docker restart demasy-server # Restart the server
-docker rm -f demasy-server   # Remove the container
 
-# Access & Monitoring
-docker exec -it demasy-server bash  # Shell access
-docker logs demasy-server    # View logs
-docker logs -f demasy-server # Follow logs
+##### Stop Server
+```bash
+docker stop demasy-server
+```
+
+##### Start Server
+```bash
+docker start demasy-server
+```
+
+##### Restart Server
+```bash
+docker restart demasy-server
+```
+
+##### Remove Container
+```bash
+docker rm -f demasy-server
+```
+
+##### Access Shell
+```bash
+docker exec -it demasy-server bash
+```
+
+##### View Logs
+```bash
+# View all logs
+docker logs demasy-server
+
+# Follow logs in real-time
+docker logs -f demasy-server
+
+# View last 100 lines
+docker logs --tail 100 demasy-server
+```
+
+##### Check Container Status
+```bash
+# View container details
+docker inspect demasy-server
+
+# View resource usage
+docker stats demasy-server
 ```
 
 ## 🔌 Database Connectivity
