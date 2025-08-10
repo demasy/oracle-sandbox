@@ -21,8 +21,14 @@ COPY ["LICENSE", "./"]
 COPY ./libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient
 
 RUN mkdir -p /usr/demasy/scripts && \
-    curl -L -o /usr/demasy/scripts/connect.sh https://gist.githubusercontent.com/demasy/e913cdc3bf9897bc0374543d416d4d2d/raw/oracle-sqlcl-connect.sh && \
-    chmod +x /usr/demasy/scripts/connect.sh
+  curl -L -o /usr/demasy/scripts/connect.sh https://gist.githubusercontent.com/demasy/e913cdc3bf9897bc0374543d416d4d2d/raw/oracle-sqlcl-connect.sh && \
+  chmod +x /usr/demasy/scripts/connect.sh
+
+COPY ./src/scripts/diagnostics/healthcheck.sh /usr/demasy/admin/scripts/healthcheck.sh
+
+RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
+
+WORKDIR /usr/demasy/scripts
 
 RUN curl -L -o sqlcl.zip "$SRC_ORACLE_SQLCL" && \
   unzip sqlcl.zip -d /opt/oracle && \
@@ -42,9 +48,16 @@ RUN apt-get update && \
   iputils-ping \
   vim \
   nano \
-  lsof && \
+  lsof \
+  telnet \
+  tcpdump \
+  net-tools \
+  htop \
+  jq \
+  openssl \
+  && npm install -g nodemon && \
   rm -rf /var/lib/apt/lists/*
- 
+
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="$JAVA_HOME/bin:$PATH"
 ENV CLASSPATH="/opt/oracle/sqlcl/lib/*"
@@ -56,10 +69,12 @@ COPY --from=demasylabs-builder /opt/oracle /opt/oracle
 RUN npm install oracledb --build-from-source --unsafe-perm
 
 RUN chmod +x /usr/demasy/scripts/connect.sh
- 
+RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
+
 RUN ln -s /opt/oracle/sqlcl/bin/sql /usr/local/bin/sql
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/oracle
+RUN ln -s /usr/demasy/admin/scripts/healthcheck.sh /usr/local/bin/healthcheck
 
 EXPOSE 3000
 
