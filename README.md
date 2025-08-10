@@ -33,6 +33,35 @@ Designed and maintained by [Demasy](https://github.com/demasy) to provide a cons
 
 <br>
 
+## 📋 Prerequisites
+
+### System Requirements
+- 🖥️ **Hardware**
+  - CPU: 2+ cores recommended
+  - Memory: 4GB+ available RAM
+  - Storage: 10GB+ free disk space
+  - Network: Stable internet connection
+
+### Software Requirements
+- 🐳 **Docker Environment**
+  - Docker Engine 24.0.0 or higher
+  - Docker Compose v2.20.0 or higher
+  - Docker Desktop (recommended for macOS/Windows)
+
+### Development Tools
+- 📝 **Optional but Recommended**
+  - SQLcl or SQL*Plus for database interaction
+  - Visual Studio Code with Oracle extensions
+  - Postman or similar API testing tool
+
+### Port Availability
+The following ports should be available on your system:
+- `1521`: Oracle Database listener
+- `5500`: Enterprise Manager Express
+- `3000`: Management API server
+
+<br>
+
 ## 🚀 Quick Start Guide
 
 ### 📥 Installation
@@ -164,17 +193,6 @@ sqlcl
 - Custom networking
 - Resource management
 - Persistent logging
-
-<br>
-
-## 📋 Prerequisites
-
-- Docker Engine 24.0.0+
-- Docker Compose v2.20.0+
-- 4GB+ available memory
-- 10GB+ free disk space
-
-<br>
 
 <br>
 
@@ -441,14 +459,12 @@ Note: The health check runs automatically every 30 seconds as part of the contai
 - Database IP: 192.168.1.10
 - Server IP: 192.168.1.20
 
----
+<br>
 
 ## 👤 Author
 
 **Ahmed El Demasy**
 - GitHub: [@demasy](https://github.com/demasy)
-
----
 
 <div align="center">
 
