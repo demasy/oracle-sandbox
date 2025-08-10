@@ -26,7 +26,8 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - demasylabs_network
+      demasylabs_network:
+        ipv4_address: 192.168.1.10
     deploy:
       resources:
         limits:
@@ -63,7 +64,8 @@ services:
     env_file:
       - .env
     networks:
-      - demasylabs_network
+      demasylabs_network:
+        ipv4_address: 192.168.1.20
     deploy:
       resources:
         limits:
@@ -73,6 +75,9 @@ services:
 networks:
   demasylabs_network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
 
 volumes:
   demasylabs_logs:
