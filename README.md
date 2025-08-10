@@ -35,30 +35,16 @@ Designed and maintained by [Demasy](https://github.com/demasy) to provide a cons
 
 ## 📋 Prerequisites
 
-### System Requirements
-- 🖥️ **Hardware**
-  - CPU: 2+ cores recommended
-  - Memory: 4GB+ available RAM
-  - Storage: 10GB+ free disk space
-  - Network: Stable internet connection
+### Required
+- Docker Engine 24.0.0+
+- Docker Compose v2.20.0+
+- 4GB RAM, 10GB storage
+- Ports: 1521 (DB), 5500 (EM), 3000 (API)
 
-### Software Requirements
-- 🐳 **Docker Environment**
-  - Docker Engine 24.0.0 or higher
-  - Docker Compose v2.20.0 or higher
-  - Docker Desktop (recommended for macOS/Windows)
-
-### Development Tools
-- 📝 **Optional but Recommended**
-  - SQLcl or SQL*Plus for database interaction
-  - Visual Studio Code with Oracle extensions
-  - Postman or similar API testing tool
-
-### Port Availability
-The following ports should be available on your system:
-- `1521`: Oracle Database listener
-- `5500`: Enterprise Manager Express
-- `3000`: Management API server
+### Recommended
+- SQLcl for database operations
+- Container orchestration experience
+- Basic Oracle Database knowledge
 
 <br>
 
