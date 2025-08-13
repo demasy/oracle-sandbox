@@ -5,12 +5,12 @@ services:
     image: container-registry.oracle.com/database/free:latest
     container_name: oracle-database-23ai
     ports:
-      - "1521:1521"
-      - "5500:5500"
+      - "${ENV_DB_PORT_LISTENER}:1521"
+      - "${ENV_DB_PORT_EM}:5500"
     environment:
-      - TZ=Asia/Riyadh
-      - DATABASE_NAME=DEMASY
-      - ORACLE_PWD=${ORACLE_PWD}
+      - TZ=${ENV_TIME_ZONE}
+      - DATABASE_NAME=${ENV_DB_NAME}
+      - ORACLE_PWD=${ENV_DB_PASSWORD}
     logging:
       driver: "json-file"
       options:
@@ -20,14 +20,14 @@ services:
       test:
         [
           "CMD-SHELL",
-          "echo 'SELECT 1;' | sqlplus -s system/${ORACLE_PWD}@localhost:1521/FREE || exit 1",
+          "echo 'SELECT 1;' | sqlplus -s ${ENV_DB_USER}/${ENV_DB_PASSWORD}@localhost:${ENV_DB_PORT_LISTENER}/${ENV_DB_SID} || exit 1",
         ]
       interval: 30s
       timeout: 10s
       retries: 3
     networks:
       demasylabs_network:
-        ipv4_address: 192.168.1.10
+        ipv4_address: ${ENV_IP_DB_SERVER}
     deploy:
       resources:
         limits:
@@ -46,18 +46,18 @@ services:
     depends_on:
       - demasylabs-oracle-database
     environment:
-      - TZ=Asia/Riyadh
+      - TZ=${ENV_TIME_ZONE}
       - DEMASYLABS_DB_CLIENT=/opt/oracle/instantclient
-      - DEMASYLABS_DB_CONNECT_STRING=oracle-database-23ai:1521/FREE
+      - DEMASYLABS_DB_CONNECT_STRING=oracle-database-23ai:${ENV_DB_PORT_LISTENER}/FREE
       - DEMASYLABS_DB_HOST=oracle-database-23ai
-      - DEMASYLABS_DB_PORT=1521
-      - DEMASYLABS_DB_SERVICE=FREE
-      - DEMASYLABS_DB_SID=FREE
-      - DEMASYLABS_DB_USER=system
-      - DEMASYLABS_DB_PASS=${ORACLE_PWD}
-      - DEMASYLABS_DB_POOL_MIN=1
-      - DEMASYLABS_DB_POOL_MAX=5
-      - DEMASYLABS_DB_POOL_INCREMENT=1
+      - DEMASYLABS_DB_PORT=${ENV_DB_PORT_LISTENER}
+      - DEMASYLABS_DB_SERVICE=${ENV_DB_SERVICE}
+      - DEMASYLABS_DB_SID=${ENV_DB_SID}
+      - DEMASYLABS_DB_USER=${ENV_DB_USER}
+      - DEMASYLABS_DB_PASS=${ENV_DB_PASSWORD}
+      - DEMASYLABS_DB_POOL_MIN=${ENV_DB_POOL_MIN}
+      - DEMASYLABS_DB_POOL_MAX=${ENV_DB_POOL_MAX}
+      - DEMASYLABS_DB_POOL_INCREMENT=${ENV_DB_POOL_INCREMENT}
     volumes:
       - demasylabs_logs:/home/oracle/logs
     restart: unless-stopped
@@ -65,7 +65,7 @@ services:
       - .env
     networks:
       demasylabs_network:
-        ipv4_address: 192.168.1.20
+        ipv4_address: ${ENV_IP_APP_SERVER}
     deploy:
       resources:
         limits:
@@ -77,7 +77,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 192.168.1.0/24
+        - subnet: ${ENV_NETWORK_SUBNET}
 
 volumes:
   demasylabs_logs:
