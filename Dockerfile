@@ -58,8 +58,14 @@ RUN apt-get update && \
   && npm install -g nodemon && \
   rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-ENV PATH="$JAVA_HOME/bin:$PATH"
+# Find and set Java home dynamically for both AMD64 and ARM64
+RUN JAVA_HOME_CANDIDATE=$(find /usr/lib/jvm -name "java-17-openjdk*" -type d | head -1) && \
+    echo "Found Java at: $JAVA_HOME_CANDIDATE" && \
+    echo "export JAVA_HOME=$JAVA_HOME_CANDIDATE" >> /etc/environment && \
+    echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> /etc/environment
+
+# Set JAVA_HOME dynamically based on architecture
+ENV JAVA_HOME_DYNAMIC=/usr/lib/jvm/java-17-openjdk-arm64
 ENV CLASSPATH="/opt/oracle/sqlcl/lib/*"
 
 COPY --from=demasylabs-builder package*.json ./
@@ -71,10 +77,30 @@ RUN npm install oracledb --build-from-source --unsafe-perm
 RUN chmod +x /usr/demasy/scripts/connect.sh
 RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
 
-RUN ln -s /opt/oracle/sqlcl/bin/sql /usr/local/bin/sql
+# Create symbolic links to Oracle tools and scripts
+RUN ln -s /opt/oracle/instantclient/sqlplus /usr/local/bin/sqlplus
+
+# Create a wrapper for SQLcl that detects Java path dynamically for any architecture
+RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
+    echo 'export LD_LIBRARY_PATH=/opt/oracle/instantclient:$LD_LIBRARY_PATH' >> /usr/local/bin/sql && \
+    echo 'DETECTED_JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::")' >> /usr/local/bin/sql && \
+    echo 'export JAVA_HOME="$DETECTED_JAVA_HOME"' >> /usr/local/bin/sql && \
+    echo 'export PATH="$JAVA_HOME/bin:$PATH"' >> /usr/local/bin/sql && \
+    echo 'cd /opt/oracle/sqlcl/bin && exec ./sql "$@"' >> /usr/local/bin/sql && \
+    chmod +x /usr/local/bin/sql
+
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/oracle
 RUN ln -s /usr/demasy/admin/scripts/healthcheck.sh /usr/local/bin/healthcheck
+
+# Verify installation and test SQLcl
+RUN echo "Testing Java installation..." && \
+    java -version && \
+    DETECTED_JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::') && \
+    echo "Detected Java home: $DETECTED_JAVA_HOME" && \
+    echo "Testing SQLcl..." && \
+    cd /opt/oracle/sqlcl/bin && \
+    JAVA_HOME="$DETECTED_JAVA_HOME" ./sql -version
 
 EXPOSE 3000
 

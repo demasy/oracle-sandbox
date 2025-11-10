@@ -1,9 +1,14 @@
-version: "3.8"
-
 services:
   demasylabs-oracle-database:
     image: container-registry.oracle.com/database/free:latest
     container_name: oracle-database-23ai
+    command: >
+      bash -c "
+        mkdir -p /opt/oracle/oradata/FREE/DEMASYLABS_PDB &&
+        chown oracle:oinstall /opt/oracle/oradata/FREE/DEMASYLABS_PDB &&
+        chmod 755 /opt/oracle/oradata/FREE/DEMASYLABS_PDB &&
+        exec /opt/oracle/runOracle.sh
+      "
     ports:
       - "${ENV_DB_PORT_LISTENER}:1521"
       - "${ENV_DB_PORT_EM}:5500"
@@ -20,7 +25,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "echo 'SELECT 1;' | sqlplus -s ${ENV_DB_USER}/${ENV_DB_PASSWORD}@localhost:${ENV_DB_PORT_LISTENER}/${ENV_DB_SID} || exit 1",
+          "echo 'SELECT 1;' | sqlplus -s ${ENV_DB_USER}/${ENV_DB_PASSWORD}@localhost:1521/${ENV_DB_SID} || exit 1",
         ]
       interval: 30s
       timeout: 10s
@@ -31,8 +36,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.0"
-          memory: "3g"
+          cpus: "${ENV_DB_CPU_LIMIT}"
+          memory: "${ENV_DB_MEMORY_LIMIT}"
 
   demasylabs-oracle-server:
     build:
@@ -42,15 +47,15 @@ services:
         SRC_ORACLE_APEX: https://download.oracle.com/otn_software/apex/apex-latest.zip
     container_name: demasy-server
     ports:
-      - "3000:3000"
+      - "${ENV_SERVER_PORT}:3000"
     depends_on:
       - demasylabs-oracle-database
     environment:
       - TZ=${ENV_TIME_ZONE}
       - DEMASYLABS_DB_CLIENT=/opt/oracle/instantclient
-      - DEMASYLABS_DB_CONNECT_STRING=oracle-database-23ai:${ENV_DB_PORT_LISTENER}/FREE
-      - DEMASYLABS_DB_HOST=oracle-database-23ai
-      - DEMASYLABS_DB_PORT=${ENV_DB_PORT_LISTENER}
+      - DEMASYLABS_DB_CONNECT_STRING=${ENV_IP_DB_SERVER}:1521/FREE
+      - DEMASYLABS_DB_HOST=${ENV_IP_DB_SERVER}
+      - DEMASYLABS_DB_PORT=1521
       - DEMASYLABS_DB_SERVICE=${ENV_DB_SERVICE}
       - DEMASYLABS_DB_SID=${ENV_DB_SID}
       - DEMASYLABS_DB_USER=${ENV_DB_USER}
@@ -61,23 +66,25 @@ services:
     volumes:
       - demasylabs_logs:/home/oracle/logs
     restart: unless-stopped
-    env_file:
-      - .env
     networks:
       demasylabs_network:
         ipv4_address: ${ENV_IP_APP_SERVER}
     deploy:
       resources:
         limits:
-          cpus: "1.0"
-          memory: "512M"
+          cpus: "${ENV_SERVER_CPU_LIMIT}"
+          memory: "${ENV_SERVER_MEMORY_LIMIT}"
 
 networks:
   demasylabs_network:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
     ipam:
       config:
         - subnet: ${ENV_NETWORK_SUBNET}
+          gateway: ${ENV_NETWORK_GATEWAY}
 
 volumes:
   demasylabs_logs:
