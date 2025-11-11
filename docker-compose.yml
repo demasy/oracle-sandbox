@@ -44,6 +44,7 @@ services:
       context: ./
       args:
         SRC_ORACLE_SQLCL: https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip
+        SRC_ORACLE_SQLPLUS: https://download.oracle.com/otn_software/linux/instantclient/2390000/instantclient-sqlplus-linux.arm64-23.9.0.25.07.zip
         SRC_ORACLE_APEX: https://download.oracle.com/otn_software/apex/apex-latest.zip
     container_name: demasy-server
     ports:

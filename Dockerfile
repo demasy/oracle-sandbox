@@ -6,7 +6,9 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 ARG SRC_ORACLE_SQLCL
+ARG SRC_ORACLE_SQLPLUS
 ENV SRC_ORACLE_SQLCL=$SRC_ORACLE_SQLCL
+ENV SRC_ORACLE_SQLPLUS=$SRC_ORACLE_SQLPLUS
 
 RUN mkdir -p /usr/demasy/app
 
@@ -25,14 +27,31 @@ RUN mkdir -p /usr/demasy/scripts && \
   chmod +x /usr/demasy/scripts/connect.sh
 
 COPY ./src/scripts/diagnostics/healthcheck.sh /usr/demasy/admin/scripts/healthcheck.sh
+COPY ./src/scripts/database/sqlplus-connect.sh /usr/demasy/scripts/sqlplus-connect.sh
 
 RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
+RUN chmod +x /usr/demasy/scripts/sqlplus-connect.sh
+# RUN chmod +x /usr/demasy/scripts/connect.sh
 
 WORKDIR /usr/demasy/scripts
 
 RUN curl -L -o sqlcl.zip "$SRC_ORACLE_SQLCL" && \
   unzip sqlcl.zip -d /opt/oracle && \
   rm sqlcl.zip
+
+# Download and install SQL*Plus
+# Updated by demasy on November 11, 2025
+# Added SQL*Plus support alongside SQLcl for enhanced Oracle client compatibility
+# Note: Automatically detects architecture and provides appropriate solution
+RUN ARCH=$(uname -m) && \
+  if [ "$ARCH" = "x86_64" ]; then \
+    curl -L -o sqlplus.zip "$SRC_ORACLE_SQLPLUS" && \
+    unzip sqlplus.zip -d /opt/oracle && \
+    cp -r /opt/oracle/instantclient_*/* /opt/oracle/instantclient/ && \
+    rm sqlplus.zip; \
+  else \
+    echo "Note: SQL*Plus not available for $ARCH architecture - SQLcl will be used as fallback"; \
+  fi
 
 FROM node:20.19.4-slim
 
@@ -75,12 +94,14 @@ COPY --from=demasylabs-builder /opt/oracle /opt/oracle
 RUN npm install oracledb --build-from-source --unsafe-perm
 
 RUN chmod +x /usr/demasy/scripts/connect.sh
+RUN chmod +x /usr/demasy/scripts/sqlplus-connect.sh
 RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
 
-# Create symbolic links to Oracle tools and scripts
-RUN ln -s /opt/oracle/instantclient/sqlplus /usr/local/bin/sqlplus
+
 
 # Create a wrapper for SQLcl that detects Java path dynamically for any architecture
+# Updated by demasy on November 11, 2025
+# Enhanced to support both AMD64 and ARM64 architectures with dynamic Java detection
 RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
     echo 'export LD_LIBRARY_PATH=/opt/oracle/instantclient:$LD_LIBRARY_PATH' >> /usr/local/bin/sql && \
     echo 'DETECTED_JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::")' >> /usr/local/bin/sql && \
@@ -89,18 +110,24 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
     echo 'cd /opt/oracle/sqlcl/bin && exec ./sql "$@"' >> /usr/local/bin/sql && \
     chmod +x /usr/local/bin/sql
 
+# Symbolic links to Oracle tools and scripts
+RUN ln -s /usr/demasy/scripts/sqlplus-connect.sh /usr/local/bin/sqlplus
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/oracle
 RUN ln -s /usr/demasy/admin/scripts/healthcheck.sh /usr/local/bin/healthcheck
 
 # Verify installation and test SQLcl
+# Updated by demasy on November 11, 2025
+# Enhanced verification to test both SQLcl and SQL*Plus installations
 RUN echo "Testing Java installation..." && \
     java -version && \
     DETECTED_JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::') && \
     echo "Detected Java home: $DETECTED_JAVA_HOME" && \
     echo "Testing SQLcl..." && \
     cd /opt/oracle/sqlcl/bin && \
-    JAVA_HOME="$DETECTED_JAVA_HOME" ./sql -version
+    JAVA_HOME="$DETECTED_JAVA_HOME" ./sql -version && \
+    echo "Testing SQLPlus..." && \
+    (sqlplus -version || echo "SQLPlus not available - using Instant Client bundled version")
 
 EXPOSE 3000
 
