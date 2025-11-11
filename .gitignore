@@ -35,3 +35,6 @@ libs
 
 # Optional: lock file (if you want reproducible builds, REMOVE this line)
 package-lock.json
+
+# Experment
+src/scripts/experment
