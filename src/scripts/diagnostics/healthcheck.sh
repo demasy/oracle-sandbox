@@ -89,7 +89,7 @@ check_database_health() {
         return 1
     fi
     
-    echo -e "   - Database: ${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_SERVICE}"
+    # echo -e " - Database: ${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_SERVICE}"
     
     # Test database connection using a simple network check first
     local port_check=$(timeout 5 bash -c "</dev/tcp/$DEMASYLABS_DB_HOST/$DEMASYLABS_DB_PORT" 2>/dev/null && echo "OK" || echo "FAILED")
