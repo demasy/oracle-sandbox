@@ -18,6 +18,9 @@ yarn-error.log*
 
 # Environment files
 .env
+.env.example
+check-env.sh
+validate-env.sh
 
 # Editor directories and files
 .vscode/
