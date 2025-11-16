@@ -7,8 +7,12 @@ RUN apt-get update && \
 
 ARG SRC_ORACLE_SQLCL
 ARG SRC_ORACLE_SQLPLUS
+ARG SRC_ORACLE_APEX
+ARG SRC_ORACLE_ORDS
 ENV SRC_ORACLE_SQLCL=$SRC_ORACLE_SQLCL
 ENV SRC_ORACLE_SQLPLUS=$SRC_ORACLE_SQLPLUS
+ENV SRC_ORACLE_APEX=$SRC_ORACLE_APEX
+ENV SRC_ORACLE_ORDS=$SRC_ORACLE_ORDS
 
 RUN mkdir -p /usr/demasy/app
 
@@ -28,9 +32,11 @@ RUN mkdir -p /usr/demasy/scripts && \
 
 COPY ./src/scripts/diagnostics/healthcheck.sh /usr/demasy/admin/scripts/healthcheck.sh
 COPY ./src/scripts/database/sqlplus-connect.sh /usr/demasy/scripts/sqlplus-connect.sh
+COPY ./src/scripts/database/apex /usr/demasy/scripts/database/apex
 
 RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
 RUN chmod +x /usr/demasy/scripts/sqlplus-connect.sh
+RUN chmod +x /usr/demasy/scripts/database/apex/*.sh
 # RUN chmod +x /usr/demasy/scripts/connect.sh
 
 WORKDIR /usr/demasy/scripts
@@ -74,8 +80,11 @@ RUN apt-get update && \
   htop \
   jq \
   openssl \
-  && npm install -g nodemon && \
-  rm -rf /var/lib/apt/lists/*
+  git \
+  && npm install -g nodemon \
+  && npm install -g @modelcontextprotocol/server-github \
+  && npm install -g @gitkraken/mcp-server \
+  && rm -rf /var/lib/apt/lists/*
 
 # Find and set Java home dynamically for both AMD64 and ARM64
 RUN JAVA_HOME_CANDIDATE=$(find /usr/lib/jvm -name "java-17-openjdk*" -type d | head -1) && \
@@ -98,7 +107,6 @@ RUN chmod +x /usr/demasy/scripts/sqlplus-connect.sh
 RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
 
 
-
 # Create a wrapper for SQLcl that detects Java path dynamically for any architecture
 # Updated by demasy on November 11, 2025
 # Enhanced to support both AMD64 and ARM64 architectures with dynamic Java detection
@@ -111,9 +119,14 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
     chmod +x /usr/local/bin/sql
 
 # Symbolic links to Oracle tools and scripts
+# -------------------------------------------- [Oracle Database Tools]
 RUN ln -s /usr/demasy/scripts/sqlplus-connect.sh /usr/local/bin/sqlplus
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/oracle
+# -------------------------------------------- [Oracle APEX Tools]
+RUN ln -s /usr/demasy/scripts/database/apex/install-apex-complete.sh /usr/local/bin/install-apex
+RUN ln -s /usr/demasy/scripts/database/apex/uninstall-apex.sh /usr/local/bin/uninstall-apex
+# -------------------------------------------- [Server scripts]
 RUN ln -s /usr/demasy/admin/scripts/healthcheck.sh /usr/local/bin/healthcheck
 
 # Verify installation and test SQLcl
@@ -129,7 +142,14 @@ RUN echo "Testing Java installation..." && \
     echo "Testing SQLPlus..." && \
     (sqlplus -version || echo "SQLPlus not available - using Instant Client bundled version")
 
+# Create MCP configuration directory
+RUN mkdir -p /root/.mcp
+
+# Copy MCP configuration if exists
+COPY mcp-config.json /root/.mcp/config.json 2>/dev/null || echo '{}' > /root/.mcp/config.json
+
 EXPOSE 3000
+EXPOSE 3001
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1

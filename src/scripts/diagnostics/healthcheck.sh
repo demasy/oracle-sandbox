@@ -153,6 +153,84 @@ check_oracle_clients() {
     fi
 }
 
+# Function to check APEX/ORDS health
+check_apex_health() {
+    echo -e "\e[1mAPEX/ORDS Status:\e[0m"
+    echo -e "${BLUE}$(date '+%Y-%m-%d %H:%M:%S')${NC} Check Oracle APEX and ORDS availability"
+    
+    local apex_url="http://localhost:8080/ords/apex"
+    local ords_running=false
+    local apex_accessible=false
+    
+    # Check if ORDS process is running (check port 8080 since ps may not be available)
+    local port_check=$(netstat -tulpn 2>/dev/null | grep ":8080.*LISTEN" | grep -o "LISTEN")
+    
+    if [ "$port_check" = "LISTEN" ]; then
+        ords_running=true
+        local ords_pid=$(netstat -tulpn 2>/dev/null | grep ":8080.*LISTEN" | awk '{print $NF}' | cut -d'/' -f1)
+        echo -e " - ORDS Process: ${GREEN}✓ RUNNING${NC} (PID: $ords_pid)"
+    else
+        echo -e " - ORDS Process: ${YELLOW}⚠ NOT RUNNING${NC}"
+        echo -e "   ${CYAN}Tip: Start with 'docker exec demasy-server start-ords'${NC}"
+        return 1
+    fi
+    
+    # Check if ORDS port is listening
+    if command -v lsof &> /dev/null; then
+        if lsof -i :8080 > /dev/null 2>&1; then
+            echo -e " - ORDS Port 8080: ${GREEN}✓ LISTENING${NC}"
+        else
+            echo -e " - ORDS Port 8080: ${RED}✗ NOT LISTENING${NC}"
+            return 1
+        fi
+    fi
+    
+    # Check APEX accessibility
+    local apex_response=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "$apex_url" 2>/dev/null)
+    local apex_curl_exit=$?
+    
+    if [ $apex_curl_exit -eq 0 ]; then
+        if [ "$apex_response" -eq 200 ] || [ "$apex_response" -eq 302 ]; then
+            apex_accessible=true
+            echo -e " - APEX Web Interface: ${GREEN}✓ ACCESSIBLE${NC} (HTTP $apex_response)"
+            echo -e "   ${CYAN}URL: http://localhost:8080/ords/apex${NC}"
+        else
+            echo -e " - APEX Web Interface: ${YELLOW}⚠ UNUSUAL RESPONSE${NC} (HTTP $apex_response)"
+        fi
+    else
+        echo -e " - APEX Web Interface: ${RED}✗ NOT ACCESSIBLE${NC}"
+        return 1
+    fi
+    
+    # Check ORDS logs for errors (if log file exists)
+    if [ -f "/tmp/ords.log" ]; then
+        local recent_errors=$(tail -50 /tmp/ords.log 2>/dev/null | grep -i "error\|exception\|failed" | wc -l)
+        if [ "$recent_errors" -gt 0 ]; then
+            echo -e " - ORDS Logs: ${YELLOW}⚠ $recent_errors recent error(s)${NC}"
+            echo -e "   ${CYAN}Check: docker exec demasy-server tail -f /tmp/ords.log${NC}"
+        else
+            echo -e " - ORDS Logs: ${GREEN}✓ NO RECENT ERRORS${NC}"
+        fi
+    fi
+    
+    # Check SQL Developer Web
+    local sdw_url="http://localhost:8080/ords/demasy_dev/_sdw/"
+    local sdw_response=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 3 "$sdw_url" 2>/dev/null)
+    
+    if [ "$sdw_response" -eq 200 ] || [ "$sdw_response" -eq 302 ]; then
+        echo -e " - SQL Developer Web: ${GREEN}✓ ACCESSIBLE${NC}"
+        echo -e "   ${CYAN}URL: http://localhost:8080/ords/demasy_dev/_sdw/${NC}"
+    else
+        echo -e " - SQL Developer Web: ${YELLOW}⚠ CHECK${NC} (HTTP $sdw_response)"
+    fi
+    
+    if [ "$ords_running" = true ] && [ "$apex_accessible" = true ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Function to check system resources
 check_system_resources() {
     echo -e "\e[1mSystem Resources:\e[0m"
@@ -262,6 +340,10 @@ main() {
     
     # 4. Server Health - Application layer
     check_server_health || { overall_status=1; ((component_failures++)); }
+    echo ""
+    
+    # 5. APEX/ORDS Status - Low-code development platform
+    check_apex_health || { overall_status=1; ((component_failures++)); }
     echo ""
     
     # Display summary
