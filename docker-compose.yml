@@ -49,10 +49,12 @@ services:
         SRC_ORACLE_SQLCL: ${ENV_SRC_ORACLE_SQLCL}
         SRC_ORACLE_SQLPLUS: ${ENV_SRC_ORACLE_SQLPLUS}
         SRC_ORACLE_APEX: ${ENV_SRC_ORACLE_APEX}
+        SRC_ORACLE_ORDS: ${ENV_SRC_ORACLE_ORDS}
     container_name: demasy-server
     ports:
       - "${ENV_SERVER_PORT}:3000"
       - "${ENV_APEX_PORT:-8080}:8080" # for Apex
+      - "${ENV_MCP_PORT:-3001}:3001"  # for MCP
     depends_on:
       demasylabs-oracle-database:
         condition: service_healthy
@@ -66,6 +68,8 @@ services:
       - DEMASYLABS_DB_SERVICE=${ENV_DB_SERVICE}
       - DEMASYLABS_DB_SID=${ENV_DB_SID}
       - DEMASYLABS_DB_USER=${ENV_DB_USER}
+      - DEMASYLABS_DB_MCP_USER=${ENV_DB_MCP_USER}
+      - DEMASYLABS_DB_PASSWORD=${ENV_DB_PASSWORD}
       - DEMASYLABS_DB_PASS=${ENV_DB_PASSWORD}
       - DEMASYLABS_DB_POOL_MIN=${ENV_DB_POOL_MIN}
       - DEMASYLABS_DB_POOL_MAX=${ENV_DB_POOL_MAX}

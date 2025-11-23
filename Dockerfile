@@ -32,11 +32,13 @@ RUN mkdir -p /usr/demasy/scripts && \
 
 COPY ./src/scripts/diagnostics/healthcheck.sh /usr/demasy/admin/scripts/healthcheck.sh
 COPY ./src/scripts/database/sqlplus-connect.sh /usr/demasy/scripts/sqlplus-connect.sh
-COPY ./src/scripts/database/apex /usr/demasy/scripts/database/apex
+COPY ./src/scripts/mcp /usr/demasy/scripts/mcp
+COPY ./src/scripts/oracle/database/dev/apex /usr/demasy/scripts/apex
 
 RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
 RUN chmod +x /usr/demasy/scripts/sqlplus-connect.sh
-RUN chmod +x /usr/demasy/scripts/database/apex/*.sh
+RUN chmod +x /usr/demasy/scripts/mcp/*.sh
+RUN chmod +x /usr/demasy/scripts/apex/*.sh
 # RUN chmod +x /usr/demasy/scripts/connect.sh
 
 WORKDIR /usr/demasy/scripts
@@ -44,6 +46,15 @@ WORKDIR /usr/demasy/scripts
 RUN curl -L -o sqlcl.zip "$SRC_ORACLE_SQLCL" && \
   unzip sqlcl.zip -d /opt/oracle && \
   rm sqlcl.zip
+
+# Download APEX and ORDS
+RUN curl -L -o apex.zip "$SRC_ORACLE_APEX" && \
+  unzip apex.zip -d /opt/oracle && \
+  rm apex.zip
+
+RUN curl -L -o ords.zip "$SRC_ORACLE_ORDS" && \
+  unzip ords.zip -d /opt/oracle/ords && \
+  rm ords.zip
 
 # Download and install SQL*Plus
 # Updated by demasy on November 11, 2025
@@ -82,8 +93,6 @@ RUN apt-get update && \
   openssl \
   git \
   && npm install -g nodemon \
-  && npm install -g @modelcontextprotocol/server-github \
-  && npm install -g @gitkraken/mcp-server \
   && rm -rf /var/lib/apt/lists/*
 
 # Find and set Java home dynamically for both AMD64 and ARM64
@@ -123,9 +132,16 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
 RUN ln -s /usr/demasy/scripts/sqlplus-connect.sh /usr/local/bin/sqlplus
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/oracle
+# -------------------------------------------- [MCP Tools]
+RUN ln -s /usr/demasy/scripts/mcp/start-mcp-sqlcl.sh /usr/local/bin/start-mcp
 # -------------------------------------------- [Oracle APEX Tools]
-RUN ln -s /usr/demasy/scripts/database/apex/install-apex-complete.sh /usr/local/bin/install-apex
-RUN ln -s /usr/demasy/scripts/database/apex/uninstall-apex.sh /usr/local/bin/uninstall-apex
+RUN ln -s /usr/demasy/scripts/apex/apex-install.sh /usr/local/bin/apex-install
+RUN ln -s /usr/demasy/scripts/apex/apex-start.sh /usr/local/bin/apex-start
+RUN ln -s /usr/demasy/scripts/apex/apex-stop.sh /usr/local/bin/apex-stop
+RUN ln -s /usr/demasy/scripts/apex/apex-uninstall.sh /usr/local/bin/apex-uninstall
+RUN ln -s /usr/demasy/scripts/apex/apex-install-internal.sh /usr/local/bin/install-apex
+
+
 # -------------------------------------------- [Server scripts]
 RUN ln -s /usr/demasy/admin/scripts/healthcheck.sh /usr/local/bin/healthcheck
 
@@ -144,9 +160,6 @@ RUN echo "Testing Java installation..." && \
 
 # Create MCP configuration directory
 RUN mkdir -p /root/.mcp
-
-# Copy MCP configuration if exists
-COPY mcp-config.json /root/.mcp/config.json 2>/dev/null || echo '{}' > /root/.mcp/config.json
 
 EXPOSE 3000
 EXPOSE 3001
