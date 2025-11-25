@@ -1182,14 +1182,6 @@ When reporting issues, please include:
 - Expected vs actual behavior
 - Relevant configuration files (sanitized)
 
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 <br>. 
 
 ## Contributors
@@ -1215,4 +1207,10 @@ We welcome you to join and contribute to the Oracle FNDLOAD Scripts. If you are 
 <p align="center">
 Code with love ❤️ in Egypt
 </p>
+
+<br>
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
