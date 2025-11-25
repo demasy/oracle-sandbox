@@ -21,13 +21,15 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_step() { echo -e "${CYAN}[STEP]${NC} $1"; }
 
-# Configuration
-DB_HOST="192.168.1.110"
-DB_PORT="1521"
-DB_SERVICE="FREEPDB1"
-SYS_PASSWORD="Demasy1986"
-APEX_PASSWORD="Demasy1986"
-APEX_EMAIL="admin@demasy.com"
+# Configuration - Use environment variables (required)
+DB_HOST="${DEMASYLABS_DB_HOST}"
+DB_PORT="${DEMASYLABS_DB_PORT}"
+DB_SERVICE="${DEMASYLABS_DB_SERVICE}"
+SYS_PASSWORD="${DEMASYLABS_DB_PASSWORD}"
+APEX_ADMIN_USERNAME="${DEMASYLABS_APEX_ADMIN_USERNAME}"
+APEX_PASSWORD="${DEMASYLABS_APEX_ADMIN_PASSWORD}"
+APEX_EMAIL="${DEMASYLABS_APEX_EMAIL}"
+APEX_WORKSPACE="${DEMASYLABS_APEX_DEFAULT_WORKSPACE}"
 
 echo ""
 echo "=================================================================="
@@ -185,7 +187,7 @@ log_info "Running APEX installation (please wait, this takes 3-5 minutes)..."
 log_info "Monitor progress in another terminal: docker exec demasy-server tail -f /tmp/apex_install.log"
 
 # Run installation from APEX directory (CRITICAL: cd is required)
-(cd /opt/oracle/apex && sql sys/Demasy1986@//192.168.1.110:1521/FREEPDB1 as sysdba @/opt/oracle/apex/install_apex.sql) > /tmp/apex_install.log 2>&1 &
+(cd /opt/oracle/apex && sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba @/opt/oracle/apex/install_apex.sql) > /tmp/apex_install.log 2>&1 &
 APEX_PID=$!
 
 # Show progress dots while installation runs
@@ -229,52 +231,54 @@ fi
 ################################################################################
 log_info "Step 5: Configuring APEX and creating/updating ADMIN user..."
 
-
 # Always recreate and unlock ADMIN user with correct password
-sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba << 'EOSQL'
+sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba <<EOSQL
 ALTER SESSION SET CONTAINER=FREEPDB1;
 
 BEGIN
-    -- Set workspace context
+    -- Set workspace context to INTERNAL (always exists)
     APEX_UTIL.SET_WORKSPACE('INTERNAL');
     APEX_UTIL.SET_SECURITY_GROUP_ID(10);
+    
     -- Remove existing ADMIN user if exists
     BEGIN
-        APEX_UTIL.REMOVE_USER(p_user_name => 'ADMIN');
-        DBMS_OUTPUT.PUT_LINE('Removed existing ADMIN user');
+        APEX_UTIL.REMOVE_USER(p_user_name => '${APEX_ADMIN_USERNAME}');
+        DBMS_OUTPUT.PUT_LINE('Removed existing ${APEX_ADMIN_USERNAME} user');
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('No existing ADMIN user to remove (this is ok)');
+            DBMS_OUTPUT.PUT_LINE('No existing ${APEX_ADMIN_USERNAME} user to remove (this is ok)');
     END;
+    
     -- Create fresh ADMIN user with correct credentials
     APEX_UTIL.CREATE_USER(
-        p_user_name => 'ADMIN',
-        p_email_address => 'admin@demasy.com',
-        p_web_password => 'Demasy1986',
+        p_user_name => '${APEX_ADMIN_USERNAME}',
+        p_email_address => '${APEX_EMAIL}',
+        p_web_password => '${APEX_PASSWORD}',
         p_developer_privs => 'ADMIN:CREATE:DATA_LOADER:EDIT:HELP:MONITOR:SQL',
         p_change_password_on_first_use => 'N'
     );
+    
     COMMIT;
-    DBMS_OUTPUT.PUT_LINE('ADMIN user created successfully');
+    DBMS_OUTPUT.PUT_LINE('${APEX_ADMIN_USERNAME} user created successfully in INTERNAL workspace');
 END;
 /
 
 -- Unlock all APEX/ORDS user accounts with standard password
 ALTER USER APEX_PUBLIC_USER ACCOUNT UNLOCK;
-ALTER USER APEX_PUBLIC_USER IDENTIFIED BY Demasy1986;
+ALTER USER APEX_PUBLIC_USER IDENTIFIED BY ${APEX_PASSWORD};
 ALTER USER APEX_PUBLIC_ROUTER ACCOUNT UNLOCK;
 ALTER USER APEX_240200 ACCOUNT UNLOCK;
 GRANT CREATE SESSION TO APEX_PUBLIC_USER;
 
 -- Verify ADMIN user was created correctly
-SELECT 'ADMIN User Status: ' || user_name || ' (Admin: ' || is_admin || ', Locked: ' || account_locked || ')' AS status
+SELECT 'User Status: ' || user_name || ' (Admin: ' || is_admin || ', Locked: ' || account_locked || ')' AS status
 FROM apex_workspace_apex_users 
-WHERE workspace_name = 'INTERNAL' AND user_name = 'ADMIN';
+WHERE workspace_name = 'INTERNAL' AND user_name = '${APEX_ADMIN_USERNAME}';
 
 EXIT
 EOSQL
 
-log_success "APEX configured with ADMIN user (Workspace: INTERNAL, Password: Demasy1986)"
+log_success "APEX configured with ${APEX_ADMIN_USERNAME} user (Workspace: INTERNAL, Password: ${APEX_PASSWORD})"
 
 ################################################################################
 # STEP 6: Configure APEX REST
@@ -364,8 +368,8 @@ if [ "${ORDS_INSTALLED}" = "0" ]; then
 --feature-rest-enabled-sql true \
 --feature-sdw true << EOINPUT 2>&1 | tee /tmp/ords_install.log
 ${SYS_PASSWORD}
-Demasy1986
-Demasy1986
+${APEX_PASSWORD}
+${APEX_PASSWORD}
 EOINPUT
     
     # Check if installation succeeded
@@ -639,7 +643,7 @@ BEGIN
         WHERE username IN ('APEX_PUBLIC_USER','APEX_PUBLIC_ROUTER','APEX_240200','ORDS_PUBLIC_USER','ORDS_METADATA')
     ) LOOP
         BEGIN
-            EXECUTE IMMEDIATE 'ALTER USER ' || r.username || ' IDENTIFIED BY Demasy1986';
+            EXECUTE IMMEDIATE 'ALTER USER ' || r.username || ' IDENTIFIED BY ${APEX_PASSWORD}';
             EXECUTE IMMEDIATE 'ALTER USER ' || r.username || ' ACCOUNT UNLOCK';
             DBMS_OUTPUT.PUT_LINE('✓ Reset & unlocked: ' || r.username);
         EXCEPTION
@@ -868,7 +872,7 @@ echo ""
 echo "🔐 Login Credentials:"
 echo "  ─────────────────────────────────────────────────────────────"
 echo "  Workspace: INTERNAL"
-echo "  Username:  ADMIN"
+echo "  Username:  ${APEX_ADMIN_USERNAME}"
 echo "  Password:  ${APEX_PASSWORD}"
 echo "  Email:     ${APEX_EMAIL}"
 echo ""

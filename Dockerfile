@@ -135,12 +135,11 @@ RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/oracle
 # -------------------------------------------- [MCP Tools]
 RUN ln -s /usr/demasy/scripts/mcp/start-mcp-sqlcl.sh /usr/local/bin/start-mcp
 # -------------------------------------------- [Oracle APEX Tools]
-RUN ln -s /usr/demasy/scripts/apex/apex-install.sh /usr/local/bin/apex-install
+RUN ln -s /usr/demasy/scripts/apex/apex-install-internal.sh /usr/local/bin/apex-install
+RUN ln -s /usr/demasy/scripts/apex/apex-install-internal.sh /usr/local/bin/install-apex
 RUN ln -s /usr/demasy/scripts/apex/apex-start.sh /usr/local/bin/apex-start
 RUN ln -s /usr/demasy/scripts/apex/apex-stop.sh /usr/local/bin/apex-stop
 RUN ln -s /usr/demasy/scripts/apex/apex-uninstall.sh /usr/local/bin/apex-uninstall
-RUN ln -s /usr/demasy/scripts/apex/apex-install-internal.sh /usr/local/bin/install-apex
-
 
 # -------------------------------------------- [Server scripts]
 RUN ln -s /usr/demasy/admin/scripts/healthcheck.sh /usr/local/bin/healthcheck
