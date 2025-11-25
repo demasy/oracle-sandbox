@@ -1190,16 +1190,29 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+<br>. 
+
+## Contributors
+
+| Author | GitHub & LinkedIn account |
+| :-  | :---- |
+| Ahmed El-Demasy (Original Author) | <a href="https://github.com/demasy">Github</a> & <a href="https://www.linkedin.com/in/demasy">LinkedIn</a> |
 <br>
 
-## 👤 Author
+ ### Contributing to the Oracle Database Free on Docker.
+We welcome you to join and contribute to the Oracle FNDLOAD Scripts. If you are interested in helping, please don’t hesitate to contact on e-mail: founder@demasy.io
 
-**Ahmed El Demasy**
-- GitHub: [@demasy](https://github.com/demasy)
+<br>
 
-<div align="center">
+###### Suggestions & Issues
+> If you find any issues or have a great idea in mind, please create an issue on <a href="https://github.com/demasy/oracle-database/issues">GitHub</a>.
 
-Built with ❤️ by [Demasy](https://github.com/demasy)
+</br>
 
-</div>
+<!--
+![Made with love in Egypt](https://madewithlove.now.sh/in?heart=true&template=for-the-badge)
+-->
+<p align="center">
+Code with love ❤️ in Egypt
+</p>
 
