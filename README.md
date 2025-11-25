@@ -1160,7 +1160,7 @@ We welcome you to join and contribute to the Oracle FNDLOAD Scripts. If you are 
 ![Made with love in Egypt](https://madewithlove.now.sh/in?heart=true&template=for-the-badge)
 -->
 <p align="center">
-Code with love ❤️ in Egypt
+Code with love ❤️ in Egypt for the Oracle development community.
 </p>
 
 <br>
