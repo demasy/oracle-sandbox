@@ -38,9 +38,9 @@ A production-ready, fully containerized Oracle Database 23ai development environ
 ### Architecture Highlights
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                   Docker Environment                     │
-│                                                          │
+┌───────────────────────────────────────────────────────┐
+│                   Docker Environment                  │
+│                                                       │
 │  ┌──────────────────┐         ┌──────────────────┐    │
 │  │  Management      │         │  Oracle Database │    │
 │  │  Server          │◄────────┤  23ai Free       │    │
@@ -52,8 +52,8 @@ A production-ready, fully containerized Oracle Database 23ai development environ
 │  │                  │         │  - 5500 (EM)     │    │
 │  │  Port: 3000      │         │  - 8080 (ORDS)   │    │
 │  └──────────────────┘         └──────────────────┘    │
-│         192.168.1.20                 192.168.1.10      │
-└─────────────────────────────────────────────────────────┘
+│      192.168.1.20                192.168.1.10         │
+└───────────────────────────────────────────────────────┘
 ```
 
 ---
