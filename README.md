@@ -1,170 +1,301 @@
-# 🛠 Oracle Database Development Environment
+# Oracle Database Development Environment
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white)
-[![Database](https://img.shields.io/badge/Oracle%20DB-23c-blue.svg)](https://www.oracle.com/database/free/)
+[![Database](https://img.shields.io/badge/Oracle%20DB-23ai-blue.svg)](https://www.oracle.com/database/free/)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org)
+[![APEX](https://img.shields.io/badge/APEX-24.2-red.svg)](https://apex.oracle.com)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/demasy/oracle-database/pulls)
 
-<div align="center">
-  <h3>🚀 Explore, Learn, and Build with Oracle Database 23c</h3>
-  <p><i>A modern containerized environment for database development and learning</i></p>
-</div>
+> **Enterprise-grade containerized Oracle Database environment for development, testing, and learning.**
+
+## Overview
+
+A production-ready, fully containerized Oracle Database 23ai development environment that combines enterprise database capabilities with modern development tools. This solution provides developers, DBAs, and learners with an isolated, reproducible workspace for Oracle Database development.
+
+### Key Features
+
+- **Oracle Database 23ai Free** - Latest Oracle technology with AI-powered features
+- **Oracle APEX 24.2.0** - Low-code application development platform
+- **Oracle ORDS 25.3** - RESTful web services and SQL Developer Web
+- **Oracle SQLcl 25.3** - Modern command-line SQL interface
+- **Node.js Management Layer** - Health monitoring and API endpoints
+- **Docker-based Architecture** - Consistent deployment across environments
+- **Instant Client 23.7** - Oracle database connectivity libraries
+
+### Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| **Application Development** | Build and test Oracle-backed applications in an isolated environment |
+| **Database Administration** | Practice DBA tasks, test procedures, and learn administration |
+| **APEX Development** | Develop low-code applications with full APEX capabilities |
+| **CI/CD Integration** | Automated testing pipelines with consistent database state |
+| **Training & Education** | Hands-on Oracle Database learning without complex setup |
+| **Proof of Concept** | Rapid prototyping and feature validation |
+
+### Architecture Highlights
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   Docker Environment                     │
+│                                                          │
+│  ┌──────────────────┐         ┌──────────────────┐    │
+│  │  Management      │         │  Oracle Database │    │
+│  │  Server          │◄────────┤  23ai Free       │    │
+│  │  (Node.js)       │         │  + APEX 24.2     │    │
+│  │                  │         │  + ORDS 25.3     │    │
+│  │  - Health Check  │         │                  │    │
+│  │  - API Endpoints │         │  Ports:          │    │
+│  │  - SQLcl Client  │         │  - 1521 (DB)     │    │
+│  │                  │         │  - 5500 (EM)     │    │
+│  │  Port: 3000      │         │  - 8080 (ORDS)   │    │
+│  └──────────────────┘         └──────────────────┘    │
+│         192.168.1.20                 192.168.1.10      │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
 
 <br>
 
-This development environment combines Oracle Database 23c Free Edition with modern tooling for an optimal learning and development experience:
+## Table of Contents
 
-**Core Components:**
-- 📦 **Oracle Database 23c** - Latest features and capabilities
-- 🔧 **Node.js Management Server** - Modern API and monitoring
-- 🐳 **Docker Containers** - Consistent and portable setup
-- ⚡ **SQLcl Integration** - Advanced database interaction tools
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Oracle APEX Setup](#oracle-apex-setup)
+- [Database Connectivity](#database-connectivity)
+- [Service Management](#service-management)
+- [Monitoring & Logs](#monitoring--logs)
+- [Configuration Reference](#configuration-reference)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
 
-**Perfect For:**
-- � **Development** - Rapid prototyping and application development
-- 🔬 **Testing** - Isolated environment for feature testing
-- � **Learning** - Hands-on database administration practice
-- 🏫 **Training** - Structured workshops and courses
-- 🧪 **Research** - Database feature exploration and testing
+---
 
-Designed and maintained by [Demasy](https://github.com/demasy) to provide a consistent, reproducible database workspace across any development machine.
+## Prerequisites
+
+### System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **Docker Engine** | 24.0.0+ | Latest stable |
+| **Docker Compose** | v2.20.0+ | Latest stable |
+| **RAM** | 4 GB | 8 GB or more |
+| **Storage** | 10 GB | 20 GB or more |
+| **CPU** | 2 cores | 4 cores or more |
+
+### Required Ports
+
+Ensure the following ports are available:
+
+| Port | Service | Protocol |
+|------|---------|----------|
+| 1521 | Oracle Database Listener | TCP |
+| 5500 | Enterprise Manager Express | HTTP |
+| 3000 | Management API | HTTP |
+| 8080 | Oracle ORDS/APEX | HTTP |
+
+### Software Prerequisites
+
+- Git for repository cloning
+- Text editor for configuration files
+- Modern web browser for APEX and EM access
+- Basic understanding of Docker and containerization
+
+### Network Requirements
+
+- Internet connection for initial setup (downloading images)
+- Subnet 192.168.1.0/24 available for container networking
+- No firewall blocking Docker container communication
 
 <br>
 
-## 📋 Prerequisites
+## Quick Start
 
-### Required
-- Docker Engine 24.0.0+
-- Docker Compose v2.20.0+
-- 4GB RAM, 10GB storage
-- Ports: 1521 (DB), 5500 (EM), 3000 (API)
+### Step 1: Clone Repository
 
-### Recommended
-- SQLcl for database operations
-- Container orchestration experience
-- Basic Oracle Database knowledge
-
-<br>
-
-## 🚀 Quick Start Guide
-
-### 📥 Installation
-
-##### Clone Repository
 ```bash
 git clone https://github.com/demasy/oracle-database.git
 cd oracle-database
 ```
 
-### ⚙️ Configuration
+### Step 2: Environment Configuration
 
-##### Set Up Environment
+#### Create Environment File
+
 ```bash
-# Create configuration file from template
 cp .env.example .env
-chmod 600 .env        # Set secure file permissions
+chmod 600 .env
 ```
 
-##### Configure Database
-```bash
-# Required Settings
-ORACLE_PWD=your_secure_password      # Database admin (SYS/SYSTEM) password
-DATABASE_NAME=DEMASY                 # Your database name (max 8 chars)
+#### Configure Required Variables
 
-# Regional Settings
-TZ=Asia/Riyadh                      # Container timezone
+Edit `.env` and set the following required parameters:
+
+```bash
+# Database Configuration (Required)
+ORACLE_PWD=YourSecurePassword123!    # ⚠️ CHANGE THIS! Minimum 8 characters
+DATABASE_NAME=DEMASY                 # Maximum 8 characters
+TZ=Asia/Riyadh                       # Your timezone
+
+# APEX Configuration (Required for APEX setup)
+ENV_APEX_ADMIN_USERNAME=ADMIN
+ENV_APEX_ADMIN_PASSWORD=YourAPEXPassword123  # ⚠️ CHANGE THIS!
+ENV_APEX_EMAIL=your-email@example.com       # ⚠️ CHANGE THIS!
+ENV_APEX_DEFAULT_WORKSPACE=INTERNAL
 ```
 
-##### Optional Settings
-```bash
-# Connection Pool (defaults shown)
-DEMASYLABS_DB_POOL_MIN=1            # Minimum connections
-DEMASYLABS_DB_POOL_MAX=5            # Maximum connections
-DEMASYLABS_DB_POOL_INCREMENT=1      # Growth increment
+#### Optional Configuration
 
-# Network Settings (defaults shown)
-DEMASYLABS_DB_PORT=1521             # Database listener port
-DEMASYLABS_DB_SERVICE=FREE          # Service name
+```bash
+# Connection Pool Settings
+DEMASYLABS_DB_POOL_MIN=1
+DEMASYLABS_DB_POOL_MAX=5
+DEMASYLABS_DB_POOL_INCREMENT=1
+
+# Network Configuration
+DEMASYLABS_DB_HOST=oracle-database-23ai
+DEMASYLABS_DB_PORT=1521
+DEMASYLABS_DB_SERVICE=FREE
 ```
 
-> 🔒 **Security Notes:**
-> - Use a strong password (min. 8 chars, mixed case, numbers, symbols)
-> - Never commit `.env` to version control
-> - Keep file permissions restricted to owner only
-> - Change default passwords after first login
+> **Security Best Practices:**
+> - Use strong passwords with mixed case, numbers, and symbols
+> - Never commit `.env` files to version control
+> - Restrict file permissions to owner only (`chmod 600`)
+> - Rotate passwords regularly in production environments
+> - Use different credentials for each environment
 
-### 🏗 Build Process
+### Step 3: Build Services
 
-##### Build Docker Services
+Build the Docker images with a clean build:
+
 ```bash
-# Clean build without cache
 docker-compose build --no-cache
 ```
 
-### 🌟 Launch
+**Build time:** Approximately 10-15 minutes (first build)
 
-##### Start Services
+### Step 4: Start Services
 
-###### Option 1: Launch All Services
+#### Option A: Production Mode (Recommended)
+
+Start all services in detached mode:
+
 ```bash
-# Start in interactive mode (with logs)
-docker compose up
-
-# Or in detached mode (background)
-docker compose up -d
+docker-compose up -d
 ```
 
-###### Option 2: Start Database Only
-```bash
-# Start database in background
-docker compose up -d demasylabs-oracle-database
+#### Option B: Development Mode
 
-# View initialization progress
+Start with real-time logs for debugging:
+
+```bash
+docker-compose up
+```
+
+To stop, press `Ctrl+C` and run:
+```bash
+docker-compose down
+```
+
+#### Option C: Selective Services
+
+Start only specific services:
+
+```bash
+# Database only
+docker-compose up -d demasylabs-oracle-database
+
+# Management server only
+docker-compose up -d demasylabs-oracle-server
+```
+
+### Step 5: Verify Installation
+
+#### 1. Check Container Status
+
+```bash
+docker ps --filter "name=oracle-database-23ai" --filter "name=demasy-server"
+```
+
+**Expected output:**
+```
+CONTAINER ID   IMAGE                    STATUS                    PORTS
+abc123def456   oracle-database:23ai     Up 2 minutes (healthy)    0.0.0.0:1521->1521/tcp
+def456ghi789   demasy-server:latest     Up 2 minutes (healthy)    0.0.0.0:3000->3000/tcp
+```
+
+#### 2. Wait for Database Initialization
+
+Monitor database startup (takes 5-10 minutes on first run):
+
+```bash
 docker logs -f oracle-database-23ai
 ```
 
-###### Option 3: Start Management Server Only
-```bash
-# Start server in background
-docker compose up -d demasylabs-oracle-server
+**Look for:** `DATABASE IS READY TO USE!`
 
-# View server logs
-docker logs -f demasy-server
+#### 3. Verify Health Endpoints
+
+Test the management server:
+
+```bash
+curl http://localhost:3000/health
 ```
 
-###### Option 4: Development Mode
-```bash
-# Start database in background, server in foreground
-docker compose up -d demasylabs-oracle-database
-docker compose up demasylabs-oracle-server
+**Expected response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-11-25T12:00:00.000Z"
+}
 ```
 
-### ✅ Verification
+#### 4. Test Database Connection
 
-##### Check Database Status
+Access the management container:
+
 ```bash
-# Wait for database initialization (approx. 5-10 minutes)
-docker logs -f oracle-database-23ai
+docker exec -it demasy-server bash
 ```
 
-##### Verify Server Health
+Connect to the database:
+
 ```bash
-# HTTP endpoint health check
+sqlcl
+```
+
+**Expected output:**
+```
+SQLcl: Release 25.3 Production
+Connected to: Oracle Database 23ai Free
+```
+
+### Quick Start Summary
+
+```bash
+# 1. Clone and setup
+git clone https://github.com/demasy/oracle-database.git
+cd oracle-database
+cp .env.example .env
+# Edit .env with your configuration
+
+# 2. Build and start
+docker-compose build --no-cache
+docker-compose up -d
+
+# 3. Verify
+docker ps
+docker logs -f oracle-database-23ai  # Wait for "READY TO USE"
 curl http://localhost:3000/health
 
-# Expected response:
-# {"status":"healthy","timestamp":"YYYY-MM-DD HH:mm:ss"}
-```
-
-##### Test Database Connection
-```bash
-# Connect to management server
-docker exec -it demasy-server bash
-
-# Run SQLcl connection test
-sqlcl
+# 4. Connect
+docker exec -it demasy-server sqlcl
 ```
 
 <br>
@@ -353,161 +484,711 @@ docker inspect demasy-server
 docker stats demasy-server
 ```
 
-## 🎨 Oracle APEX
+---
 
-This environment includes **Oracle APEX 24.2.0** (Application Express) - Oracle's low-code development platform.
+## Oracle APEX Setup
 
-### Quick APEX Setup
+Oracle Application Express (APEX) 24.2.0 is included as a low-code development platform for building web applications.
+
+### Installation
+
+Run the one-time installation command:
 
 ```bash
-# Install APEX (one-time, takes 5-7 minutes)
 docker exec demasy-server install-apex
-
-# Start ORDS (if stopped)
-docker exec demasy-server start-ords
-
-# Stop ORDS
-docker exec demasy-server stop-ords
 ```
 
-### Access APEX
+**Installation includes:**
+- Oracle APEX 24.2.0 core components
+- Oracle REST Data Services (ORDS) 25.3
+- SQL Developer Web interface
+- Static image serving configuration
+- Workspace and admin user setup
 
-After installation, access these URLs:
+**Installation time:** Approximately 5-7 minutes
 
-**Application Builder:**
-- URL: http://localhost:8080/ords/f?p=4550:1
-- Workspace: `INTERNAL`
-- Username: `ADMIN`
-- Password: `Demasy1986`
+**Installation process:**
+1. Creates required tablespaces (APEX, APEX_FILES)
+2. Installs APEX core schema and metadata
+3. Configures APEX REST APIs
+4. Installs and configures ORDS
+5. Creates ADMIN user in INTERNAL workspace
+6. Starts ORDS listener on port 8080
 
-**SQL Developer Web:**
-- URL: http://localhost:8080/ords/sql-developer/
-- Username: `ADMIN`
-- Password: `Demasy1986`
+### Access Endpoints
 
-**APEX Administration:**
-- URL: http://localhost:8080/ords/apex_admin
-- Username: `ADMIN`
-- Password: `Demasy1986`
+After successful installation:
 
-### APEX Management
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| **Application Builder** | http://localhost:8080/ords/f?p=4550:1 | Workspace: `INTERNAL`<br>Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
+| **SQL Developer Web** | http://localhost:8080/ords/sql-developer/ | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
+| **APEX Administration** | http://localhost:8080/ords/apex_admin | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
+
+> **Security Note:** All passwords are configured in the `.env` file. Ensure you change all default passwords before deployment. Never commit `.env` to version control.
+
+### APEX Management Commands
 
 ```bash
-# View ORDS logs
-docker exec demasy-server tail -f /tmp/ords.log
-
-# Check ORDS status (port 8080)
+# Check ORDS status
 docker exec demasy-server netstat -tulnp | grep :8080
 
-# Restart ORDS
+# View ORDS logs in real-time
+docker exec demasy-server tail -f /tmp/ords.log
+
+# Restart ORDS service
 docker exec demasy-server stop-ords
 docker exec demasy-server start-ords
 ```
 
-### Available APEX Commands
+### Available Commands
 
-Once the container is built, these commands are available:
+| Command | Description | Usage |
+|---------|-------------|-------|
+| `install-apex` | One-time APEX + ORDS installation | `docker exec demasy-server install-apex` |
+| `start-ords` | Start ORDS listener | `docker exec demasy-server start-ords` |
+| `stop-ords` | Stop ORDS listener | `docker exec demasy-server stop-ords` |
+
+### Troubleshooting APEX
+
+#### ORDS Not Starting
+
 ```bash
-docker exec demasy-server install-apex    # Install APEX + ORDS (one-time setup)
-docker exec demasy-server start-ords      # Start ORDS server
-docker exec demasy-server stop-ords       # Stop ORDS server
+# Check for port conflicts
+docker exec demasy-server netstat -tulnp | grep :8080
+
+# View detailed logs
+docker exec demasy-server cat /tmp/ords.log
 ```
 
-📖 **Full Guide:** See [APEX-GUIDE.md](APEX-GUIDE.md) for complete documentation
+#### Images Not Loading
+
+```bash
+# Verify images directory
+docker exec demasy-server ls -la /tmp/i | wc -l
+# Should show ~27000 files
+
+# Restart ORDS if needed
+docker exec demasy-server stop-ords && docker exec demasy-server start-ords
+```
+
+#### Login Issues
+
+- Verify you're using workspace: `INTERNAL` (case-sensitive)
+- Ensure username is `ADMIN` (all uppercase)
+- Check ORDS is running on port 8080
+
+For comprehensive APEX documentation, see [APEX-GUIDE.md](APEX-GUIDE.md)
 
 <br>
 
-## 🔌 Database Connectivity
+---
+
+## Database Connectivity
 
 ### Connection Methods
 
-#### 1. SQL*Plus (Traditional)
-```sql
-sqlplus / as sysdba
+#### Method 1: Oracle SQLcl (Recommended)
+
+Modern command-line interface with enhanced features:
+
+```bash
+# From host machine (requires container access)
+docker exec -it demasy-server sqlcl
+
+# Or use the preconfigured alias
+docker exec -it demasy-server oracle
 ```
 
-#### 2. Oracle SQLcl (Modern CLI)
-Multiple connection options available:
+**Features:**
+- Auto-completion and command history
+- Modern SQL formatting
+- Built-in scripting capabilities
+- No separate installation required
 
-##### a. Using Preconfigured Aliases (Recommended)
+#### Method 2: SQL Command
+
+Direct SQL connection using the `sql` wrapper:
+
 ```bash
-# From management server container
-sqlcl     # Primary connection command
-oracle    # Alternative alias
+docker exec -it demasy-server sql
 ```
 
-##### b. Using Direct SQL Command
+#### Method 3: Custom Connection String
+
+For specific user connections:
+
 ```bash
-sql       # Uses symlink in /usr/local/bin
+# Syntax
+docker exec -it demasy-server bash -c "sql username/password@hostname:port/service"
+
+# Example - Connect as SYSTEM
+docker exec -it demasy-server bash -c "sql system/${ORACLE_PWD}@oracle-database-23ai:1521/FREE"
+
+# Example - Connect as SYSDBA
+docker exec -it demasy-server bash -c "sql sys/${ORACLE_PWD}@oracle-database-23ai:1521/FREE as sysdba"
 ```
 
-##### c. Using Custom Connection String
+#### Method 4: SQL*Plus (Traditional)
+
+For compatibility with legacy scripts:
+
 ```bash
-sql ${username}/${password}@localhost:1521/FREE as sysdba
+docker exec -it demasy-server sqlplus
+
+# Or with connection string
+docker exec -it oracle-database-23ai sqlplus / as sysdba
 ```
 
 ### Connection Parameters
 
-| Parameter | Environment Variable | Default Value |
-|-----------|---------------------|---------------|
-| Host | DEMASYLABS_DB_HOST | oracle-database-23ai |
-| Port | DEMASYLABS_DB_PORT | 1521 |
-| Service | DEMASYLABS_DB_SERVICE | FREE |
-| SID | DEMASYLABS_DB_SID | FREE |
-| User | DEMASYLABS_DB_USER | system |
-| Password | ORACLE_PWD | *from .env* |
+| Parameter | Environment Variable | Default Value | Description |
+|-----------|---------------------|---------------|-------------|
+| **Hostname** | `DEMASYLABS_DB_HOST` | `oracle-database-23ai` | Database container name |
+| **Port** | `DEMASYLABS_DB_PORT` | `1521` | Listener port |
+| **Service Name** | `DEMASYLABS_DB_SERVICE` | `FREE` | Database service |
+| **SID** | `DEMASYLABS_DB_SID` | `FREE` | System identifier |
+| **PDB Name** | - | `FREEPDB1` | Pluggable database |
+| **Admin User** | - | `SYS` / `SYSTEM` | Administrative accounts |
+| **Admin Password** | `ORACLE_PWD` | *from .env* | Set during setup |
 
-### Connection Pool Settings
+### Connection Pool Configuration
 
-| Parameter | Value | Environment Variable |
-|-----------|-------|---------------------|
-| Minimum Size | 1 | DEMASYLABS_DB_POOL_MIN |
-| Maximum Size | 5 | DEMASYLABS_DB_POOL_MAX |
-| Increment | 1 | DEMASYLABS_DB_POOL_INCREMENT |
-- Hostname: localhost (or 192.168.1.10)
-- Port: 1521
-- Service Name: FREE
-- SID: FREE
-- Default User: system
-- Database Name: DEMASY
+For Node.js applications using the management server:
 
-## Monitoring and Logs
-- Database logs are managed with JSON file driver
-  - Max size: 10MB per file
-  - Max files: 3
-- Application logs are stored in the `demasylabs_logs` volume
-- Health checks run every 30 seconds for both services
+| Setting | Environment Variable | Default | Description |
+|---------|---------------------|---------|-------------|
+| **Minimum Connections** | `DEMASYLABS_DB_POOL_MIN` | `1` | Minimum pool size |
+| **Maximum Connections** | `DEMASYLABS_DB_POOL_MAX` | `5` | Maximum pool size |
+| **Pool Increment** | `DEMASYLABS_DB_POOL_INCREMENT` | `1` | Growth increment |
 
-### Health Check
-You can check the server's health status in two ways:
+### Connection String Formats
 
-1. Using HTTP endpoint:
+#### EZ Connect Format
+```
+hostname:port/service_name
+oracle-database-23ai:1521/FREE
+```
+
+#### TNS Format
+```
+(DESCRIPTION=
+  (ADDRESS=(PROTOCOL=TCP)(HOST=oracle-database-23ai)(PORT=1521))
+  (CONNECT_DATA=(SERVICE_NAME=FREE))
+)
+```
+
+#### JDBC Format
+```
+jdbc:oracle:thin:@oracle-database-23ai:1521:FREE
+```
+
+### External Connections
+
+To connect from outside the Docker network:
+
+```bash
+# Update hostname to localhost or host IP
+sql username/password@localhost:1521/FREE
+
+# Or using IP address
+sql username/password@192.168.1.10:1521/FREE
+```
+
+### Common Connection Examples
+
+```bash
+# Connect as SYS with SYSDBA privileges
+docker exec -it demasy-server bash -c "sql sys/${ORACLE_PWD}@oracle-database-23ai:1521/FREE as sysdba"
+
+# Connect to pluggable database
+docker exec -it demasy-server bash -c "sql system/${ORACLE_PWD}@oracle-database-23ai:1521/FREEPDB1"
+
+# Connect with specific schema
+docker exec -it demasy-server bash -c "sql your_user/your_password@oracle-database-23ai:1521/FREE"
+```
+
+---
+
+## Monitoring & Logs
+
+### Health Monitoring
+
+#### Automated Health Checks
+
+Both containers implement automated health monitoring:
+
+- **Check Interval:** Every 30 seconds
+- **Timeout:** 5 seconds
+- **Start Period:** 10 seconds
+- **Retries:** 3 attempts before marking unhealthy
+
+#### Health Check Methods
+
+**Method 1: HTTP Endpoint**
+
 ```bash
 curl http://localhost:3000/health
 ```
-or open in your browser:
-- http://localhost:3000/health
 
-2. Using command line:
-```bash
-# Connect to the server container
-docker exec -it demasy-server bash
-
-# Run health check
-healthcheck
+**Response (Healthy):**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-11-25T12:00:00.000Z",
+  "uptime": 3600,
+  "database": "connected"
+}
 ```
-Expected output if healthy:
+
+**Method 2: Docker Inspect**
+
+```bash
+docker inspect --format='{{.State.Health.Status}}' demasy-server
+docker inspect --format='{{.State.Health.Status}}' oracle-database-23ai
+```
+
+**Method 3: Built-in Command**
+
+```bash
+docker exec demasy-server healthcheck
+```
+
+**Expected output:**
 ```
 Server is healthy.
 ```
 
-Note: The health check runs automatically every 30 seconds as part of the container's health monitoring.
+### Log Management
 
-## Network Configuration
-- Custom network: `demasylabs_network`
-- Subnet: 192.168.1.0/24
-- Database IP: 192.168.1.10
-- Server IP: 192.168.1.20
+#### Database Logs
+
+**Configuration:**
+- **Driver:** JSON file
+- **Max Size:** 10MB per file
+- **Max Files:** 3 (rotation)
+- **Total Size:** ~30MB
+
+**Access database logs:**
+
+```bash
+# View all logs
+docker logs oracle-database-23ai
+
+# Follow logs in real-time
+docker logs -f oracle-database-23ai
+
+# View last 100 lines
+docker logs --tail 100 oracle-database-23ai
+
+# View with timestamps
+docker logs -t oracle-database-23ai
+
+# Filter by time
+docker logs --since 1h oracle-database-23ai
+docker logs --since 2025-11-25T10:00:00 oracle-database-23ai
+```
+
+#### Management Server Logs
+
+```bash
+# View application logs
+docker logs demasy-server
+
+# Follow logs
+docker logs -f demasy-server
+
+# View with grep filter
+docker logs demasy-server 2>&1 | grep ERROR
+```
+
+#### Application Logs Volume
+
+Persistent logs are stored in the `demasylabs_logs` volume:
+
+```bash
+# Inspect volume
+docker volume inspect demasylabs_logs
+
+# Access logs from host
+docker run --rm -v demasylabs_logs:/logs alpine ls -la /logs
+```
+
+#### APEX/ORDS Logs
+
+```bash
+# ORDS server logs
+docker exec demasy-server tail -f /tmp/ords.log
+
+# APEX installation logs
+docker exec demasy-server tail -f /tmp/apex_install.log
+
+# ORDS configuration logs
+docker exec demasy-server cat /tmp/ords_install.log
+```
+
+### Resource Monitoring
+
+#### Real-time Resource Usage
+
+```bash
+# Monitor all containers
+docker stats
+
+# Monitor specific container
+docker stats oracle-database-23ai
+
+# One-time snapshot
+docker stats --no-stream
+```
+
+**Output includes:**
+- CPU usage percentage
+- Memory usage and limit
+- Memory percentage
+- Network I/O
+- Block I/O
+- Process count
+
+#### Container Details
+
+```bash
+# Full container inspection
+docker inspect oracle-database-23ai
+
+# Get specific information
+docker inspect --format='{{.State.Status}}' oracle-database-23ai
+docker inspect --format='{{.NetworkSettings.IPAddress}}' oracle-database-23ai
+```
+
+### Performance Monitoring
+
+#### Database Performance
+
+```bash
+# Connect to database
+docker exec -it oracle-database-23ai sqlplus / as sysdba
+
+# Run performance queries
+SELECT * FROM V$SESSION WHERE USERNAME IS NOT NULL;
+SELECT * FROM V$SQL WHERE ELAPSED_TIME > 1000000;
+SELECT * FROM V$SYSTEM_EVENT;
+```
+
+#### Process Monitoring
+
+```bash
+# List running processes in container
+docker exec demasy-server ps aux
+
+# Check ORDS process
+docker exec demasy-server netstat -tulnp | grep :8080
+
+# Monitor Java processes
+docker exec demasy-server jps -v
+```
+
+### Alert Configuration
+
+#### Email Notifications (Optional)
+
+Configure Docker to send alerts for container events:
+
+```yaml
+# docker-compose.yml
+services:
+  demasylabs-oracle-database:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "production"
+```
+
+#### Log Aggregation
+
+For production environments, consider integrating with:
+- **ELK Stack** (Elasticsearch, Logstash, Kibana)
+- **Grafana + Prometheus**
+- **Splunk**
+- **DataDog**
+
+---
+
+## Configuration Reference
+
+### Network Configuration
+
+| Component | Value | Description |
+|-----------|-------|-------------|
+| **Network Name** | `demasylabs_network` | Custom Docker bridge network |
+| **Subnet** | `192.168.1.0/24` | Network CIDR |
+| **Database IP** | `192.168.1.10` | Static IP for database container |
+| **Server IP** | `192.168.1.20` | Static IP for management server |
+| **Gateway** | `192.168.1.1` | Network gateway |
+
+### Environment Variables Reference
+
+#### Database Configuration
+
+```bash
+# Core Settings
+ORACLE_PWD=                    # Required: Database system password (⚠️ CHANGE THIS!)
+DATABASE_NAME=DEMASY           # Database name (max 8 chars)
+TZ=Asia/Riyadh                # Timezone
+
+# Connection Settings
+DEMASYLABS_DB_HOST=oracle-database-23ai
+DEMASYLABS_DB_PORT=1521
+DEMASYLABS_DB_SERVICE=FREE
+DEMASYLABS_DB_SID=FREE
+DEMASYLABS_DB_USER=system
+DEMASYLABS_DB_PASSWORD=${ORACLE_PWD}
+```
+
+#### APEX Configuration
+
+```bash
+ENV_APEX_ADMIN_USERNAME=ADMIN
+ENV_APEX_ADMIN_PASSWORD=        # Required: APEX admin password (⚠️ CHANGE THIS!)
+ENV_APEX_EMAIL=                 # Required: Your email address (⚠️ CHANGE THIS!)
+ENV_APEX_DEFAULT_WORKSPACE=INTERNAL
+ENV_APEX_HOME=/opt/oracle/apex
+ENV_APEX_IMAGES_DIR=/tmp/i
+```
+
+#### Connection Pool
+
+```bash
+DEMASYLABS_DB_POOL_MIN=1
+DEMASYLABS_DB_POOL_MAX=5
+DEMASYLABS_DB_POOL_INCREMENT=1
+```
+
+#### ORDS Configuration
+
+```bash
+ENV_ORDS_PORT=8080
+ENV_ORDS_HOME=/opt/oracle/ords
+ENV_ORDS_CONFIG=/opt/oracle/ords/config
+ENV_ORDS_JDBC_MIN_LIMIT=3
+ENV_ORDS_JDBC_MAX_LIMIT=20
+```
+
+### Container Resource Limits
+
+#### Database Container
+
+```yaml
+resources:
+  limits:
+    cpus: '1'
+    memory: 3GB
+  reservations:
+    cpus: '0.5'
+    memory: 2GB
+```
+
+#### Management Server
+
+```yaml
+resources:
+  limits:
+    cpus: '1'
+    memory: 512MB
+  reservations:
+    cpus: '0.25'
+    memory: 256MB
+```
+
+### Volume Mounts
+
+| Volume | Mount Point | Purpose |
+|--------|-------------|---------|
+| `demasylabs_logs` | `/home/oracle/logs` | Application logs |
+| Database datafiles | `/opt/oracle/oradata` | Database files (internal) |
+| APEX images | `/tmp/i` | APEX static assets |
+| ORDS config | `/opt/oracle/ords/config` | ORDS configuration |
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+#### Port Already in Use
+
+**Symptom:** Container fails to start with port binding error
+
+**Solution:**
+```bash
+# Check what's using the port
+lsof -i :1521
+netstat -an | grep 1521
+
+# Stop conflicting service or change port in docker-compose.yml
+```
+
+#### Database Initialization Timeout
+
+**Symptom:** Database takes longer than 10 minutes to initialize
+
+**Solution:**
+```bash
+# Increase timeout in healthcheck
+# Check available resources
+docker system df
+docker system prune  # Free up space
+
+# Monitor initialization
+docker logs -f oracle-database-23ai
+```
+
+#### APEX Installation Fails
+
+**Symptom:** `install-apex` command returns errors
+
+**Solution:**
+```bash
+# Check database is running
+docker exec -it oracle-database-23ai sqlplus / as sysdba
+
+# Review installation logs
+docker exec demasy-server cat /tmp/apex_install.log
+
+# Verify connectivity
+docker exec demasy-server ping oracle-database-23ai
+```
+
+#### Connection Refused
+
+**Symptom:** Cannot connect to database
+
+**Solution:**
+```bash
+# Verify database is healthy
+docker ps --filter "name=oracle-database-23ai"
+
+# Check listener status
+docker exec oracle-database-23ai lsnrctl status
+
+# Verify network connectivity
+docker exec demasy-server ping oracle-database-23ai
+
+# Check firewall rules
+sudo iptables -L
+```
+
+#### Images Not Loading in APEX
+
+**Symptom:** APEX UI shows missing images
+
+**Solution:**
+```bash
+# Verify images directory
+docker exec demasy-server ls -la /tmp/i | wc -l
+
+# Should show ~27000 files
+# If empty, reinstall APEX or restart ORDS
+
+docker exec demasy-server stop-ords
+docker exec demasy-server start-ords
+```
+
+### Getting Help
+
+1. **Check Logs:** Always start with container logs
+2. **Verify Configuration:** Double-check `.env` file
+3. **Resource Check:** Ensure sufficient CPU/memory
+4. **Network Test:** Verify container connectivity
+5. **GitHub Issues:** Open an issue with logs and configuration
+
+### Diagnostic Commands
+
+```bash
+# System information
+docker version
+docker-compose version
+docker info
+
+# Container diagnostics
+docker ps -a
+docker inspect <container_id>
+docker logs <container_id>
+
+# Network diagnostics
+docker network ls
+docker network inspect demasylabs_network
+
+# Volume diagnostics
+docker volume ls
+docker volume inspect demasylabs_logs
+
+# Resource usage
+docker stats --no-stream
+df -h
+free -m
+```
+
+---
+
+## Contributing
+
+We welcome contributions! Please follow these guidelines:
+
+### How to Contribute
+
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Commit your changes** (`git commit -m 'Add amazing feature'`)
+4. **Push to the branch** (`git push origin feature/amazing-feature`)
+5. **Open a Pull Request**
+
+### Contribution Guidelines
+
+- Follow existing code style and conventions
+- Update documentation for any new features
+- Add tests for new functionality
+- Ensure all tests pass before submitting PR
+- Keep commits atomic and well-described
+
+### Development Setup
+
+```bash
+# Clone your fork
+git clone https://github.com/your-username/oracle-database.git
+
+# Add upstream remote
+git remote add upstream https://github.com/demasy/oracle-database.git
+
+# Create feature branch
+git checkout -b feature/your-feature
+
+# Make changes and test
+docker-compose build
+docker-compose up -d
+
+# Submit PR
+git push origin feature/your-feature
+```
+
+### Reporting Issues
+
+When reporting issues, please include:
+- Environment details (OS, Docker version)
+- Complete error messages and logs
+- Steps to reproduce
+- Expected vs actual behavior
+- Relevant configuration files (sanitized)
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
 
 <br>
 
