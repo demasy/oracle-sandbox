@@ -353,6 +353,92 @@ docker inspect demasy-server
 docker stats demasy-server
 ```
 
+## 🎨 Oracle APEX
+
+This environment includes **Oracle APEX 24.2.0** (Application Express) - Oracle's low-code development platform.
+
+### Quick APEX Setup
+
+#### Option 1: From Container (Recommended)
+```bash
+# Install APEX (one-time, takes 5-7 minutes)
+docker exec demasy-server apex-install
+
+# Start APEX/ORDS
+docker exec demasy-server apex-start
+
+# Stop APEX/ORDS
+docker exec demasy-server apex-stop
+
+# Uninstall APEX
+docker exec demasy-server apex-uninstall
+```
+
+#### Option 2: From Host
+```bash
+# Navigate to APEX scripts directory
+cd src/scripts/oracle/database/dev/apex
+
+# Install APEX (one-time, takes 5-7 minutes)
+./apex-install.sh
+
+# Start APEX/ORDS
+./apex-start.sh
+
+# Stop APEX/ORDS
+./apex-stop.sh
+
+# Uninstall APEX
+./apex-uninstall.sh
+```
+
+### Access APEX
+
+After installation, access these URLs:
+
+**APEX App Builder:**
+- URL: http://localhost:8080/ords/apex
+- Workspace: DEMASY_LABS
+- Username: DEMASY_ADMIN
+- Password: DemasyApex1986!
+
+**SQL Developer Web:**
+- URL: http://localhost:8080/ords/demasy_dev/_sdw/
+- Username: DEMASY_DEV
+- Password: DemasyApex1986!
+
+### APEX Management
+
+```bash
+# View ORDS logs
+docker exec demasy-server tail -f /tmp/ords.log
+
+# Check ORDS status
+docker exec demasy-server pgrep -f ords.war
+
+# Restart ORDS (from container)
+docker exec demasy-server apex-stop
+docker exec demasy-server apex-start
+
+# Or from host
+cd src/scripts/oracle/database/dev/apex
+./apex-stop.sh && ./apex-start.sh
+```
+
+### Available APEX Commands in Container
+
+Once the container is built, these commands are available:
+```bash
+docker exec demasy-server apex-install    # Install APEX
+docker exec demasy-server apex-start      # Start ORDS
+docker exec demasy-server apex-stop       # Stop ORDS
+docker exec demasy-server apex-uninstall  # Uninstall APEX
+```
+
+📖 **Full Guide:** See [APEX-GUIDE.md](APEX-GUIDE.md) for complete documentation
+
+<br>
+
 ## 🔌 Database Connectivity
 
 ### Connection Methods
