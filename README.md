@@ -76,7 +76,6 @@ A fully containerized Oracle Database 23ai **development and training environmen
 - [Configuration Reference](#configuration-reference)
 - [Troubleshooting](#troubleshooting)
 - [Change Log](#change-log)
-- [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -304,47 +303,13 @@ curl http://localhost:3000/health
 docker exec -it demasy-server sqlcl
 ```
 
-<br>
+---
 
-## 🎯 Features
-
-- Oracle Free Database 23c
-- Node.js-based management server
-- Oracle SQLcl integration
-- Automated health monitoring
-- Connection pooling
-- Custom networking
-- Resource management
-- Persistent logging
-
-<br>
-
-### 🔐 Environment Setup
-
-```bash
-# Copy template and edit
-cp .env.example .env
-
-# Required Settings
-ORACLE_PWD=your_secure_password     # Database system password
-TZ=Asia/Riyadh                      # Timezone
-DATABASE_NAME=DEMASY                # Database name
-
-# Connection Settings (preconfigured)
-DEMASYLABS_DB_HOST=oracle-database-23ai
-DEMASYLABS_DB_PORT=1521
-DEMASYLABS_DB_SERVICE=FREE
-DEMASYLABS_DB_POOL_MAX=5
-```
-
-> 🔒 **Security**: Never commit `.env` file to version control
-
-## 🏗 Architecture
+## Architecture
 
 The environment consists of two main containerized services:
 
-### Database Service
-`demasylabs-oracle-database`
+### Database Service (`demasylabs-oracle-database`)
 
 | Component | Details |
 |-----------|---------|
@@ -356,8 +321,7 @@ The environment consists of two main containerized services:
 | Resources | • CPU: 1 core<br>• Memory: 3GB |
 | Health Check | Every 30s via SQL connectivity test |
 
-### Management Server
-`demasylabs-oracle-server`
+### Management Server (`demasylabs-oracle-server`)
 
 | Component | Details |
 |-----------|---------|
@@ -369,7 +333,9 @@ The environment consists of two main containerized services:
 | Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
 | Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
 
-## ⚙️ Service Management
+---
+
+## Service Management
 
 ### Container Operations
 
@@ -585,8 +551,6 @@ docker exec demasy-server stop-ords && docker exec demasy-server start-ords
 - Check ORDS is running on port 8080
 
 For comprehensive APEX documentation, see [APEX-GUIDE.md](APEX-GUIDE.md)
-
-<br>
 
 ---
 
@@ -1170,120 +1134,8 @@ When reporting issues, please include:
 
 ## Change Log
 
-All notable changes to this project will be documented in this section.
-
-### Version 2.0.0 (2025-11-25)
-
-#### 🎉 Major Release
-
-**Added:**
-- ✨ Complete documentation overhaul with professional structure
-- ✨ Comprehensive `.env` file documentation with inline comments
-- ✨ Enhanced security warnings and best practices throughout
-- ✨ Development & training environment designation
-- ✨ Model Context Protocol (MCP) support for AI agent integration
-- ✨ Detailed APEX 24.2.0 installation and configuration guide
-- ✨ ORDS 25.3 REST services integration
-- ✨ SQLcl 25.3 modern command-line interface
-- ✨ Health monitoring and diagnostic commands
-- ✨ Resource monitoring and performance tuning guides
-- ✨ Connection pool configuration documentation
-- ✨ Troubleshooting section with common issues
-
-**Changed:**
-- 🔄 Repository title to "Oracle Database 23ai Free - Docker Development Kit"
-- 🔄 Updated all documentation to emphasize development/training use only
-- 🔄 Improved Quick Start guide with 5-step verification process
-- 🔄 Enhanced architecture diagrams and network configuration
-- 🔄 Standardized IP addresses to .10/.20 scheme
-- 🔄 Resource limits adjusted to recommended values (2GB DB, 1GB Server)
-
-**Security:**
-- 🔒 All hardcoded passwords removed from examples
-- 🔒 `.env.example` sanitized for safe public GitHub commit
-- 🔒 Security best practices documented throughout
-- 🔒 File permission guidelines added (chmod 600)
-- 🔒 Production deployment warnings prominently displayed
-
-**Fixed:**
-- 🐛 APEX workspace configuration (INTERNAL vs custom workspaces)
-- 🐛 Script file naming consistency (apex-install.sh)
-- 🐛 Documentation references to environment variables
-- 🐛 Port configuration clarity and conflict prevention
-
-### Version 1.0.0 (Initial Release)
-
-**Added:**
-- 🚀 Initial Oracle Database 23ai Free Edition containerization
-- 🚀 Docker Compose multi-container setup
-- 🚀 Basic APEX installation scripts
-- 🚀 Node.js management server
-- 🚀 Health check endpoints
-- 🚀 Basic documentation
-
----
-
-## Roadmap
-
-### 🎯 Planned Features & Improvements
-
-#### Short Term (Q1 2026)
-
-| Priority | Feature | Status | Description |
-|----------|---------|--------|-------------|
-| **HIGH** | 🔐 Enhanced Security Module | 📋 Planned | Advanced security scanning, vulnerability checks, and hardening scripts |
-| **HIGH** | 📊 Performance Dashboard | 📋 Planned | Web-based dashboard for real-time monitoring and metrics visualization |
-| **MEDIUM** | 🧪 Automated Testing Suite | 📋 Planned | Integration tests, smoke tests, and continuous validation |
-| **MEDIUM** | 📚 Video Tutorials | 📋 Planned | YouTube tutorial series for setup and common tasks |
-| **MEDIUM** | 🌐 Multi-Platform Support | 🔄 In Progress | ARM64/Apple Silicon optimization and Windows WSL2 support |
-
-#### Medium Term (Q2-Q3 2026)
-
-| Priority | Feature | Status | Description |
-|----------|---------|--------|-------------|
-| **HIGH** | 🔄 Backup & Restore Tools | 📋 Planned | Automated backup scripts with point-in-time recovery |
-| **HIGH** | 🚀 One-Click Deployment | 📋 Planned | Simplified setup script for instant deployment |
-| **MEDIUM** | 📦 Sample Applications | 📋 Planned | Pre-built APEX applications for learning and demonstration |
-| **MEDIUM** | 🔗 External Tool Integration | 📋 Planned | SQL Developer, DBeaver, and Oracle Data Modeler integration guides |
-| **LOW** | 🎨 Custom Themes | 📋 Planned | APEX theme templates and UI customizations |
-
-#### Long Term (Q4 2026 and beyond)
-
-| Priority | Feature | Status | Description |
-|----------|---------|--------|-------------|
-| **HIGH** | ☁️ Cloud Deployment Guides | 💡 Idea | AWS, Azure, and GCP deployment templates |
-| **MEDIUM** | 🔄 CI/CD Pipeline Templates | 💡 Idea | GitHub Actions, GitLab CI, Jenkins integration examples |
-| **MEDIUM** | 📊 Data Migration Tools | 💡 Idea | Tools for migrating data from other databases |
-| **MEDIUM** | 🌍 Localization Support | 💡 Idea | Multi-language documentation and APEX templates |
-| **LOW** | 🤖 AI-Powered Query Assistant | 💡 Idea | Natural language to SQL conversion with Claude/GPT integration |
-
-### 🎯 Community Requests
-
-> Have a feature request? [Open an issue](https://github.com/demasy/oracle-database/issues) with the label `enhancement`!
-
-#### Top Community Requests (Vote with 👍)
-
-1. **GraphQL API Layer** - GraphQL endpoint for modern API access
-2. **Docker Swarm / Kubernetes** - Orchestration templates for scaling
-3. **Load Balancing** - Multi-node setup with connection pooling
-4. **Advanced Monitoring** - Prometheus/Grafana integration
-5. **Schema Version Control** - Liquibase/Flyway integration
-
-### 📅 Version Release Schedule
-
-- **v2.1.0** - January 2026 - Performance Dashboard & Enhanced Security
-- **v2.2.0** - March 2026 - Automated Testing Suite & Video Tutorials
-- **v2.5.0** - June 2026 - Backup/Restore Tools & Sample Applications
-- **v3.0.0** - December 2026 - Major architectural improvements
-
-### 🤝 How to Contribute to Roadmap
-
-We welcome community input on our roadmap:
-
-1. **Vote on Features** - React with 👍 on GitHub issues labeled `enhancement`
-2. **Suggest New Features** - Open a new issue with detailed use case
-3. **Sponsor Development** - Priority support for sponsored features
-4. **Submit Pull Requests** - Implement features and submit PRs
+| Version | Date | Type | Description |
+|---------|------|------|-------------|
 
 ---
 
