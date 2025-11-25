@@ -359,37 +359,15 @@ This environment includes **Oracle APEX 24.2.0** (Application Express) - Oracle'
 
 ### Quick APEX Setup
 
-#### Option 1: From Container (Recommended)
 ```bash
 # Install APEX (one-time, takes 5-7 minutes)
-docker exec demasy-server apex-install
+docker exec demasy-server install-apex
 
-# Start APEX/ORDS
-docker exec demasy-server apex-start
+# Start ORDS (if stopped)
+docker exec demasy-server start-ords
 
-# Stop APEX/ORDS
-docker exec demasy-server apex-stop
-
-# Uninstall APEX
-docker exec demasy-server apex-uninstall
-```
-
-#### Option 2: From Host
-```bash
-# Navigate to APEX scripts directory
-cd src/scripts/oracle/database/dev/apex
-
-# Install APEX (one-time, takes 5-7 minutes)
-./apex-install.sh
-
-# Start APEX/ORDS
-./apex-start.sh
-
-# Stop APEX/ORDS
-./apex-stop.sh
-
-# Uninstall APEX
-./apex-uninstall.sh
+# Stop ORDS
+docker exec demasy-server stop-ords
 ```
 
 ### Access APEX
@@ -419,25 +397,20 @@ After installation, access these URLs:
 docker exec demasy-server tail -f /tmp/ords.log
 
 # Check ORDS status
-docker exec demasy-server pgrep -f ords.war
+docker exec demasy-server pgrep -f ords
 
-# Restart ORDS (from container)
-docker exec demasy-server apex-stop
-docker exec demasy-server apex-start
-
-# Or from host
-cd src/scripts/oracle/database/dev/apex
-./apex-stop.sh && ./apex-start.sh
+# Restart ORDS
+docker exec demasy-server stop-ords
+docker exec demasy-server start-ords
 ```
 
-### Available APEX Commands in Container
+### Available APEX Commands
 
 Once the container is built, these commands are available:
 ```bash
-docker exec demasy-server apex-install    # Install APEX
-docker exec demasy-server apex-start      # Start ORDS
-docker exec demasy-server apex-stop       # Stop ORDS
-docker exec demasy-server apex-uninstall  # Uninstall APEX
+docker exec demasy-server install-apex    # Install APEX + ORDS (one-time setup)
+docker exec demasy-server start-ords      # Start ORDS server
+docker exec demasy-server stop-ords       # Stop ORDS server
 ```
 
 📖 **Full Guide:** See [APEX-GUIDE.md](APEX-GUIDE.md) for complete documentation
