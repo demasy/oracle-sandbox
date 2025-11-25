@@ -396,16 +396,21 @@ cd src/scripts/oracle/database/dev/apex
 
 After installation, access these URLs:
 
-**APEX App Builder:**
-- URL: http://localhost:8080/ords/apex
-- Workspace: DEMASY_LABS
-- Username: DEMASY_ADMIN
-- Password: DemasyApex1986!
+**Application Builder:**
+- URL: http://localhost:8080/ords/f?p=4550:1
+- Workspace: `INTERNAL`
+- Username: `ADMIN`
+- Password: `Demasy1986`
 
 **SQL Developer Web:**
-- URL: http://localhost:8080/ords/demasy_dev/_sdw/
-- Username: DEMASY_DEV
-- Password: DemasyApex1986!
+- URL: http://localhost:8080/ords/sql-developer/
+- Username: `ADMIN`
+- Password: `Demasy1986`
+
+**APEX Administration:**
+- URL: http://localhost:8080/ords/apex_admin
+- Username: `ADMIN`
+- Password: `Demasy1986`
 
 ### APEX Management
 
