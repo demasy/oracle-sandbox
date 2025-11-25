@@ -1,18 +1,22 @@
-# Oracle Database Development Environment
+# 🚀 Oracle Database 23ai Free - Docker Development Kit
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Oracle](https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white)
+![Oracle](https://img.shields.io/badge/Oracle-23ai_Free-F80000?style=flat&logo=oracle&logoColor=white)
 [![Database](https://img.shields.io/badge/Oracle%20DB-23ai-blue.svg)](https://www.oracle.com/database/free/)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org)
 [![APEX](https://img.shields.io/badge/APEX-24.2-red.svg)](https://apex.oracle.com)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/demasy/oracle-database/pulls)
 
-> **Enterprise-grade containerized Oracle Database environment for development, testing, and learning.**
+> **⚠️ FOR DEVELOPMENT & TRAINING ONLY - NOT FOR PRODUCTION USE**
+> 
+> **Complete containerized Oracle 23ai Free Edition with APEX & ORDS - Perfect for developers, DBAs, and learners!**
 
 ## Overview
 
-A production-ready, fully containerized Oracle Database 23ai development environment that combines enterprise database capabilities with modern development tools. This solution provides developers, DBAs, and learners with an isolated, reproducible workspace for Oracle Database development.
+A fully containerized Oracle Database 23ai **development and training environment** that combines enterprise database capabilities with modern development tools. This solution provides developers, DBAs, and learners with an isolated, reproducible workspace for Oracle Database development, testing, and hands-on learning.
+
+> **⚠️ Important Notice:** This environment is designed exclusively for **development, testing, and training purposes**. It is **NOT recommended for production deployments**. For production use, please refer to [Oracle's official production deployment guidelines](https://www.oracle.com/database/).
 
 ### Key Features
 
