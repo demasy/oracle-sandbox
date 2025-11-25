@@ -396,8 +396,8 @@ After installation, access these URLs:
 # View ORDS logs
 docker exec demasy-server tail -f /tmp/ords.log
 
-# Check ORDS status
-docker exec demasy-server pgrep -f ords
+# Check ORDS status (port 8080)
+docker exec demasy-server netstat -tulnp | grep :8080
 
 # Restart ORDS
 docker exec demasy-server stop-ords
