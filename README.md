@@ -1154,6 +1154,13 @@ We welcome you to join and contribute to the Oracle FNDLOAD Scripts. If you are 
 ###### Suggestions & Issues
 > If you find any issues or have a great idea in mind, please create an issue on <a href="https://github.com/demasy/oracle-database/issues">GitHub</a>.
 
+
+<br>
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 </br>
 
 <!--
@@ -1162,10 +1169,3 @@ We welcome you to join and contribute to the Oracle FNDLOAD Scripts. If you are 
 <p align="center">
 Code with love ❤️ in Egypt for the Oracle development community.
 </p>
-
-<br>
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
