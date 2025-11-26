@@ -13,7 +13,7 @@ services:
       - ORACLE_PWD=${ENV_DB_PASSWORD}
       - ORACLE_CHARACTERSET=${ENV_DB_CHARACTERSET}
     volumes:
-      - oracle_data:/opt/oracle/oradata
+      - demasylabs_oracle_vol:/opt/oracle/oradata
     logging:
       driver: "json-file"
       options:
@@ -79,7 +79,7 @@ services:
       - DEMASYLABS_APEX_ADMIN_PASSWORD=${ENV_APEX_ADMIN_PASSWORD}
       - DEMASYLABS_APEX_EMAIL=${ENV_APEX_EMAIL}
     volumes:  
-      - demasylabs_logs:/home/oracle/logs
+      - demasylabs_logs_vol:/home/oracle/logs
     logging:
       driver: "json-file"
       options:
@@ -119,9 +119,9 @@ networks:
           gateway: ${ENV_NETWORK_GATEWAY}
 
 volumes:
-  oracle_data:
+  demasylabs_oracle_vol:
     driver: local
-    name: oracle_data
-  demasylabs_logs:
+    name: demasylabs_oracle_vol
+  demasylabs_logs_vol:
     driver: local
-    name: demasylabs_logs
+    name: demasylabs_logs_vol
