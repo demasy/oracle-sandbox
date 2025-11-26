@@ -136,7 +136,7 @@ The environment consists of two primary containerized services:
 | Component | Details |
 |-----------|---------|
 | Base Image | Oracle AI Database 26ai Free Edition |
-| Container Name | `oracle-database-26ai` |
+| Container Name | `oracle-al-database-26ai` |
 | Database Name | DEMASY |
 | Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
 | Network | 192.168.1.10 |
@@ -297,7 +297,7 @@ DEMASYLABS_DB_POOL_MAX=5
 DEMASYLABS_DB_POOL_INCREMENT=1
 
 # Network Configuration
-DEMASYLABS_DB_HOST=oracle-database-26ai
+DEMASYLABS_DB_HOST=oracle-al-database-26ai
 DEMASYLABS_DB_PORT=1521
 DEMASYLABS_DB_SERVICE=FREE
 ```
@@ -359,7 +359,7 @@ docker-compose up -d demasylabs-oracle-server
 #### 1. Check Container Status
 
 ```bash
-docker ps --filter "name=oracle-database-26ai" --filter "name=demasy-server"
+docker ps --filter "name=oracle-al-database-26ai" --filter "name=demasy-server"
 ```
 
 **Expected output:**
@@ -374,7 +374,7 @@ def456ghi789   demasy-server:latest     Up 2 minutes (healthy)    0.0.0.0:3000->
 Monitor database startup (takes 5-10 minutes on first run):
 
 ```bash
-docker logs -f oracle-database-26ai
+docker logs -f oracle-al-database-26ai
 ```
 
 **Look for:** `DATABASE IS READY TO USE!`
@@ -430,7 +430,7 @@ docker-compose up -d
 
 # 3. Verify
 docker ps
-docker logs -f oracle-database-26ai  # Wait for "READY TO USE"
+docker logs -f oracle-al-database-26ai  # Wait for "READY TO USE"
 curl http://localhost:3000/health
 
 # 4. Connect
@@ -446,54 +446,54 @@ docker exec -it demasy-server sqlcl
 
 ##### Stop Database
 ```bash
-docker stop oracle-database-26ai
+docker stop oracle-al-database-26ai
 ```
 
 ##### Start Database
 ```bash
-docker start oracle-database-26ai
+docker start oracle-al-database-26ai
 ```
 
 ##### Restart Database
 ```bash
-docker restart oracle-database-26ai
+docker restart oracle-al-database-26ai
 ```
 
 ##### Remove Database Container
 ```bash
-docker rm -f oracle-database-26ai
+docker rm -f oracle-al-database-26ai
 ```
 
 ##### Access Database Shell
 ```bash
-docker exec -it oracle-database-26ai bash
+docker exec -it oracle-al-database-26ai bash
 ```
 
 ##### View Database Logs
 ```bash
 # View all logs
-docker logs oracle-database-26ai
+docker logs oracle-al-database-26ai
 
 # Follow logs in real-time
-docker logs -f oracle-database-26ai
+docker logs -f oracle-al-database-26ai
 
 # View last 100 lines
-docker logs --tail 100 oracle-database-26ai
+docker logs --tail 100 oracle-al-database-26ai
 
 # View logs with timestamps
-docker logs -t oracle-database-26ai
+docker logs -t oracle-al-database-26ai
 ```
 
 ##### Monitor Database
 ```bash
 # View container details
-docker inspect oracle-database-26ai
+docker inspect oracle-al-database-26ai
 
 # View resource usage
-docker stats oracle-database-26ai
+docker stats oracle-al-database-26ai
 
 # Check container health
-docker inspect --format='{{.State.Health.Status}}' oracle-database-26ai
+docker inspect --format='{{.State.Health.Status}}' oracle-al-database-26ai
 ```
 
 ##### Database Port Status
@@ -508,7 +508,7 @@ netstat -an | grep 5500
 ##### Backup Database
 ```bash
 # Create a backup of the container
-docker commit oracle-database-26ai oracle-db-backup:$(date +%Y%m%d)
+docker commit oracle-al-database-26ai oracle-db-backup:$(date +%Y%m%d)
 ```
 
 #### Management Server
@@ -697,10 +697,10 @@ For specific user connections:
 docker exec -it demasy-server bash -c "sql username/password@hostname:port/service"
 
 # Example - Connect as SYSTEM
-docker exec -it demasy-server bash -c "sql system/${ORACLE_PWD}@oracle-database-26ai:1521/FREE"
+docker exec -it demasy-server bash -c "sql system/${ORACLE_PWD}@oracle-al-database-26ai:1521/FREE"
 
 # Example - Connect as SYSDBA
-docker exec -it demasy-server bash -c "sql sys/${ORACLE_PWD}@oracle-database-26ai:1521/FREE as sysdba"
+docker exec -it demasy-server bash -c "sql sys/${ORACLE_PWD}@oracle-al-database-26ai:1521/FREE as sysdba"
 ```
 
 #### Method 4: SQL*Plus (Traditional)
@@ -711,14 +711,14 @@ For compatibility with legacy scripts:
 docker exec -it demasy-server sqlplus
 
 # Or with connection string
-docker exec -it oracle-database-26ai sqlplus / as sysdba
+docker exec -it oracle-al-database-26ai sqlplus / as sysdba
 ```
 
 ### Connection Parameters
 
 | Parameter | Environment Variable | Default Value | Description |
 |-----------|---------------------|---------------|-------------|
-| **Hostname** | `DEMASYLABS_DB_HOST` | `oracle-database-26ai` | Database container name |
+| **Hostname** | `DEMASYLABS_DB_HOST` | `oracle-al-database-26ai` | Database container name |
 | **Port** | `DEMASYLABS_DB_PORT` | `1521` | Listener port |
 | **Service Name** | `DEMASYLABS_DB_SERVICE` | `FREE` | Database service |
 | **SID** | `DEMASYLABS_DB_SID` | `FREE` | System identifier |
@@ -741,20 +741,20 @@ For Node.js applications using the management server:
 #### EZ Connect Format
 ```
 hostname:port/service_name
-oracle-database-26ai:1521/FREE
+oracle-al-database-26ai:1521/FREE
 ```
 
 #### TNS Format
 ```
 (DESCRIPTION=
-  (ADDRESS=(PROTOCOL=TCP)(HOST=oracle-database-26ai)(PORT=1521))
+  (ADDRESS=(PROTOCOL=TCP)(HOST=oracle-al-database-26ai)(PORT=1521))
   (CONNECT_DATA=(SERVICE_NAME=FREE))
 )
 ```
 
 #### JDBC Format
 ```
-jdbc:oracle:thin:@oracle-database-26ai:1521:FREE
+jdbc:oracle:thin:@oracle-al-database-26ai:1521:FREE
 ```
 
 ### External Connections
@@ -773,13 +773,13 @@ sql username/password@192.168.1.10:1521/FREE
 
 ```bash
 # Connect as SYS with SYSDBA privileges
-docker exec -it demasy-server bash -c "sql sys/${ORACLE_PWD}@oracle-database-26ai:1521/FREE as sysdba"
+docker exec -it demasy-server bash -c "sql sys/${ORACLE_PWD}@oracle-al-database-26ai:1521/FREE as sysdba"
 
 # Connect to pluggable database
-docker exec -it demasy-server bash -c "sql system/${ORACLE_PWD}@oracle-database-26ai:1521/FREEPDB1"
+docker exec -it demasy-server bash -c "sql system/${ORACLE_PWD}@oracle-al-database-26ai:1521/FREEPDB1"
 
 # Connect with specific schema
-docker exec -it demasy-server bash -c "sql your_user/your_password@oracle-database-26ai:1521/FREE"
+docker exec -it demasy-server bash -c "sql your_user/your_password@oracle-al-database-26ai:1521/FREE"
 ```
 
 ---
@@ -819,7 +819,7 @@ curl http://localhost:3000/health
 
 ```bash
 docker inspect --format='{{.State.Health.Status}}' demasy-server
-docker inspect --format='{{.State.Health.Status}}' oracle-database-26ai
+docker inspect --format='{{.State.Health.Status}}' oracle-al-database-26ai
 ```
 
 **Method 3: Built-in Command**
@@ -847,20 +847,20 @@ Server is healthy.
 
 ```bash
 # View all logs
-docker logs oracle-database-26ai
+docker logs oracle-al-database-26ai
 
 # Follow logs in real-time
-docker logs -f oracle-database-26ai
+docker logs -f oracle-al-database-26ai
 
 # View last 100 lines
-docker logs --tail 100 oracle-database-26ai
+docker logs --tail 100 oracle-al-database-26ai
 
 # View with timestamps
-docker logs -t oracle-database-26ai
+docker logs -t oracle-al-database-26ai
 
 # Filter by time
-docker logs --since 1h oracle-database-26ai
-docker logs --since 2025-11-25T10:00:00 oracle-database-26ai
+docker logs --since 1h oracle-al-database-26ai
+docker logs --since 2025-11-25T10:00:00 oracle-al-database-26ai
 ```
 
 #### Management Server Logs
@@ -910,7 +910,7 @@ docker exec demasy-server cat /tmp/ords_install.log
 docker stats
 
 # Monitor specific container
-docker stats oracle-database-26ai
+docker stats oracle-al-database-26ai
 
 # One-time snapshot
 docker stats --no-stream
@@ -928,11 +928,11 @@ docker stats --no-stream
 
 ```bash
 # Full container inspection
-docker inspect oracle-database-26ai
+docker inspect oracle-al-database-26ai
 
 # Get specific information
-docker inspect --format='{{.State.Status}}' oracle-database-26ai
-docker inspect --format='{{.NetworkSettings.IPAddress}}' oracle-database-26ai
+docker inspect --format='{{.State.Status}}' oracle-al-database-26ai
+docker inspect --format='{{.NetworkSettings.IPAddress}}' oracle-al-database-26ai
 ```
 
 ### Performance Monitoring
@@ -941,7 +941,7 @@ docker inspect --format='{{.NetworkSettings.IPAddress}}' oracle-database-26ai
 
 ```bash
 # Connect to database
-docker exec -it oracle-database-26ai sqlplus / as sysdba
+docker exec -it oracle-al-database-26ai sqlplus / as sysdba
 
 # Run performance queries
 SELECT * FROM V$SESSION WHERE USERNAME IS NOT NULL;
@@ -1013,7 +1013,7 @@ DATABASE_NAME=DEMASY           # Database name (max 8 chars)
 TZ=Asia/Riyadh                # Timezone
 
 # Connection Settings
-DEMASYLABS_DB_HOST=oracle-database-26ai
+DEMASYLABS_DB_HOST=oracle-al-database-26ai
 DEMASYLABS_DB_PORT=1521
 DEMASYLABS_DB_SERVICE=FREE
 DEMASYLABS_DB_SID=FREE
@@ -1116,7 +1116,7 @@ docker system df
 docker system prune  # Free up space
 
 # Monitor initialization
-docker logs -f oracle-database-26ai
+docker logs -f oracle-al-database-26ai
 ```
 
 #### APEX Installation Fails
@@ -1126,13 +1126,13 @@ docker logs -f oracle-database-26ai
 **Solution:**
 ```bash
 # Check database is running
-docker exec -it oracle-database-26ai sqlplus / as sysdba
+docker exec -it oracle-al-database-26ai sqlplus / as sysdba
 
 # Review installation logs
 docker exec demasy-server cat /tmp/apex_install.log
 
 # Verify connectivity
-docker exec demasy-server ping oracle-database-26ai
+docker exec demasy-server ping oracle-al-database-26ai
 ```
 
 #### Connection Refused
@@ -1142,13 +1142,13 @@ docker exec demasy-server ping oracle-database-26ai
 **Solution:**
 ```bash
 # Verify database is healthy
-docker ps --filter "name=oracle-database-26ai"
+docker ps --filter "name=oracle-al-database-26ai"
 
 # Check listener status
-docker exec oracle-database-26ai lsnrctl status
+docker exec oracle-al-database-26ai lsnrctl status
 
 # Verify network connectivity
-docker exec demasy-server ping oracle-database-26ai
+docker exec demasy-server ping oracle-al-database-26ai
 
 # Check firewall rules
 sudo iptables -L
