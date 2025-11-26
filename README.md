@@ -14,27 +14,23 @@
 
 </div>
 
----
-
-<div align="center">
-
-### 🌟 Join 100+ developers using this project!
-
-**[⭐ Star](https://github.com/demasy/oracle-database) • [🔀 Fork](https://github.com/demasy/oracle-database/fork) • [💬 Discuss](https://github.com/demasy/oracle-database/discussions) • [🐛 Report Bug](https://github.com/demasy/oracle-database/issues)**
-
-</div>
+<br>
 
 > **⚠️ DEVELOPMENT AND TRAINING ENVIRONMENT ONLY**
 > 
 > **Enterprise-grade containerized Oracle AI Database 26ai Free Edition with integrated APEX & ORDS. Purpose-built for professional developers, database administrators, and technical education.**
 
-## Overview
+<br>
+
+# Overview
 
 A professionally architected, fully containerized Oracle AI Database 26ai **development and training environment** that seamlessly integrates enterprise-grade database capabilities with modern development tooling. This solution delivers a robust, isolated, and reproducible workspace for Oracle Database development, comprehensive testing, and professional training programs.
 
 > **⚠️ Important Notice:** This environment has been specifically engineered for **development, testing, and educational purposes**. It is **not hardened or optimized for production deployments**. Organizations seeking production-ready solutions should consult [Oracle's official production deployment guidelines](https://www.oracle.com/database/) and engage with Oracle's enterprise support channels.
 
-### ✨ Key Features
+<br>
+
+## ✨ Key Features
 
 <table>
 <tr>
@@ -75,7 +71,9 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 </tr>
 </table>
 
-### Use Cases
+<br>
+
+## Use Cases
 
 | Use Case | Description |
 |----------|-------------|
@@ -85,6 +83,8 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 | **CI/CD Pipeline Integration** | Implement automated testing pipelines with consistent database state management |
 | **Professional Training & Education** | Structured, hands-on Oracle Database learning with simplified setup |
 | **Proof of Concept & Prototyping** | Accelerated prototyping and technical feature validation |
+
+<br>
 
 ### Architecture Highlights
 
@@ -106,22 +106,6 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 │      192.168.1.20                192.168.1.10         │
 └───────────────────────────────────────────────────────┘
 ```
-
----
-
-## 🚀 Quick Links
-
-<div align="center">
-
-| 📖 Documentation | 🎯 Get Started | 💬 Community | 🐛 Support |
-|:---:|:---:|:---:|:---:|
-| [**README**](#overview) | [**Quick Start**](#quick-start) | [**Issues**](https://github.com/demasy/oracle-database/issues) | [**Troubleshooting**](#troubleshooting) |
-| [**APEX Guide**](#oracle-apex-setup) | [**Prerequisites**](#prerequisites) | [**Pull Requests**](https://github.com/demasy/oracle-database/pulls) | [**FAQ**](#troubleshooting) |
-| [**Architecture**](#architecture) | [**Configuration**](#configuration-reference) | [**Discussions**](https://github.com/demasy/oracle-database/discussions) | [**Contact**](mailto:founder@demasy.io) |
-
-</div>
-
----
 
 <br>
 
