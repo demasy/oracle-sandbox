@@ -32,34 +32,23 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 ## ✨ What's Included
 
-<table>
-<tr>
-<td width="50%">
-
 #### 🗄️ **Oracle Database**
-- ✅ **Oracle AI Database 26ai Free** - Latest release with AI capabilities
-- ✅ **Pluggable Database (FREEPDB1)** - Multi-tenant architecture
+- **Oracle AI Database 26ai Free** - Latest release with AI capabilities
+- **Pluggable Database (FREEPDB1)** - Multi-tenant architecture
 
 #### 🛠️ **SQL Development Tools**
-- ✅ **Oracle SQLcl 25.3** - Modern command-line interface
-- ✅ **SQL*Plus** - Traditional SQL client
-- ✅ **SQL Developer Web** - Browser-based SQL IDE
-
-</td>
-<td width="50%">
+- **Oracle SQLcl 25.3** - Modern command-line interface
+- **SQL*Plus** - Traditional SQL client
+- **SQL Developer Web** - Browser-based SQL IDE
 
 #### 🎨 **Low-Code Platform**
-- ✅ **Oracle APEX 24.2.0** - Enterprise application development
-- ✅ **Oracle ORDS 25.3** - RESTful web services
+- **Oracle APEX 24.2.0** - Enterprise application development
+- **Oracle ORDS 25.3** - RESTful web services
 
 #### 🐳 **Docker Environment**
-- ✅ **Docker Compose** - One-command deployment
-- ✅ **Multi-architecture** - AMD64 & ARM64 support
-- ✅ **Health Monitoring** - Built-in diagnostics
-
-</td>
-</tr>
-</table>
+- **Docker Compose** - One-command deployment
+- **Multi-architecture** - AMD64 & ARM64 support
+- **Health Monitoring** - Built-in diagnostics
 
 <br>
 
@@ -67,12 +56,12 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 | Use Case | Description |
 |----------|-------------|
-| **Training & Education** | Hands-on learning environment for professional training programs and skill development |
-| **Proof of Concept (POC)** | Rapid prototyping and solution validation with latest Oracle technologies |
-| **Community Development** | Accessible platform for open source projects and collaborative development |
-| **Discovery & Exploration** | Learn what's new in Oracle AI Database 26ai with isolated, risk-free sandbox |
-| **APEX Application Development** | Build enterprise low-code applications with complete APEX 24.2.0 platform capabilities |
-| **Isolated Docker Environment** | Consistent, reproducible Oracle database instances without affecting your local system |
+| **Professional Training & Education** | Comprehensive learning environment for Oracle Database administration, SQL development, and APEX application development with hands-on practical experience |
+| **Proof of Concept (POC)** | Rapid prototyping and technical validation platform for evaluating Oracle AI Database 26ai features and enterprise solutions |
+| **APEX Application Development** | Full-stack low-code development environment with Oracle APEX 24.2.0, ORDS 25.3, and integrated database services for building enterprise applications |
+| **Technology Discovery** | Explore and evaluate the latest Oracle AI Database 26ai capabilities, new features, and enhancements in an isolated sandbox environment |
+| **Community & Open Source** | Accessible development platform enabling collaborative projects, community contributions, and knowledge sharing |
+| **Isolated Development Environment** | Containerized Oracle database instances providing consistent, reproducible development environments without impacting local system configuration |
 
 <br>
 
