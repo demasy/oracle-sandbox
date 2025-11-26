@@ -30,41 +30,32 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 <br>
 
-## ✨ Key Features
+## ✨ What's Included
 
 <table>
 <tr>
 <td width="50%">
 
-#### 🗄️ **Database & Core**
-- ✅ **Oracle AI Database 26ai Free** - Next-gen AI-powered platform
-- ✅ **Pluggable Database (FREEPDB1)** - Container architecture
-- ✅ **Enterprise Manager Express** - Web-based administration
-- ✅ **Oracle Instant Client 23.7** - Complete connectivity
-- ✅ **Multi-architecture** - AMD64 & ARM64 support
+#### 🗄️ **Oracle Database**
+- ✅ **Oracle AI Database 26ai Free** - Latest release with AI capabilities
+- ✅ **Pluggable Database (FREEPDB1)** - Multi-tenant architecture
 
-#### 🛠️ **Development Tools**
-- ✅ **Oracle SQLcl 25.3** - Modern SQL CLI with auto-completion
-- ✅ **SQL*Plus** - Traditional client (AMD64)
-- ✅ **SQL Developer Web** - Browser-based IDE
-- ✅ **Node.js 20.19.4 LTS** - Management server & REST API
-- ✅ **Git, vim, nano** - Essential utilities
+#### 🛠️ **SQL Development Tools**
+- ✅ **Oracle SQLcl 25.3** - Modern command-line interface
+- ✅ **SQL*Plus** - Traditional SQL client
+- ✅ **SQL Developer Web** - Browser-based SQL IDE
 
 </td>
 <td width="50%">
 
-#### 🎨 **APEX & Low-Code**
-- ✅ **Oracle APEX 24.2.0** - Enterprise low-code platform
-- ✅ **Oracle ORDS 25.3** - RESTful Data Services
-- ✅ **Pre-configured Workspace** - Ready-to-use INTERNAL
-- ✅ **27,000+ Static Assets** - Optimized images
-- ✅ **One-command Install** - Automated deployment
+#### 🎨 **Low-Code Platform**
+- ✅ **Oracle APEX 24.2.0** - Enterprise application development
+- ✅ **Oracle ORDS 25.3** - RESTful web services
 
-#### 🐳 **Container & DevOps**
-- ✅ **Docker Compose** - Single-command deployment
-- ✅ **Multi-stage Builds** - Optimized image layers
-- ✅ **Health Monitoring** - Automated checks
-- ✅ **Security Scanning** - Trivy vulnerability detection
+#### 🐳 **Docker Environment**
+- ✅ **Docker Compose** - One-command deployment
+- ✅ **Multi-architecture** - AMD64 & ARM64 support
+- ✅ **Health Monitoring** - Built-in diagnostics
 
 </td>
 </tr>
@@ -76,12 +67,12 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 | Use Case | Description |
 |----------|-------------|
-| **Enterprise Application Development** | Develop and test Oracle-backed applications in a professionally isolated environment |
-| **Database Administration Training** | Comprehensive DBA task practice, procedure testing, and administration skill development |
-| **APEX Application Development** | Build enterprise low-code applications with complete APEX platform capabilities |
-| **CI/CD Pipeline Integration** | Implement automated testing pipelines with consistent database state management |
-| **Professional Training & Education** | Structured, hands-on Oracle Database learning with simplified setup |
-| **Proof of Concept & Prototyping** | Accelerated prototyping and technical feature validation |
+| **Training & Education** | Hands-on learning environment for professional training programs and skill development |
+| **Proof of Concept (POC)** | Rapid prototyping and solution validation with latest Oracle technologies |
+| **Community Development** | Accessible platform for open source projects and collaborative development |
+| **Discovery & Exploration** | Learn what's new in Oracle AI Database 26ai with isolated, risk-free sandbox |
+| **APEX Application Development** | Build enterprise low-code applications with complete APEX 24.2.0 platform capabilities |
+| **Isolated Docker Environment** | Consistent, reproducible Oracle database instances without affecting your local system |
 
 <br>
 
