@@ -583,14 +583,6 @@ docker exec demasy-server install-apex
 
 **Installation time:** Approximately 5-7 minutes
 
-**Installation process:**
-1. Creates required tablespaces (APEX, APEX_FILES)
-2. Installs APEX core schema and metadata
-3. Configures APEX REST APIs
-4. Installs and configures ORDS
-5. Creates ADMIN user in INTERNAL workspace
-6. Starts ORDS listener on port 8080
-
 ### Access Endpoints
 
 After successful installation:
