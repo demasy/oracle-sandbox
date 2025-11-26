@@ -169,3 +169,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 WORKDIR /usr/demasy/app
 
 CMD ["node", "app.js"]
+
+WORKDIR /usr/demasy/

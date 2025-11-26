@@ -284,3 +284,6 @@ package-lock.json
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md

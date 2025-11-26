@@ -36,36 +36,35 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 <tr>
 <td width="50%">
 
-#### 🗄️ **Database & Core Infrastructure**
-- ✅ **Oracle AI Database 26ai Free** - Next-generation AI-powered database platform
-- ✅ **Pluggable Database (FREEPDB1)** - Advanced container database architecture
-- ✅ **Enterprise Manager Express** - Integrated web-based database administration
-- ✅ **Oracle Instant Client 23.7** - Comprehensive connectivity libraries
-- ✅ **Multi-architecture Support** - AMD64 & ARM64 (Apple Silicon M-series)
+#### 🗄️ **Database & Core**
+- ✅ **Oracle AI Database 26ai Free** - Next-gen AI-powered platform
+- ✅ **Pluggable Database (FREEPDB1)** - Container architecture
+- ✅ **Enterprise Manager Express** - Web-based administration
+- ✅ **Oracle Instant Client 23.7** - Complete connectivity
+- ✅ **Multi-architecture** - AMD64 & ARM64 support
 
-#### 🛠️ **Development Toolchain**
-- ✅ **Oracle SQLcl 25.3** - Advanced SQL command-line interface with intelligent auto-completion
-- ✅ **SQL*Plus** - Traditional Oracle client (AMD64 architecture)
-- ✅ **SQL Developer Web** - Enterprise-grade browser-based SQL IDE
-- ✅ **Node.js 20.19.4 LTS** - Management server infrastructure & RESTful API layer
-- ✅ **Development Utilities** - Git version control, vim, nano text editors
+#### 🛠️ **Development Tools**
+- ✅ **Oracle SQLcl 25.3** - Modern SQL CLI with auto-completion
+- ✅ **SQL*Plus** - Traditional client (AMD64)
+- ✅ **SQL Developer Web** - Browser-based IDE
+- ✅ **Node.js 20.19.4 LTS** - Management server & REST API
+- ✅ **Git, vim, nano** - Essential utilities
 
 </td>
 <td width="50%">
 
-#### 🎨 **APEX & Low-Code Development**
-- ✅ **Oracle APEX 24.2.0** - Enterprise-grade low-code application platform
-- ✅ **Oracle ORDS 25.3** - RESTful Data Services middleware
-- ✅ **Pre-configured Workspace** - Production-ready INTERNAL workspace
-- ✅ **Static Asset Management** - 27,000+ optimized APEX image assets
-- ✅ **Automated Provisioning** - Single-command APEX deployment
+#### 🎨 **APEX & Low-Code**
+- ✅ **Oracle APEX 24.2.0** - Enterprise low-code platform
+- ✅ **Oracle ORDS 25.3** - RESTful Data Services
+- ✅ **Pre-configured Workspace** - Ready-to-use INTERNAL
+- ✅ **27,000+ Static Assets** - Optimized images
+- ✅ **One-command Install** - Automated deployment
 
-#### 🐳 **Container & DevOps Infrastructure**
-- ✅ **Docker Compose Orchestration** - Streamlined single-command deployment
-- ✅ **Multi-stage Build Optimization** - Minimized image footprint with layered architecture
-- ✅ **Automated Health Monitoring** - Continuous container health assessment
-- ✅ **GitHub Actions CI/CD** - Integrated continuous integration and deployment pipelines
-- ✅ **Security Scanning** - Automated vulnerability detection with Trivy
+#### 🐳 **Container & DevOps**
+- ✅ **Docker Compose** - Single-command deployment
+- ✅ **Multi-stage Builds** - Optimized image layers
+- ✅ **Health Monitoring** - Automated checks
+- ✅ **Security Scanning** - Trivy vulnerability detection
 
 </td>
 </tr>
