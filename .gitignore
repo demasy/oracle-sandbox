@@ -1,48 +1,285 @@
+# ============================================
+# Demasy Labs - Oracle Database 23ai
+# .gitignore Configuration
+# ============================================
+
+# ===========================================
+# Operating System Files
+# ===========================================
+
 # macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
 
 # Linux
 *~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
 
 # Windows
 Thumbs.db
+Thumbs.db:encryptable
 ehthumbs.db
+ehthumbs_vista.db
 Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
 
-# Node
-node_modules
+# ===========================================
+# Node.js & JavaScript
+# ===========================================
+node_modules/
+jspm_packages/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
 *.log
+.npm
+.eslintcache
+.node_repl_history
+*.tgz
+.yarn-integrity
 
-# Environment files
+# Optional: lock files (uncomment to ignore)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ===========================================
+# Environment & Configuration
+# ===========================================
 .env
-.env.example
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 check-env.sh
 validate-env.sh
+config.local.js
+secrets.json
 
-# Editor directories and files
+# ===========================================
+# IDEs & Editors
+# ===========================================
+
+# Visual Studio Code
 .vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.code-workspace
+
+# JetBrains IDEs (IntelliJ, WebStorm, etc.)
 .idea/
+*.iml
+*.ipr
+*.iws
+out/
 
-# Build output
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+tags
+[._]*.un~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ===========================================
+# Build & Distribution
+# ===========================================
 dist/
+build/
+out/
 coverage/
+*.tsbuildinfo
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.output/
+.vuepress/dist
 
-# Test output
+# ===========================================
+# Testing & Quality
+# ===========================================
 test-output/
+.nyc_output/
+coverage/
+*.lcov
+.pytest_cache/
+.coverage
+htmlcov/
+junit.xml
+
+# ===========================================
+# Docker & Containers
+# ===========================================
+*.log
+docker-compose.override.yml
+.dockerignore.local
+
+# ===========================================
+# Oracle Database Specific
+# ===========================================
 
 # Oracle binaries/libs (if not custom code)
-libs
+libs/
 
-# Optional: lock file (if you want reproducible builds, REMOVE this line)
-package-lock.json
+# Oracle Instant Client archives
+*.zip
+!instantclient*.zip
 
-# Experment
-src/scripts/experment
-/src/scripts/database/setup
-src/scripts/mcp
+# Database dumps and exports
+*.dmp
+*.dat
+*.ora.bak
+
+# SQL*Plus history
+sql_history.sql
+afiedt.buf
+
+# APEX exports
+f*.sql
+!f100.sql
+
+# ORDS configuration (if sensitive)
+ords/config/
+ords/secrets/
+
+# ===========================================
+# Logs & Temporary Files
+# ===========================================
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*.bak
+*.backup
+*.old
+*~.nib
+pid
+*.pid
+*.seed
+*.pid.lock
+pids/
+
+# ===========================================
+# Archives & Compressed Files
+# ===========================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.war
+*.ear
+*.sar
+*.class
+
+# ===========================================
+# Security & Secrets
+# ===========================================
+*.pem
+*.key
+*.cert
+*.crt
+*.csr
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+ssh_config
+known_hosts
+.ssh/
+
+# ===========================================
+# Project Specific Exclusions
+# ===========================================
+
+# Experimental scripts
+src/scripts/experment/
+src/scripts/database/setup/
+src/scripts/mcp/
 src/scripts/bin/common/demasy_logo.sh
 src/scripts/database/run-db-setup.sh
-docs
+
+# Documentation (if generated)
+docs/
+
+# GitHub workflows (if testing locally)
+.github/
+
+# Personal notes
+notes/
+TODO.md
+NOTES.md
+scratch/
+
+.env.example
+package-lock.json
+
+# ===========================================
+# Optional: CI/CD & Deployment
+# ===========================================
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
