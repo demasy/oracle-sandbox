@@ -85,6 +85,44 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 <br>
 
+# 📦 Prerequisites
+
+### System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **Docker Engine** | 24.0.0+ | Latest stable |
+| **Docker Compose** | v2.20.0+ | Latest stable |
+| **RAM** | 4 GB | 8 GB or more |
+| **Storage** | 10 GB | 20 GB or more |
+| **CPU** | 2 cores | 4 cores or more |
+
+### Required Ports
+
+Ensure the following ports are available:
+
+| Port | Service | Protocol |
+|------|---------|----------|
+| 1521 | Oracle Database Listener | TCP |
+| 5500 | Enterprise Manager Express | HTTP |
+| 3000 | Management API | HTTP |
+| 8080 | Oracle ORDS/APEX | HTTP |
+
+### Software Prerequisites
+
+- Git for repository cloning
+- Text editor for configuration files
+- Modern web browser for APEX and EM access
+- Basic understanding of Docker and containerization
+
+### Network Requirements
+
+- Internet connection for initial setup (downloading images)
+- Subnet 192.168.1.0/24 available for container networking
+- No firewall blocking Docker container communication
+
+<br>
+
 # Architecture
 
 <br>
@@ -191,10 +229,7 @@ All scripts are organized in a structured directory layout for better maintainab
 │   │   ├── uninstall.sh  # APEX removal
 │   │   ├── start.sh      # Start ORDS
 │   │   └── stop.sh       # Stop ORDS
-│   │
-│   └── mcp/               # Model Context Protocol
-│       ├── start.sh
-│       └── setup-saved-connection.sh
+
 ```
 
 <br>
@@ -214,47 +249,7 @@ All scripts are organized in a structured directory layout for better maintainab
 
 > 📝 **Note:** All scripts are organized using best practices with flat structure (max 3 levels), DRY principle with shared utilities, and clear naming conventions. For detailed documentation, see `src/scripts/README.md`.
 
-
 <br>
-
-# 📦 Prerequisites
-
-### System Requirements
-
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| **Docker Engine** | 24.0.0+ | Latest stable |
-| **Docker Compose** | v2.20.0+ | Latest stable |
-| **RAM** | 4 GB | 8 GB or more |
-| **Storage** | 10 GB | 20 GB or more |
-| **CPU** | 2 cores | 4 cores or more |
-
-### Required Ports
-
-Ensure the following ports are available:
-
-| Port | Service | Protocol |
-|------|---------|----------|
-| 1521 | Oracle Database Listener | TCP |
-| 5500 | Enterprise Manager Express | HTTP |
-| 3000 | Management API | HTTP |
-| 8080 | Oracle ORDS/APEX | HTTP |
-
-### Software Prerequisites
-
-- Git for repository cloning
-- Text editor for configuration files
-- Modern web browser for APEX and EM access
-- Basic understanding of Docker and containerization
-
-### Network Requirements
-
-- Internet connection for initial setup (downloading images)
-- Subnet 192.168.1.0/24 available for container networking
-- No firewall blocking Docker container communication
-
-<br>
-
 
 
 ## Quick Start
