@@ -30,8 +30,6 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 <br>
 
-<br>
-
 # 📑 Table of Contents
 
 - [Prerequisites](#prerequisites)
@@ -49,6 +47,8 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 - [Contributors](#-contributors)
 - [Support](#-support-the-project)
 - [License](#license)
+
+<br>
 
 ## ✨ What's Included
 
