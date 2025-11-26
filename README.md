@@ -87,6 +87,24 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 # 📦 Prerequisites
 
+### Software Prerequisites
+
+1. **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Container platform (includes Docker Engine and Docker Compose)
+2. **[Git](https://git-scm.com/)** - Version control system for repository cloning
+3. **Modern web browser** - For accessing APEX and Enterprise Manager (Chrome, Firefox, Edge, or Safari)
+4. **Text editor** - For configuration file editing (VS Code, Sublime Text, or similar)
+
+> **Note:** Oracle APEX 24.2.0 is pre-installed in the container - no separate installation required.
+
+### Network Requirements
+
+1. **Internet connection** - Required for initial setup and Docker image downloads
+2. **Available subnet** - 192.168.1.0/24 for container networking
+3. **Firewall configuration** - Allow Docker container communication
+4. **Port availability** - Ensure ports 1521, 5500, 3000, and 8080 are not in use
+
+<br>
+
 ### System Requirements
 
 | Component | Minimum Specification |
@@ -108,22 +126,6 @@ Ensure the following ports are available:
 | 5500 | Enterprise Manager Express | HTTP |
 | 3000 | Management API | HTTP |
 | 8080 | Oracle ORDS/APEX | HTTP |
-
-### Software Prerequisites
-
-1. **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Container platform (includes Docker Engine and Docker Compose)
-2. **[Git](https://git-scm.com/)** - Version control system for repository cloning
-3. **Modern web browser** - For accessing APEX and Enterprise Manager (Chrome, Firefox, Edge, or Safari)
-4. **Text editor** - For configuration file editing (VS Code, Sublime Text, or similar)
-
-> **Note:** Oracle APEX 24.2.0 is pre-installed in the container - no separate installation required.
-
-### Network Requirements
-
-1. **Internet connection** - Required for initial setup and Docker image downloads
-2. **Available subnet** - 192.168.1.0/24 for container networking
-3. **Firewall configuration** - Allow Docker container communication
-4. **Port availability** - Ensure ports 1521, 5500, 3000, and 8080 are not in use
 
 <br>
 
