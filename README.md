@@ -111,17 +111,19 @@ Ensure the following ports are available:
 
 ### Software Prerequisites
 
-- **[Git](https://git-scm.com/)** - Version control system for repository cloning
-- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Container platform (includes Docker Engine and Docker Compose)
-- **[Oracle APEX](https://apex.oracle.com/)** - Low-code development platform (included in container)
-- Text editor for configuration files
-- Modern web browser for APEX and Enterprise Manager access
+1. **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Container platform (includes Docker Engine and Docker Compose)
+2. **[Git](https://git-scm.com/)** - Version control system for repository cloning
+3. **Modern web browser** - For accessing APEX and Enterprise Manager (Chrome, Firefox, Edge, or Safari)
+4. **Text editor** - For configuration file editing (VS Code, Sublime Text, or similar)
+
+> **Note:** Oracle APEX 24.2.0 is pre-installed in the container - no separate installation required.
 
 ### Network Requirements
 
-- Internet connection for initial setup (downloading images)
-- Subnet 192.168.1.0/24 available for container networking
-- No firewall blocking Docker container communication
+1. **Internet connection** - Required for initial setup and Docker image downloads
+2. **Available subnet** - 192.168.1.0/24 for container networking
+3. **Firewall configuration** - Allow Docker container communication
+4. **Port availability** - Ensure ports 1521, 5500, 3000, and 8080 are not in use
 
 <br>
 
