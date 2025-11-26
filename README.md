@@ -1577,27 +1577,6 @@ git push origin feature/your-feature
 # 5. Create Pull Request on GitHub
 ```
 
-### 📋 Contribution Guidelines
-
-**Commit Convention:**
-```bash
-feat: add new feature
-fix: resolve bug
-docs: update documentation
-style: format code
-refactor: restructure code
-test: add tests
-chore: update dependencies
-```
-
-**Pull Request Checklist:**
-- ✅ One feature/fix per PR
-- ✅ Update documentation
-- ✅ Test your changes
-- ✅ Follow code style
-- ✅ Respond to feedback
-
-
 # 🏆 Contributors
 
 ### Core Team
