@@ -160,7 +160,6 @@ The environment consists of two primary containerized services:
 | Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
 
 <br>
-<br>
 
 ### Docker Architecture Diagram
 
