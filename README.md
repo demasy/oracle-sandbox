@@ -133,7 +133,7 @@ Ensure the following ports are available:
 
 The environment consists of two primary containerized services:
 
-## Database Service (`demasylabs-oracle-database`)
+### Database Service (`demasylabs-oracle-database`)
 
 | Component | Details |
 |-----------|---------|
@@ -147,7 +147,7 @@ The environment consists of two primary containerized services:
 
 <br>
 
-## Management Server (`demasylabs-oracle-server`)
+### Management Server (`demasylabs-oracle-server`)
 
 | Component | Details |
 |-----------|---------|
