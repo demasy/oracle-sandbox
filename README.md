@@ -87,6 +87,24 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 # 📦 Prerequisites
 
+### Software Prerequisites
+
+1. **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Container platform (includes Docker Engine and Docker Compose)
+2. **[Git](https://git-scm.com/)** - Version control system for repository cloning
+3. **Modern web browser** - For accessing APEX and Enterprise Manager (Chrome, Firefox, Edge, or Safari)
+4. **Text editor** - For configuration file editing (VS Code, Sublime Text, or similar)
+
+### Network Requirements
+
+1. **Internet connection** - Required for initial setup and Docker image downloads
+2. **Available subnet** - 192.168.1.0/24 for container networking
+3. **Firewall configuration** - Allow Docker container communication
+4. **Port availability** - Ensure ports 1521, 5500, 3000, and 8080 are not in use
+
+> **Note:** Oracle APEX 24.2.0 is pre-installed in the container - no separate installation required.
+
+<br>
+
 ### System Requirements
 
 | Component | Minimum Specification |
@@ -109,29 +127,13 @@ Ensure the following ports are available:
 | 3000 | Management API | HTTP |
 | 8080 | Oracle ORDS/APEX | HTTP |
 
-### Software Prerequisites
-
-1. **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Container platform (includes Docker Engine and Docker Compose)
-2. **[Git](https://git-scm.com/)** - Version control system for repository cloning
-3. **Modern web browser** - For accessing APEX and Enterprise Manager (Chrome, Firefox, Edge, or Safari)
-4. **Text editor** - For configuration file editing (VS Code, Sublime Text, or similar)
-
-> **Note:** Oracle APEX 24.2.0 is pre-installed in the container - no separate installation required.
-
-### Network Requirements
-
-1. **Internet connection** - Required for initial setup and Docker image downloads
-2. **Available subnet** - 192.168.1.0/24 for container networking
-3. **Firewall configuration** - Allow Docker container communication
-4. **Port availability** - Ensure ports 1521, 5500, 3000, and 8080 are not in use
-
 <br>
 
 # Architecture
 
 The environment consists of two primary containerized services:
 
-## Database Service (`demasylabs-oracle-database`)
+### Database Service (`demasylabs-oracle-database`)
 
 | Component | Details |
 |-----------|---------|
@@ -145,7 +147,7 @@ The environment consists of two primary containerized services:
 
 <br>
 
-## Management Server (`demasylabs-oracle-server`)
+### Management Server (`demasylabs-oracle-server`)
 
 | Component | Details |
 |-----------|---------|
@@ -158,7 +160,8 @@ The environment consists of two primary containerized services:
 | Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
 
 <br>
-<br>
+
+### Docker Architecture Diagram
 
 ```
 ┌───────────────────────────────────────────────────────┐
@@ -181,7 +184,7 @@ The environment consists of two primary containerized services:
 
 <br>
 
-## 📋 Version Information
+### 📋 Version Information
 
 | Component | Version | Release Date | Status |
 |-----------|---------|--------------|--------|
@@ -196,7 +199,7 @@ The environment consists of two primary containerized services:
 
 <br>
 
-## 🖥️ Platform Compatibility
+### 🖥️ Platform Compatibility
 
 | Platform | Architecture | SQL*Plus | SQLcl | APEX | Status |
 |----------|-------------|----------|-------|------|--------|
@@ -559,9 +562,7 @@ docker inspect demasy-server
 docker stats demasy-server
 ```
 
----
-
-## Oracle APEX Setup
+## Oracle APEX Installation
 
 Oracle Application Express (APEX) 24.2.0 is included as a low-code development platform for building web applications.
 
@@ -582,14 +583,6 @@ docker exec demasy-server install-apex
 
 **Installation time:** Approximately 5-7 minutes
 
-**Installation process:**
-1. Creates required tablespaces (APEX, APEX_FILES)
-2. Installs APEX core schema and metadata
-3. Configures APEX REST APIs
-4. Installs and configures ORDS
-5. Creates ADMIN user in INTERNAL workspace
-6. Starts ORDS listener on port 8080
-
 ### Access Endpoints
 
 After successful installation:
@@ -597,7 +590,7 @@ After successful installation:
 | Service | URL | Credentials |
 |---------|-----|-------------|
 | **Application Builder** | http://localhost:8080/ords/f?p=4550:1 | Workspace: `INTERNAL`<br>Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
-| **SQL Developer Web** | http://localhost:8080/ords/sql-developer/ | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
+| **SQL Developer Web** | http://localhost:8080/ords/sql-developer | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
 | **APEX Administration** | http://localhost:8080/ords/apex_admin | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
 
 > **Security Note:** All passwords are configured in the `.env` file. Ensure you change all default passwords before deployment. Never commit `.env` to version control.
@@ -1576,29 +1569,7 @@ git push origin feature/your-feature
 # 5. Create Pull Request on GitHub
 ```
 
-### 📋 Contribution Guidelines
-
-**Commit Convention:**
-```bash
-feat: add new feature
-fix: resolve bug
-docs: update documentation
-style: format code
-refactor: restructure code
-test: add tests
-chore: update dependencies
-```
-
-**Pull Request Checklist:**
-- ✅ One feature/fix per PR
-- ✅ Update documentation
-- ✅ Test your changes
-- ✅ Follow code style
-- ✅ Respond to feedback
-
----
-
-## 🏆 Contributors
+# 🏆 Contributors
 
 ### Core Team
 
@@ -1638,15 +1609,8 @@ Thanks to everyone who contributes to this project! 🎉
 - 💼 LinkedIn: [Ahmed El-Demasy](https://www.linkedin.com/in/demasy)
 - 🌐 Website: [www.demasy.io](https://www.demasy.io)
 
----
 
-### 🎯 Good First Issues
-
-New to the project? Look for [`good first issue`](https://github.com/demasy/oracle-database/labels/good%20first%20issue) labels!
-
----
-
-### 📜 Code of Conduct
+# 📜 Code of Conduct
 
 We are committed to providing a welcoming environment for all contributors.
 
@@ -1666,9 +1630,7 @@ We are committed to providing a welcoming environment for all contributors.
 
 Report issues to: founder@demasy.io
 
----
-
-## 💖 Support the Project
+# 💖 Support the Project
 
 - ⭐ **Star the repo** on GitHub
 - 🔀 **Fork it** and customize
