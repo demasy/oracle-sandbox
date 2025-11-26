@@ -162,6 +162,8 @@ The environment consists of two primary containerized services:
 <br>
 <br>
 
+### Docker Architecture Diagram
+
 ```
 ┌───────────────────────────────────────────────────────┐
 │                   Docker Environment                  │
