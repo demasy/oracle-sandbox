@@ -30,6 +30,26 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 <br>
 
+<br>
+
+# 📑 Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Oracle APEX Setup](#oracle-apex-setup)
+- [Database Connectivity](#database-connectivity)
+- [Service Management](#service-management)
+- [Monitoring & Logs](#monitoring--logs)
+- [Configuration Reference](#configuration-reference)
+- [Troubleshooting](#troubleshooting)
+- [Change Log](#-change-log)
+- [Community & Contributing](#-community--contributing)
+- [Code of Conduct](#-code-of-conduct)
+- [Contributors](#-contributors)
+- [Support](#-support-the-project)
+- [License](#license)
+
 ## ✨ What's Included
 
 #### 🗄️ **Oracle Database**
@@ -65,48 +85,6 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 <br>
 
-### Architecture Highlights
-
-```
-┌───────────────────────────────────────────────────────┐
-│                   Docker Environment                  │
-│                                                       │
-│  ┌──────────────────┐         ┌──────────────────┐    │
-│  │  Management      │         │  Oracle AI       │    │
-│  │  Server          │◄────────┤  Database 26ai   │    │
-│  │  (Node.js)       │         │  + APEX 24.2     │    │
-│  │                  │         │  + ORDS 25.3     │    │
-│  │  - Health Check  │         │                  │    │
-│  │  - API Endpoints │         │  Ports:          │    │
-│  │  - SQLcl Client  │         │  - 1521 (DB)     │    │
-│  │                  │         │  - 5500 (EM)     │    │
-│  │  Port: 3000      │         │  - 8080 (ORDS)   │    │
-│  └──────────────────┘         └──────────────────┘    │
-│      192.168.1.20                192.168.1.10         │
-└───────────────────────────────────────────────────────┘
-```
-
-<br>
-
-## 📑 Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Architecture](#architecture)
-- [Oracle APEX Setup](#oracle-apex-setup)
-- [Database Connectivity](#database-connectivity)
-- [Service Management](#service-management)
-- [Monitoring & Logs](#monitoring--logs)
-- [Configuration Reference](#configuration-reference)
-- [Troubleshooting](#troubleshooting)
-- [Change Log](#-change-log)
-- [Community & Contributing](#-community--contributing)
-- [Code of Conduct](#-code-of-conduct)
-- [Contributors](#-contributors)
-- [Support](#-support-the-project)
-- [License](#license)
-
----
 
 ## 📋 Version Information
 
@@ -359,9 +337,28 @@ docker exec -it demasy-server sqlcl
 
 ---
 
-## Architecture
+# Architecture
 
-The environment consists of two main containerized services:
+```
+┌───────────────────────────────────────────────────────┐
+│                   Docker Environment                  │
+│                                                       │
+│  ┌──────────────────┐         ┌──────────────────┐    │
+│  │  Management      │         │  Oracle AI       │    │
+│  │  Server          │◄────────┤  Database 26ai   │    │
+│  │  (Node.js)       │         │  + APEX 24.2     │    │
+│  │                  │         │  + ORDS 25.3     │    │
+│  │  - Health Check  │         │                  │    │
+│  │  - API Endpoints │         │  Ports:          │    │
+│  │  - SQLcl Client  │         │  - 1521 (DB)     │    │
+│  │                  │         │  - 5500 (EM)     │    │
+│  │  Port: 3000      │         │  - 8080 (ORDS)   │    │
+│  └──────────────────┘         └──────────────────┘    │
+│      192.168.1.20                192.168.1.10         │
+└───────────────────────────────────────────────────────┘
+```
+
+The environment consists of two primary containerized services:
 
 ### Database Service (`demasylabs-oracle-database`)
 
