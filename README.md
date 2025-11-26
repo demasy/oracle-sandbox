@@ -110,10 +110,11 @@ Ensure the following ports are available:
 
 ### Software Prerequisites
 
-- Git for repository cloning
+- **[Git](https://git-scm.com/)** - Version control system for repository cloning
+- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Container platform (includes Docker Engine and Docker Compose)
+- **[Oracle APEX](https://apex.oracle.com/)** - Low-code development platform (included in container)
 - Text editor for configuration files
-- Modern web browser for APEX and EM access
-- Basic understanding of Docker and containerization
+- Modern web browser for APEX and Enterprise Manager access
 
 ### Network Requirements
 
