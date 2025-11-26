@@ -562,8 +562,6 @@ docker inspect demasy-server
 docker stats demasy-server
 ```
 
----
-
 ## Oracle APEX Setup
 
 Oracle Application Express (APEX) 24.2.0 is included as a low-code development platform for building web applications.
@@ -1599,9 +1597,8 @@ chore: update dependencies
 - ✅ Follow code style
 - ✅ Respond to feedback
 
----
 
-## 🏆 Contributors
+# 🏆 Contributors
 
 ### Core Team
 
@@ -1641,15 +1638,8 @@ Thanks to everyone who contributes to this project! 🎉
 - 💼 LinkedIn: [Ahmed El-Demasy](https://www.linkedin.com/in/demasy)
 - 🌐 Website: [www.demasy.io](https://www.demasy.io)
 
----
 
-### 🎯 Good First Issues
-
-New to the project? Look for [`good first issue`](https://github.com/demasy/oracle-database/labels/good%20first%20issue) labels!
-
----
-
-### 📜 Code of Conduct
+# 📜 Code of Conduct
 
 We are committed to providing a welcoming environment for all contributors.
 
@@ -1669,9 +1659,7 @@ We are committed to providing a welcoming environment for all contributors.
 
 Report issues to: founder@demasy.io
 
----
-
-## 💖 Support the Project
+# 💖 Support the Project
 
 - ⭐ **Star the repo** on GitHub
 - 🔀 **Fork it** and customize
