@@ -562,7 +562,7 @@ docker inspect demasy-server
 docker stats demasy-server
 ```
 
-## Oracle APEX Setup
+## Oracle APEX Installation
 
 Oracle Application Express (APEX) 24.2.0 is included as a low-code development platform for building web applications.
 
@@ -598,7 +598,7 @@ After successful installation:
 | Service | URL | Credentials |
 |---------|-----|-------------|
 | **Application Builder** | http://localhost:8080/ords/f?p=4550:1 | Workspace: `INTERNAL`<br>Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
-| **SQL Developer Web** | http://localhost:8080/ords/sql-developer/ | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
+| **SQL Developer Web** | http://localhost:8080/ords/sql-developer | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
 | **APEX Administration** | http://localhost:8080/ords/apex_admin | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
 
 > **Security Note:** All passwords are configured in the `.env` file. Ensure you change all default passwords before deployment. Never commit `.env` to version control.
