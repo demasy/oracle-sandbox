@@ -649,8 +649,6 @@ docker exec demasy-server stop-apex && docker exec demasy-server start-apex
 
 For comprehensive APEX documentation, see [APEX-GUIDE.md](APEX-GUIDE.md)
 
----
-
 ## Database Connectivity
 
 ### Connection Methods
