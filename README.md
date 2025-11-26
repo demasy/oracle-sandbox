@@ -89,13 +89,14 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 ### System Requirements
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| **Docker Engine** | 24.0.0+ | Latest stable |
-| **Docker Compose** | v2.20.0+ | Latest stable |
-| **RAM** | 4 GB | 8 GB or more |
-| **Storage** | 10 GB | 20 GB or more |
-| **CPU** | 2 cores | 4 cores or more |
+| Component | Minimum Specification |
+|-----------|----------------------|
+| **Docker Engine** | 24.0.0 or later |
+| **Docker Compose** | v2.20.0 or later |
+| **RAM** | 8 GB |
+| **Storage** | 20 GB available disk space |
+| **CPU** | 2 cores (x86_64 or ARM64) |
+| **Operating System** | Linux, macOS, or Windows with WSL2 |
 
 ### Required Ports
 
