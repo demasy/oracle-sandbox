@@ -10,17 +10,7 @@
 [![APEX](https://img.shields.io/badge/APEX-24.2-red.svg)](https://apex.oracle.com)
 [![ORDS](https://img.shields.io/badge/ORDS-25.3-success.svg)](https://www.oracle.com/database/technologies/appdev/rest.html)
 [![SQLcl](https://img.shields.io/badge/SQLcl-25.3-blueviolet.svg)](https://www.oracle.com/database/sqldeveloper/technologies/sqlcl/)
-
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/demasy/oracle-database/pulls)
-[![GitHub Issues](https://img.shields.io/github/issues/demasy/oracle-database)](https://github.com/demasy/oracle-database/issues)
-[![GitHub Stars](https://img.shields.io/github/stars/demasy/oracle-database)](https://github.com/demasy/oracle-database/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/demasy/oracle-database)](https://github.com/demasy/oracle-database/network/members)
-[![Documentation](https://img.shields.io/badge/docs-comprehensive-success.svg)](https://github.com/demasy/oracle-database#table-of-contents)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/demasy/oracle-database/graphs/commit-activity)
 [![Made with Love](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-red.svg)](https://github.com/demasy)
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](#-contributors)
-[![Good First Issues](https://img.shields.io/github/issues/demasy/oracle-database/good%20first%20issue)](https://github.com/demasy/oracle-database/labels/good%20first%20issue)
-[![Code of Conduct](https://img.shields.io/badge/code_of_conduct-✓-blue.svg)](#-code-of-conduct)
 
 </div>
 
