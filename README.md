@@ -333,6 +333,47 @@ The environment consists of two main containerized services:
 | Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
 | Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
 
+### Scripts Organization
+
+All scripts are organized in a structured directory layout for better maintainability:
+
+**Container Path Structure:**
+```
+/usr/demasy/scripts/
+├── cli/                    # User-facing CLI tools
+│   ├── sqlcl-connect.sh   # SQLcl database connection
+│   └── sqlplus-connect.sh # SQL*Plus connection
+│
+├── oracle/
+│   ├── admin/             # Administrative tools
+│   │   └── healthcheck.sh # System health monitoring
+│   │
+│   ├── apex/              # APEX management
+│   │   ├── install.sh    # APEX + ORDS installation
+│   │   ├── uninstall.sh  # APEX removal
+│   │   ├── start.sh      # Start ORDS
+│   │   └── stop.sh       # Stop ORDS
+│   │
+│   └── mcp/               # Model Context Protocol
+│       ├── start.sh
+│       └── setup-saved-connection.sh
+```
+
+**Available Command Aliases:**
+
+| Alias | Target Script | Purpose |
+|-------|--------------|----------|
+| `sqlcl` | `/usr/demasy/scripts/cli/sqlcl-connect.sh` | Connect via SQLcl |
+| `sqlplus` | `/usr/demasy/scripts/cli/sqlplus-connect.sh` | Connect via SQL*Plus |
+| `oracle` | `/usr/demasy/scripts/cli/sqlcl-connect.sh` | Alias for SQLcl |
+| `healthcheck` | `/usr/demasy/scripts/oracle/admin/healthcheck.sh` | Run health check |
+| `install-apex` | `/usr/demasy/scripts/oracle/apex/install.sh` | Install APEX |
+| `uninstall-apex` | `/usr/demasy/scripts/oracle/apex/uninstall.sh` | Remove APEX |
+| `start-apex` | `/usr/demasy/scripts/oracle/apex/start.sh` | Start ORDS |
+| `stop-apex` | `/usr/demasy/scripts/oracle/apex/stop.sh` | Stop ORDS |
+
+> 📝 **Note:** All scripts are organized using best practices with flat structure (max 3 levels), DRY principle with shared utilities, and clear naming conventions. For detailed documentation, see `src/scripts/README.md`.
+
 ---
 
 ## Service Management
@@ -509,8 +550,8 @@ docker exec demasy-server netstat -tulnp | grep :8080
 docker exec demasy-server tail -f /tmp/ords.log
 
 # Restart ORDS service
-docker exec demasy-server stop-ords
-docker exec demasy-server start-ords
+docker exec demasy-server stop-apex
+docker exec demasy-server start-apex
 ```
 
 ### Available Commands
@@ -518,8 +559,9 @@ docker exec demasy-server start-ords
 | Command | Description | Usage |
 |---------|-------------|-------|
 | `install-apex` | One-time APEX + ORDS installation | `docker exec demasy-server install-apex` |
-| `start-ords` | Start ORDS listener | `docker exec demasy-server start-ords` |
-| `stop-ords` | Stop ORDS listener | `docker exec demasy-server stop-ords` |
+| `start-apex` | Start ORDS listener | `docker exec demasy-server start-apex` |
+| `stop-apex` | Stop ORDS listener | `docker exec demasy-server stop-apex` |
+| `uninstall-apex` | Remove APEX installation | `docker exec demasy-server uninstall-apex` |
 
 ### Troubleshooting APEX
 
@@ -541,7 +583,7 @@ docker exec demasy-server ls -la /tmp/i | wc -l
 # Should show ~27000 files
 
 # Restart ORDS if needed
-docker exec demasy-server stop-ords && docker exec demasy-server start-ords
+docker exec demasy-server stop-apex && docker exec demasy-server start-apex
 ```
 
 #### Login Issues
@@ -1062,8 +1104,8 @@ docker exec demasy-server ls -la /tmp/i | wc -l
 # Should show ~27000 files
 # If empty, reinstall APEX or restart ORDS
 
-docker exec demasy-server stop-ords
-docker exec demasy-server start-ords
+docker exec demasy-server stop-apex
+docker exec demasy-server start-apex
 ```
 
 ### Getting Help

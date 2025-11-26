@@ -250,6 +250,7 @@ src/scripts/database/setup/
 src/scripts/mcp/
 src/scripts/bin/common/demasy_logo.sh
 src/scripts/database/run-db-setup.sh
+src/scripts/experimental
 
 # Documentation (if generated)
 docs/

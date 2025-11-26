@@ -21,25 +21,23 @@ COPY package*.json ./
 WORKDIR /usr/demasy/app
 
 COPY ./app.js ./app.js
-COPY ./src ./src
+# COPY ./src ./src
 COPY ["LICENSE", "./"]
 
 COPY ./libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient
 
-RUN mkdir -p /usr/demasy/scripts && \
-  curl -L -o /usr/demasy/scripts/connect.sh https://gist.githubusercontent.com/demasy/e913cdc3bf9897bc0374543d416d4d2d/raw/oracle-sqlcl-connect.sh && \
-  chmod +x /usr/demasy/scripts/connect.sh
+# Copy scripts to organized structure
+COPY ./src/scripts/cli/sqlcl-connect.sh /usr/demasy/scripts/cli/sqlcl-connect.sh
+COPY ./src/scripts/cli/sqlplus-connect.sh /usr/demasy/scripts/cli/sqlplus-connect.sh
+COPY ./src/scripts/oracle/admin/healthcheck.sh /usr/demasy/scripts/oracle/admin/healthcheck.sh
+COPY ./src/scripts/oracle/mcp/*.sh /usr/demasy/scripts/oracle/mcp/
+COPY ./src/scripts/oracle/apex/*.sh /usr/demasy/scripts/oracle/apex/
 
-COPY ./src/scripts/diagnostics/healthcheck.sh /usr/demasy/admin/scripts/healthcheck.sh
-COPY ./src/scripts/database/sqlplus-connect.sh /usr/demasy/scripts/sqlplus-connect.sh
-COPY ./src/scripts/mcp /usr/demasy/scripts/mcp
-COPY ./src/scripts/oracle/database/dev/apex /usr/demasy/scripts/apex
-
-RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
-RUN chmod +x /usr/demasy/scripts/sqlplus-connect.sh
-RUN chmod +x /usr/demasy/scripts/mcp/*.sh
-RUN chmod +x /usr/demasy/scripts/apex/*.sh
-# RUN chmod +x /usr/demasy/scripts/connect.sh
+# Set permissions for all scripts
+RUN chmod +x /usr/demasy/scripts/cli/*.sh && \
+    chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
+    chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
+    chmod +x /usr/demasy/scripts/oracle/apex/*.sh
 
 WORKDIR /usr/demasy/scripts
 
@@ -111,10 +109,11 @@ COPY --from=demasylabs-builder /opt/oracle /opt/oracle
 
 RUN npm install oracledb --build-from-source --unsafe-perm
 
-RUN chmod +x /usr/demasy/scripts/connect.sh
-RUN chmod +x /usr/demasy/scripts/sqlplus-connect.sh
-RUN chmod +x /usr/demasy/admin/scripts/healthcheck.sh
-
+# Set permissions for all scripts in runtime stage
+RUN chmod +x /usr/demasy/scripts/cli/*.sh && \
+    chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
+    chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
+    chmod +x /usr/demasy/scripts/oracle/apex/*.sh
 
 # Create a wrapper for SQLcl that detects Java path dynamically for any architecture
 # Updated by demasy on November 11, 2025
@@ -128,21 +127,22 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
     chmod +x /usr/local/bin/sql
 
 # Symbolic links to Oracle tools and scripts
-# -------------------------------------------- [Oracle Database Tools]
-RUN ln -s /usr/demasy/scripts/sqlplus-connect.sh /usr/local/bin/sqlplus
-RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/sqlcl
-RUN ln -s /usr/demasy/scripts/connect.sh /usr/local/bin/oracle
-# -------------------------------------------- [MCP Tools]
-RUN ln -s /usr/demasy/scripts/mcp/start-mcp-sqlcl.sh /usr/local/bin/start-mcp
-# -------------------------------------------- [Oracle APEX Tools]
-RUN ln -s /usr/demasy/scripts/apex/apex-install.sh /usr/local/bin/apex-install
-RUN ln -s /usr/demasy/scripts/apex/apex-uninstall.sh /usr/local/bin/apex-uninstall
-RUN ln -s /usr/demasy/scripts/apex/apex-install.sh /usr/local/bin/install-apex
-RUN ln -s /usr/demasy/scripts/apex/apex-start.sh /usr/local/bin/apex-start
-RUN ln -s /usr/demasy/scripts/apex/apex-stop.sh /usr/local/bin/apex-stop
+# -------------------------------------------- [CLI Tools]
+RUN ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus
+RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl
+RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/oracle
 
-# -------------------------------------------- [Server scripts]
-RUN ln -s /usr/demasy/admin/scripts/healthcheck.sh /usr/local/bin/healthcheck
+# -------------------------------------------- [Oracle APEX Tools]
+RUN ln -s /usr/demasy/scripts/oracle/apex/install.sh /usr/local/bin/install-apex
+RUN ln -s /usr/demasy/scripts/oracle/apex/uninstall.sh /usr/local/bin/uninstall-apex
+RUN ln -s /usr/demasy/scripts/oracle/apex/start.sh /usr/local/bin/start-apex
+RUN ln -s /usr/demasy/scripts/oracle/apex/stop.sh /usr/local/bin/stop-apex
+
+# # -------------------------------------------- [MCP Tools]
+# RUN ln -s /usr/demasy/scripts/oracle/mcp/start.sh /usr/local/bin/start-mcp
+
+# -------------------------------------------- [Admin & Diagnostics]
+RUN ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck
 
 # Verify installation and test SQLcl
 # Updated by demasy on November 11, 2025
