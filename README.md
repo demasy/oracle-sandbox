@@ -1707,7 +1707,7 @@ Report issues to: founder@demasy.io
 
 ---
 
-### 💖 Support the Project
+## 💖 Support the Project
 
 - ⭐ **Star the repo** on GitHub
 - 🔀 **Fork it** and customize
@@ -1725,9 +1725,8 @@ Report issues to: founder@demasy.io
 
 </div>
 
----
 
-### 🙏 Acknowledgments
+## 🙏 Acknowledgments
 
 - **Oracle Corporation** - Database technology
 - **Docker Community** - Containerization platform
