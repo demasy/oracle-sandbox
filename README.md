@@ -37,7 +37,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - [Use Cases](#use-cases)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
-- Architecture
+- [Architecture](#architecture)
 - [Built-in Tools & Scripts](#built-in-tools--scripts)
 - Configuration
 - Troubleshooting / FAQ
