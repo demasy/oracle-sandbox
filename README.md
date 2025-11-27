@@ -595,13 +595,19 @@ docker exec demasy-server install-apex
 
 After successful installation:
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| **Application Builder** | http://localhost:8080/ords/f?p=4550:1 | Workspace: `INTERNAL`<br>Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
-| **SQL Developer Web** | http://localhost:8080/ords/sql-developer | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
-| **APEX Administration** | http://localhost:8080/ords/apex_admin | Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) |
+| Service | URL | 
+|:---------:|:--------------------------------------------- |
+| **Application Builder** | http://localhost:8080/ords/f?p=4550 | 
+| **SQL Developer Web**   | http://localhost:8080/ords/sql-developer | 
+| **APEX Administration** | http://localhost:8080/ords/apex_admin |
+
+> Workspace: `INTERNAL`<br>Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) 
+
+<br>
 
 > **Security Note:** All passwords are configured in the `.env` file. Ensure you change all default passwords before deployment. Never commit `.env` to version control.
+
+Access Endpoints
 
 ### APEX Management Commands
 
