@@ -1,4 +1,4 @@
-# 🚀 Oracle AI Database 26ai Free - Docker Development Environment
+# 🚀 Oracle AI Database 26ai Free – Developer Environment
 
 <div align="center">
 
