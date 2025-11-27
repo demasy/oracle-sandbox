@@ -37,7 +37,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - [Key Features](#key-features)
 - [Use Cases](#use-cases)
 - [Prerequisites](#prerequisites)
-- Quick Start
+- [Getting Started](#getting-started)
 - Architecture
 - Configuration
 - Troubleshooting / FAQ
