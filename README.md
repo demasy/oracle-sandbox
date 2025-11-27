@@ -1387,10 +1387,8 @@ SELECT tablespace_name,
 FROM dba_tablespace_usage_metrics;
 ```
 
----
 
-
-
+<br>
 
 ## 📜 Change Log
 
@@ -1399,13 +1397,13 @@ FROM dba_tablespace_usage_metrics;
 |v1.0.0|01-DEC-2025|------|Foundation Release (December 2025)|
 
 
+<br>
+
 ## 🤝 Community & Contributing
 
-# 🏆 Contributors
-
-### Core Team
-
-<table>
+| Author | GitHub & LinkedIn account |
+| :-  | :---- |
+| <table>
 <tr>
 <td align="center">
 <a href="https://github.com/demasy">
@@ -1418,14 +1416,13 @@ FROM dba_tablespace_usage_metrics;
 <sub>Oracle ACE | Solutions Architect</sub>
 </td>
 </tr>
-</table>
+</table> | <a href="https://github.com/demasy">Github</a> & <a href="https://www.linkedin.com/in/demasy">LinkedIn</a> |
+<br>
 
-### All Contributors
+ ### Contributing to the Oracle AI Database 26ai Free - Docker Development Environment. 
+We welcome you to join and contribute to the Oracle FNDLOAD Scripts. If you are interested in helping, please don’t hesitate to contact us at founder@demasy.io
 
-Thanks to everyone who contributes to this project! 🎉
-
-> Want to see your name here? [Start contributing today](#-ways-to-contribute)!
-
+<br>
 
 ## License
 
