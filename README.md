@@ -44,7 +44,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - Documentation
 - Change Log
 - Contributors
-- License
+- [License](#overview)
 
 <br>
 
@@ -75,7 +75,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 <br>
 
-## 📦 Prerequisites
+## Prerequisites
 
 <br>
 
