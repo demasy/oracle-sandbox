@@ -68,9 +68,11 @@ docker exec demasy-server start-apex
 
 ```bash
 # Check for port conflicts
-docker exec demasy-server netstat -tulnp | grep :8080
+docker exec demasy-server netstat -tulnp | grep:8080
 
-# View detailed logs
+# View detailed logs 
+
+```bash
 docker exec demasy-server cat /tmp/ords.log
 ```
 
@@ -90,6 +92,3 @@ docker exec demasy-server stop-apex && docker exec demasy-server start-apex
 - Verify you're using workspace: `INTERNAL` (case-sensitive)
 - Ensure username is `ADMIN` (all uppercase)
 - Check ORDS is running on port 8080
-
-For comprehensive APEX documentation, see [APEX-GUIDE.md](APEX-GUIDE.md)
-
