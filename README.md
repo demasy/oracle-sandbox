@@ -32,14 +32,14 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 # 📑 Table of Contents
 
-- [What's Included](#-whats-included)
-- [Use Cases](#-use-cases)
-- [Prerequisites](#-prerequisites)
-- [Quick Start](#-quick-start)
-- [Architecture](#-architecture)
-- [Documentation](#-documentation)
-- [Change Log](#-change-log)
-- [Contributors](#-contributors)
+- [What's Included](#whats-included)
+- [Use Cases](#use-cases)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Documentation](#documentation)
+- [Change Log](#change-log)
+- [Contributors](#contributors)
 - [License](#license)
 
 <br>
