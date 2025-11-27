@@ -52,7 +52,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - Oracle Database 26ai Free, preconfigured for local development
 - APEX 24.2 + ORDS 25.3 fully integrated and ready to use
 - SQLcl & SQL*Plus included for scripting, labs, and automation
-- Clean Docker Compose setup (DB + Management Server)
+- Clean Docker Compose setup (Database + Management Server)
 - Compatible with Linux, macOS (Intel/ARM), and Windows WSL2
 - Simple environment variables and port mapping for easy configuration
 - Built-in scripts for APEX installation, health checks, and utilities
