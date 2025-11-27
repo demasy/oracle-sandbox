@@ -130,38 +130,11 @@ Ensure the following ports are available:
 <br>
 
 # Architecture
-
 The environment consists of two primary containerized services:
 
-### Database Service (`demasylabs-oracle-database`)
-
-| Component | Details |
-|-----------|---------|
-| Base Image | Oracle AI Database 26ai Free Edition |
-| Container Name | `oracle-al-database-26ai` |
-| Database Name | DEMASY |
-| Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
-| Network | 192.168.1.10 |
-| Resources | • CPU: 1 core<br>• Memory: 3GB |
-| Health Check | Every 30s via SQL connectivity test |
-
 <br>
 
-### Management Server (`demasylabs-oracle-server`)
-
-| Component | Details |
-|-----------|---------|
-| Base Image | Node.js 20.19.4 |
-| Container Name | `demasy-server` |
-| Exposed Port | 3000 (API & Health Check) |
-| Network | 192.168.1.20 |
-| Resources | • CPU: 1 core<br>• Memory: 512MB |
-| Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
-| Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
-
-<br>
-
-### Docker Architecture Diagram
+#### Docker Architecture Diagram
 
 ```
 ┌───────────────────────────────────────────────────────┐
@@ -181,6 +154,35 @@ The environment consists of two primary containerized services:
 │      192.168.1.20                192.168.1.10         │
 └───────────────────────────────────────────────────────┘
 ```
+
+<br>
+
+#### Database Service (`demasylabs-oracle-database`)
+
+| Component | Details |
+|-----------|---------|
+| Base Image | Oracle AI Database 26ai Free Edition |
+| Container Name | `oracle-al-database-26ai` |
+| Database Name | DEMASY |
+| Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
+| Network | 192.168.1.10 |
+| Resources | • CPU: 1 core<br>• Memory: 3GB |
+| Health Check | Every 30s via SQL connectivity test |
+
+<br>
+
+#### Management Server (`demasylabs-oracle-server`)
+
+| Component | Details |
+|-----------|---------|
+| Base Image | Node.js 20.19.4 |
+| Container Name | `demasy-server` |
+| Exposed Port | 3000 (API & Health Check) |
+| Network | 192.168.1.20 |
+| Resources | • CPU: 1 core<br>• Memory: 512MB |
+| Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
+| Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
+
 
 <br>
 
