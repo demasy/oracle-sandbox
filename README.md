@@ -281,30 +281,36 @@ chmod 600 .env
 Edit `.env` and set the following required parameters:
 
 ```bash
-# Database Configuration (Required)
-ORACLE_PWD=YourSecurePassword123!    # ⚠️ CHANGE THIS! Minimum 8 characters
-DATABASE_NAME=DEMASY                 # Maximum 8 characters
-TZ=Asia/Riyadh                       # Your timezone
+# Absolutely Required - Container Won't Start Without These
+ENV_DB_PASSWORD=YourSecurePassword123!
+ENV_DB_SID=FREE
+ENV_DB_SERVICE=FREEPDB1
+ENV_DB_CHARACTERSET=AL32UTF8
+ENV_NETWORK_SUBNET=192.168.1.0/24
+ENV_NETWORK_GATEWAY=192.168.1.1
+ENV_IP_DB_SERVER=192.168.1.110
+ENV_IP_APP_SERVER=192.168.1.120
+ENV_DB_PORT_LISTENER=1521
+ENV_SERVER_PORT=3000
+ENV_DB_POOL_MIN=1
+ENV_DB_POOL_MAX=5
+ENV_DB_POOL_INCREMENT=1
+ENV_DB_USER=system
+ENV_DB_CLIENT=/opt/oracle/instantclient
+ENV_DB_CPU_LIMIT=2
+ENV_DB_MEMORY_LIMIT=4g
+ENV_SERVER_CPU_LIMIT=3.0
+ENV_SERVER_MEMORY_LIMIT=3g
+ENV_SRC_ORACLE_SQLCL=https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip
+ENV_SRC_ORACLE_SQLPLUS=https://download.oracle.com/otn_software/linux/instantclient/2390000/instantclient-sqlplus-linux.arm64-23.9.0.25.07.zip
+ENV_SRC_ORACLE_APEX=https://download.oracle.com/otn_software/apex/apex-latest.zip
+ENV_SRC_ORACLE_ORDS=https://download.oracle.com/otn_software/java/ords/ords-latest.zip
 
-# APEX Configuration (Required for APEX setup)
+# Required Only If Using APEX
+ENV_APEX_ADMIN_PASSWORD=YourAPEXPassword123
 ENV_APEX_ADMIN_USERNAME=ADMIN
-ENV_APEX_ADMIN_PASSWORD=YourAPEXPassword123  # ⚠️ CHANGE THIS!
-ENV_APEX_EMAIL=your-email@example.com       # ⚠️ CHANGE THIS!
+ENV_APEX_EMAIL=your-email@example.com
 ENV_APEX_DEFAULT_WORKSPACE=INTERNAL
-```
-
-#### Optional Configuration
-
-```bash
-# Connection Pool Settings
-DEMASYLABS_DB_POOL_MIN=1
-DEMASYLABS_DB_POOL_MAX=5
-DEMASYLABS_DB_POOL_INCREMENT=1
-
-# Network Configuration
-DEMASYLABS_DB_HOST=oracle-al-database-26ai
-DEMASYLABS_DB_PORT=1521
-DEMASYLABS_DB_SERVICE=FREE
 ```
 
 > **Security Best Practices:**
