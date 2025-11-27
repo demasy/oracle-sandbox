@@ -609,15 +609,15 @@ After successful installation:
 
 > **Security Note:** All passwords are configured in the `.env` file. Ensure you change all default passwords before deployment. Never commit `.env` to version control.
 
-Access Endpoints
+<br>
 
 ### APEX Management Commands
 
 ```bash
 # Check ORDS status
-docker exec demasy-server netstat -tulnp | grep :8080
+docker exec demasy-server netstat -tulnp | grep:8080
 
-# View ORDS logs in real-time
+# View ORDS logs in real-time 
 docker exec demasy-server tail -f /tmp/ords.log
 
 # Restart ORDS service
