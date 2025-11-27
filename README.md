@@ -43,7 +43,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - Troubleshooting / FAQ
 - Documentation
 - Change Log
-- Contributors
+- [Contributors](#contributors)
 - [License](#overview)
 
 <br>
