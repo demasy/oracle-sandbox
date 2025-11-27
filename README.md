@@ -420,10 +420,18 @@ Connect to the database:
 sqlcl
 ```
 
-**Expected output:**
+**Expected output: 
 ```
-SQLcl: Release 25.3 Production
-Connected to: Oracle AI Database 26ai Free
+SQLcl: Release 25.3 Production on Thu Nov 13 11:13:11 1986
+
+Copyright (c) 1982, 2025, Oracle.  All rights reserved.
+
+Last Successful login time: Thu Nov 13 1986 13:29:04 +03:00
+
+Connected to:
+Oracle AI Database 26ai Free Release 23.26.0.0.0 - Develop, Learn, and Run for Free
+Version 23.26.0.0.0
+SQL>
 ```
 
 ### Quick Start Summary
