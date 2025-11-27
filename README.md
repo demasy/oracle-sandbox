@@ -215,7 +215,7 @@ The environment consists of two primary containerized services:
 
 <br>
 
-## Scripts Organization
+## Scripts
 
 All scripts are organized in a structured directory layout for better maintainability:
 
