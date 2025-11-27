@@ -208,29 +208,3 @@ docker exec demasy-server netstat -tulnp | grep :8080
 # Monitor Java processes
 docker exec demasy-server jps -v
 ```
-
-## Alert Configuration
-
-### Email Notifications (Optional)
-
-Configure Docker to send alerts for container events:
-
-```yaml
-# docker-compose.yml
-services:
-  demasylabs-oracle-database:
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-        labels: "production"
-```
-
-### Log Aggregation
-
-For production environments, consider integrating with:
-- **ELK Stack** (Elasticsearch, Logstash, Kibana)
-- **Grafana + Prometheus**
-- **Splunk**
-- **DataDog**
