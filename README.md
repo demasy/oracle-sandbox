@@ -1399,28 +1399,17 @@ FROM dba_tablespace_usage_metrics;
 
 <br>
 
-## 🤝 Community & Contributing
+## Contributors
+
 
 | Author | GitHub & LinkedIn account |
 | :-  | :---- |
-| <table>
-<tr>
-<td align="center">
-<a href="https://github.com/demasy">
-<img src="https://github.com/demasy.png" width="100px;" alt="Ahmed El-Demasy"/><br />
-<sub><b>Ahmed El-Demasy</b></sub>
-</a><br />
-<sub>Creator & Maintainer</sub><br />
-<a href="https://github.com/demasy">GitHub</a> •
-<a href="https://www.linkedin.com/in/demasy">LinkedIn</a><br />
-<sub>Oracle ACE | Solutions Architect</sub>
-</td>
-</tr>
-</table> | <a href="https://github.com/demasy">Github</a> & <a href="https://www.linkedin.com/in/demasy">LinkedIn</a> |
+| <div align="center"> <img src="https://github.com/demasy.png" width="100px;" alt="Ahmed El-Demasy"/> <br> **Ahmed El-Demasy** (Creator & Maintainer) <br> Oracle Solutions Architect <br> Oracle ACE </div> | <div align="center"> <a href="https://github.com/demasy">Github</a> & <a href="https://www.linkedin.com/in/demasy">LinkedIn</a> </div> |
+
 <br>
 
- ### Contributing to the Oracle AI Database 26ai Free - Docker Development Environment. 
-We welcome you to join and contribute to the Oracle FNDLOAD Scripts. If you are interested in helping, please don’t hesitate to contact us at founder@demasy.io
+### Contributing to the Oracle AI Database 26ai Free - Docker Development Environment. 
+We welcome you to join and contribute to the Oracle AI Database 26ai Free - Docker Development Environment. If you are interested in helping, please don’t hesitate to contact us at founder@demasy.io
 
 <br>
 
