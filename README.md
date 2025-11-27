@@ -33,15 +33,18 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 # 📑 Table of Contents
 
-- [Key Features](#)
-- [Use Cases](#use-cases)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Architecture](#architecture)
-- [Documentation](#documentation)
-- [Change Log](#change-log)
-- [Contributors](#contributors)
-- [License](#license)
+- [Overview](#overview) 
+- [Key Features](#key-features)
+- Use Cases
+- Prerequisites
+- Quick Start
+- Architecture
+- Configuration
+- Troubleshooting / FAQ
+- Documentation
+- Change Log
+- Contributors
+- License
 
 <br>
 
