@@ -32,7 +32,7 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 # 📑 Table of Contents
 
-- [What's Included](#whats-included)
+- [Key Features](#)
 - [Use Cases](#use-cases)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
@@ -44,25 +44,15 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 
 <br>
 
-## ✨ What's Included
-
-#### 🗄️ **Oracle Database**
-- **Oracle AI Database 26ai Free** - Latest release with AI capabilities
-- **Pluggable Database (FREEPDB1)** - Multi-tenant architecture
-
-#### 🛠️ **SQL Development Tools**
-- **Oracle SQLcl 25.3** - Modern command-line interface
-- **SQL*Plus** - Traditional SQL client
-- **SQL Developer Web** - Browser-based SQL IDE
-
-#### 🎨 **Low-Code Platform**
-- **Oracle APEX 24.2.0** - Enterprise application development
-- **Oracle ORDS 25.3** - RESTful web services
-
-#### 🐳 **Docker Environment**
-- **Docker Compose** - One-command deployment
-- **Multi-architecture** - AMD64 & ARM64 support
-- **Health Monitoring** - Built-in diagnostics
+## Key Features
+- Oracle Database 26ai Free, preconfigured for local development
+- APEX 24.2 + ORDS 25.3 fully integrated and ready to use
+- SQLcl & SQL*Plus included for scripting, labs, and automation
+- Clean Docker Compose setup (DB + Management Server)
+- Compatible with Linux, macOS (Intel/ARM), and Windows WSL2
+- Simple environment variables and port mapping for easy configuration
+- Built-in scripts for APEX installation, health checks, and utilities
+- Developer-friendly structure ideal for training, demos, and workshops
 
 <br>
 
