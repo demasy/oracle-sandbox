@@ -110,10 +110,8 @@ Designed to facilitate learning through practical experience, this setup allows 
 - **Firewall Permissions:** Docker must be granted permission to create and manage local container networks.
 - **Open Host Ports:** Ensure that the following ports are not in use by other services:
 
-
-
-#### Open Host Ports Table
-
+<div style="padding: 10px;">
+  
 | Port | Service | Protocol |
 |------|---------|----------|
 | 3000 | Demasy Labs Management Server | HTTP |
@@ -123,6 +121,8 @@ Designed to facilitate learning through practical experience, this setup allows 
 | 3000 | Management API | HTTP |
 | 8080 | Oracle ORDS/APEX | HTTP |
 
+</div>
+  
 <br>
 
 > 📌 Notes
