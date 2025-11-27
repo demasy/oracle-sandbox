@@ -27,9 +27,8 @@ Designed to facilitate learning through practical experience, this setup allows 
 <br>
 
 > **⚠️ DEVELOPMENT AND TRAINING ENVIRONMENT ONLY**
-
-> **⚠️ Important Notice:** This environment has been specifically engineered for **development, testing, and educational purposes**. It is **not hardened or optimized for production deployments**. Organizations seeking production-ready solutions should consult [Oracle's official production deployment guidelines](https://www.oracle.com/database/) and engage with Oracle's enterprise support channels.
-
+> 
+> This environment is intended solely for **development**, **testing**, **evaluation**, and **educational** purposes. It is not secured, hardened, or optimized for production workloads. For production-grade deployments, organizations should consult Oracle's official deployment guidelines and work with Oracle Support or certified Oracle partners to ensure appropriate architecture, security, and compliance.
 <br>
 
 # 📑 Table of Contents
