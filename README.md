@@ -38,17 +38,6 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
 
-### 📚 Detailed Documentation
-
-For comprehensive guides, see the [src/docs](src/docs) directory:
-
-- [Service Management](src/docs/service-management.md) - Container operations, logs, and diagnostics
-- [Oracle APEX Installation](src/docs/oracle-apex-installation.md) - APEX setup, ORDS configuration, and endpoints
-- [Database Connectivity](src/docs/database-connectivity.md) - Connection methods, parameters, and examples
-- [Monitoring & Logs](src/docs/monitoring.md) - Health checks, logging, and resource monitoring
-- [Configuration Reference](src/docs/configuration-reference.md) - Environment variables and settings
-- [Troubleshooting](src/docs/troubleshooting.md) - Common issues and solutions
-
 ### 🤝 Community
 
 - [Change Log](#-change-log)
@@ -478,6 +467,19 @@ curl http://localhost:3000/health
 # 4. Connect
 docker exec -it demasy-server sqlcl
 ```
+
+<br>
+
+## 📚 Documentation
+
+For comprehensive guides, see the [src/docs](src/docs) directory:
+
+- [Service Management](src/docs/service-management.md) - Container operations, logs, and diagnostics
+- [Oracle APEX Installation](src/docs/oracle-apex-installation.md) - APEX setup, ORDS configuration, and endpoints
+- [Database Connectivity](src/docs/database-connectivity.md) - Connection methods, parameters, and examples
+- [Monitoring & Logs](src/docs/monitoring.md) - Health checks, logging, and resource monitoring
+- [Configuration Reference](src/docs/configuration-reference.md) - Environment variables and settings
+- [Troubleshooting](src/docs/troubleshooting.md) - Common issues and solutions
 
 <br>
 
