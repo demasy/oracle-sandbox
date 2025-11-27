@@ -1452,77 +1452,16 @@ FROM dba_tablespace_usage_metrics;
 - [Oracle Developer Community](https://community.oracle.com/)
 - [Stack Overflow - Oracle](https://stackoverflow.com/questions/tagged/oracle)
 
----
-
-## 📈 Project Statistics
-
-![GitHub repo size](https://img.shields.io/github/repo-size/demasy/oracle-database)
-![GitHub code size](https://img.shields.io/github/languages/code-size/demasy/oracle-database)
-![Lines of code](https://img.shields.io/tokei/lines/github/demasy/oracle-database)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/demasy/oracle-database)
-![GitHub last commit](https://img.shields.io/github/last-commit/demasy/oracle-database)
-
----
-
-## 🏆 Acknowledgments
-
-### Technology Partners
-- **Oracle Corporation** - For Oracle AI Database 26ai, APEX, ORDS, and SQLcl
-- **Docker Inc.** - For containerization platform
-- **Node.js Foundation** - For JavaScript runtime
-- **GitHub** - For hosting and CI/CD infrastructure
-
-### Inspiration & References
-- Oracle's official Docker images
-- Community feedback and contributions
-- Best practices from DevOps community
-
----
-
 ## 📜 Change Log
-
-### v1.0.0 - Foundation Release (December 2025) - 95% Complete
-
-**Added:**
-- ✅ Complete Docker infrastructure with multi-stage builds
-- ✅ Oracle AI Database 26ai Free Edition integration
-- ✅ APEX 24.2.0 automated installation
-- ✅ ORDS 25.3.1 configuration
-- ✅ SQLcl 25.3 & SQL*Plus clients
-- ✅ Node.js 20.19.4 management server
-- ✅ Health monitoring and diagnostics
-- ✅ GitHub Actions CI/CD workflows
-- ✅ Security scanning with Trivy
-- ✅ Comprehensive documentation
-- ✅ Multi-architecture support (AMD64/ARM64)
-- ✅ Custom Docker networking
-- ✅ Environment-based configuration
-- ✅ CLI connection scripts with branding
-- ✅ Organized scripts structure
-
-**Changed:**
-- Renamed connect.sh to sqlcl-connect.sh for clarity
-- Updated APEX commands (start-apex/stop-apex)
-- Reorganized scripts directory structure
-- Enhanced README documentation
-
-**Fixed:**
-- Docker build issues on ARM64
-- APEX installation script improvements
-- Health check reliability
-
----
-
-### Previous Versions
 
 | Version | Date | Type | Description |
 |---------|------|------|-------------|
+|v1.0.0|01-DEC-2025|------|Foundation Release (December 2025)|
 
----
 
 ## 🤝 Community & Contributing
 
-We welcome you to join and contribute to the Oracle Database project! Whether you're a developer, DBA, educator, or enthusiast - there's a place for you in our community.
+We welcome you to join and contribute to the Oracle Database project! Whether you're a developer, DBA, educator, or enthusiast, there's a place for you in our community.
 
 <div align="center">
 
