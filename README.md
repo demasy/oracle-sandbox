@@ -438,7 +438,7 @@ The environment consists of two primary containerized services:
 
 <br>
 
-## Scripts
+## Built-in Tools & Scripts
 
 All scripts are organized in a structured directory layout for better maintainability:
 
