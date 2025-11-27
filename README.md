@@ -132,11 +132,16 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 <br>
 
-## Quick Start
+## 🚀 Getting Started
+
 
 <br>
 
-### Step 1: Clone Repository
+### Setup Instructions
+
+<br>
+
+#### Step 1: Clone Repository
 
 ```bash
 git clone https://github.com/demasy/oracle-database.git
@@ -145,16 +150,16 @@ cd oracle-database
 
 <br>
 
-### Step 2: Environment Configuration
+#### Step 2: Environment Configuration
 
-#### Create Environment File
+##### Create Environment File
 
 ```bash
 cp .env.example .env
 chmod 600 .env
 ```
 
-#### Configure Required Variables
+##### Configure Required Variables
 
 Edit `.env` and set the following required parameters:
 
@@ -200,7 +205,7 @@ ENV_APEX_DEFAULT_WORKSPACE=INTERNAL
 
 <br>
 
-### Step 3: Build Services
+#### Step 3: Build Services
 
 Build the Docker images with a clean build:
 
@@ -208,13 +213,11 @@ Build the Docker images with a clean build:
 docker-compose build --no-cache
 ```
 
-**Build time:** Approximately 10-15 minutes (first build)
-
 <br>
 
-### Step 4: Start Services
+#### Step 4: Start Services
 
-#### Option A: Production Mode (Recommended)
+##### Option A: Production Mode (Recommended)
 
 Start all services in detached mode:
 
@@ -222,7 +225,7 @@ Start all services in detached mode:
 docker-compose up -d
 ```
 
-#### Option B: Development Mode
+##### Option B: Development Mode
 
 Start with real-time logs for debugging:
 
@@ -235,7 +238,7 @@ To stop, press `Ctrl+C` and run:
 docker-compose down
 ```
 
-#### Option C: Selective Services
+##### Option C: Selective Services
 
 Start only specific services:
 
@@ -249,9 +252,9 @@ docker-compose up -d demasylabs-oracle-server
 
 <br>
 
-### Step 5: Verify Installation
+#### Step 5: Verify Installation
 
-#### 1. Check Container Status
+##### 1. Check Container Status
 
 ```bash
 docker ps --filter "name=oracle-al-database-26ai" --filter "name=demasy-server"
@@ -264,7 +267,7 @@ abc123def456   oracle-database:26ai     Up 2 minutes (healthy)    0.0.0.0:1521->
 def456ghi789   demasy-server:latest     Up 2 minutes (healthy)    0.0.0.0:3000->3000/tcp
 ```
 
-#### 2. Wait for Database Initialization
+##### 2. Wait for Database Initialization
 
 Monitor database startup (takes 5-10 minutes on first run):
 
@@ -274,7 +277,7 @@ docker logs -f oracle-al-database-26ai
 
 **Look for:** `DATABASE IS READY TO USE!`
 
-#### 3. Verify Health Endpoints
+##### 3. Verify Health Endpoints
 
 Test the management server:
 
@@ -290,7 +293,7 @@ curl http://localhost:3000/health
 }
 ```
 
-#### 4. Test Database Connection
+##### 4. Test Database Connection
 
 Access the management container:
 
@@ -307,12 +310,6 @@ sqlcl
 Expected output: 
 
 ```
-SQLcl: Release 25.3 Production on Thu Nov 13 11:13:11 1986
-
-Copyright (c) 1982, 2025, Oracle.  All rights reserved.
-
-Last Successful login time: Thu Nov 13 1986 13:29:04 +03:00
-
 Connected to:
 Oracle AI Database 26ai Free Release 23.26.0.0.0 - Develop, Learn, and Run for Free
 Version 23.26.0.0.0
@@ -321,7 +318,7 @@ SQL>
 
 <br>
 
-### Quick Start Summary
+#### Quick Start Summary
 
 ```bash
 # 1. Clone and setup
@@ -339,11 +336,20 @@ docker ps
 docker logs -f oracle-al-database-26ai  # Wait for "READY TO USE"
 curl http://localhost:3000/health
 
-# 4. Connect
+# 4. (Optional) Run the APEX & ORDS installer inside the database container
+docker exec -it oracle-db-container bash
+/usr/demasy/scripts/apex/install-apex.sh
+exit
+
+# APEX / ORDS Web UI: open http://localhost:8080 (or your configured port) in a browser
+
+
+# 5. Connect
 docker exec -it demasy-server sqlcl
 ```
 
 <br>
+
 
 
 # Architecture
