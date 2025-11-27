@@ -39,7 +39,7 @@ services:
           cpus: "${ENV_DB_CPU_LIMIT}"
           memory: "${ENV_DB_MEMORY_LIMIT}"
         reservations:
-          cpus: "0.5"
+          cpus: "1"
           memory: "2g"
 
   demasylabs-oracle-server:
