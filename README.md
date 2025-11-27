@@ -1413,6 +1413,11 @@ We welcome you to join and contribute to the Oracle AI Database 26ai Free - Dock
 
 <br>
 
+###### Suggestions & Issues
+> If you find any issue or have a great idea in mind, please create an issue on <a href="https://github.com/demasy/oracle-database/issues">GitHub</a>.
+
+<br>
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
