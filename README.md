@@ -493,7 +493,7 @@ For comprehensive guides, see the [src/docs](src/docs) directory:
 
 <br>
 
-## 📜 Change Log / Release History
+## Change Log / Release History
 
 <br>
 
