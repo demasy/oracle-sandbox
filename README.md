@@ -240,9 +240,9 @@ All scripts are organized in a structured directory layout for better maintainab
 
 <br>
 
-**Available Command Aliases:**
+**Command Aliases:**
 
-| Alias | Target Script | Purpose |
+| Command Alias | Target Script | Purpose |
 |-------|--------------|----------|
 | `sqlcl` | `/usr/demasy/scripts/cli/sqlcl-connect.sh` | Connect via SQLcl |
 | `sqlplus` | `/usr/demasy/scripts/cli/sqlplus-connect.sh` | Connect via SQL*Plus |
@@ -253,7 +253,7 @@ All scripts are organized in a structured directory layout for better maintainab
 | `start-apex` | `/usr/demasy/scripts/oracle/apex/start.sh` | Start ORDS |
 | `stop-apex` | `/usr/demasy/scripts/oracle/apex/stop.sh` | Stop ORDS |
 
-> 📝 **Note:** All scripts are organized using best practices with flat structure (max 3 levels), DRY principle with shared utilities, and clear naming conventions. For detailed documentation, see `src/scripts/README.md`.
+> 📝 **Note:** All scripts are organized using best practices with a flat structure (max three levels). For detailed documentation, see `src/scripts/README.md`.
 
 <br>
 
