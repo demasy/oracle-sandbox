@@ -42,7 +42,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - Configuration
 - Troubleshooting / FAQ
 - Documentation
-- Change Log
+- [Change Log / Release History](#change-log--release-history)
 - [Contributors](#contributors)
 - [License](#overview)
 
