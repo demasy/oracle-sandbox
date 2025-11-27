@@ -123,135 +123,6 @@ Ensure the following ports are available:
 
 <br>
 
-# Architecture
-The environment consists of two primary containerized services:
-
-<br>
-
-#### Docker Architecture Diagram
-
-```
-┌───────────────────────────────────────────────────────┐
-│                   Docker Environment                  │
-│                                                       │
-│  ┌──────────────────┐         ┌──────────────────┐    │
-│  │  Management      │         │  Oracle AI       │    │
-│  │  Server          │◄────────┤  Database 26ai   │    │
-│  │  (Node.js)       │         │  + APEX 24.2     │    │
-│  │                  │         │  + ORDS 25.3     │    │
-│  │  - Health Check  │         │                  │    │
-│  │  - API Endpoints │         │  Ports:          │    │
-│  │  - SQLcl Client  │         │  - 1521 (DB)     │    │
-│  │                  │         │  - 5500 (EM)     │    │
-│  │  Port: 3000      │         │  - 8080 (ORDS)   │    │
-│  └──────────────────┘         └──────────────────┘    │
-│      192.168.1.20                192.168.1.10         │
-└───────────────────────────────────────────────────────┘
-```
-
-<br>
-
-#### Database Service (`demasylabs-oracle-database`)
-
-| Component | Details |
-|-----------|---------|
-| Base Image | Oracle AI Database 26ai Free Edition |
-| Container Name | `oracle-al-database-26ai` |
-| Database Name | DEMASY |
-| Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
-| Network | 192.168.1.10 |
-| Resources | • CPU: 1 core<br>• Memory: 3GB |
-| Health Check | Every 30s via SQL connectivity test |
-
-<br>
-
-#### Management Server (`demasylabs-oracle-server`)
-
-| Component | Details |
-|-----------|---------|
-| Base Image | Node.js 20.19.4 |
-| Container Name | `demasy-server` |
-| Exposed Port | 3000 (API & Health Check) |
-| Network | 192.168.1.20 |
-| Resources | • CPU: 1 core<br>• Memory: 512MB |
-| Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
-| Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
-
-
-<br>
-
-#### 📋 Version Information
-
-| Component | Version | Release Date | Status |
-|-----------|---------|--------------|--------|
-| Oracle AI Database | 26ai Free | 2025 | ✅ Production-Ready |
-| Oracle APEX | 24.2.0 | October 2024 | ✅ Current Release |
-| Oracle ORDS | 25.3.1 | November 2024 | ✅ Current Release |
-| Oracle SQLcl | 25.3 | November 2024 | ✅ Current Release |
-| Oracle Instant Client | 23.7 | 2024 | ✅ Stable |
-| Node.js | 20.19.4 LTS | 2024 | ✅ Long-Term Support |
-| Docker Engine | 24.0.0+ | - | ✅ Required |
-| Docker Compose | v2.20.0+ | - | ✅ Required |
-
-<br>
-
-#### 🖥️ Platform Compatibility
-
-| Platform | Architecture | SQL*Plus | SQLcl | APEX | Status |
-|----------|-------------|----------|-------|------|--------|
-| **Linux (Ubuntu/Debian)** | AMD64 (x86_64) | ✅ | ✅ | ✅ | Fully Supported |
-| **Linux (Ubuntu/Debian)** | ARM64 (aarch64) | ⚠️ Fallback | ✅ | ✅ | Supported |
-| **macOS (Intel)** | AMD64 (x86_64) | ✅ | ✅ | ✅ | Fully Supported |
-| **macOS (Apple Silicon)** | ARM64 (M1/M2/M3) | ⚠️ Fallback | ✅ | ✅ | Supported |
-| **Windows (WSL2)** | AMD64 (x86_64) | ✅ | ✅ | ✅ | Supported |
-
-> ⚠️ **Note:** SQL*Plus is not natively available on ARM64. SQLcl is automatically used as a fallback.
-
-<br>
-
-## Scripts
-
-All scripts are organized in a structured directory layout for better maintainability:
-
-**Container Path Structure:**
-```
-/usr/demasy/scripts/
-├── cli/                    # User-facing CLI tools
-│   ├── sqlcl-connect.sh   # SQLcl database connection
-│   └── sqlplus-connect.sh # SQL*Plus connection
-│
-├── oracle/
-│   ├── admin/             # Administrative tools
-│   │   └── healthcheck.sh # System health monitoring
-│   │
-│   ├── apex/              # APEX management
-│   │   ├── install.sh    # APEX + ORDS installation
-│   │   ├── uninstall.sh  # APEX removal
-│   │   ├── start.sh      # Start ORDS
-│   │   └── stop.sh       # Stop ORDS
-
-```
-
-<br>
-
-**Command Aliases:**
-
-| Command Alias | Target Script | Purpose |
-|-------|--------------|----------|
-| `sqlcl` | `/usr/demasy/scripts/cli/sqlcl-connect.sh` | Connect via SQLcl |
-| `sqlplus` | `/usr/demasy/scripts/cli/sqlplus-connect.sh` | Connect via SQL*Plus |
-| `oracle` | `/usr/demasy/scripts/cli/sqlcl-connect.sh` | Alias for SQLcl |
-| `healthcheck` | `/usr/demasy/scripts/oracle/admin/healthcheck.sh` | Run health check |
-| `install-apex` | `/usr/demasy/scripts/oracle/apex/install.sh` | Install APEX |
-| `uninstall-apex` | `/usr/demasy/scripts/oracle/apex/uninstall.sh` | Remove APEX |
-| `start-apex` | `/usr/demasy/scripts/oracle/apex/start.sh` | Start ORDS |
-| `stop-apex` | `/usr/demasy/scripts/oracle/apex/stop.sh` | Stop ORDS |
-
-> 📝 **Note:** All scripts are organized using best practices with a flat structure (max three levels). For detailed documentation, see `src/scripts/README.md`.
-
-<br>
-
-
 ## Quick Start
 
 <br>
@@ -462,6 +333,135 @@ curl http://localhost:3000/health
 # 4. Connect
 docker exec -it demasy-server sqlcl
 ```
+
+<br>
+
+
+# Architecture
+The environment consists of two primary containerized services:
+
+<br>
+
+#### Docker Architecture Diagram
+
+```
+┌───────────────────────────────────────────────────────┐
+│                   Docker Environment                  │
+│                                                       │
+│  ┌──────────────────┐         ┌──────────────────┐    │
+│  │  Management      │         │  Oracle AI       │    │
+│  │  Server          │◄────────┤  Database 26ai   │    │
+│  │  (Node.js)       │         │  + APEX 24.2     │    │
+│  │                  │         │  + ORDS 25.3     │    │
+│  │  - Health Check  │         │                  │    │
+│  │  - API Endpoints │         │  Ports:          │    │
+│  │  - SQLcl Client  │         │  - 1521 (DB)     │    │
+│  │                  │         │  - 5500 (EM)     │    │
+│  │  Port: 3000      │         │  - 8080 (ORDS)   │    │
+│  └──────────────────┘         └──────────────────┘    │
+│      192.168.1.20                192.168.1.10         │
+└───────────────────────────────────────────────────────┘
+```
+
+<br>
+
+#### Database Service (`demasylabs-oracle-database`)
+
+| Component | Details |
+|-----------|---------|
+| Base Image | Oracle AI Database 26ai Free Edition |
+| Container Name | `oracle-al-database-26ai` |
+| Database Name | DEMASY |
+| Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
+| Network | 192.168.1.10 |
+| Resources | • CPU: 1 core<br>• Memory: 3GB |
+| Health Check | Every 30s via SQL connectivity test |
+
+<br>
+
+#### Management Server (`demasylabs-oracle-server`)
+
+| Component | Details |
+|-----------|---------|
+| Base Image | Node.js 20.19.4 |
+| Container Name | `demasy-server` |
+| Exposed Port | 3000 (API & Health Check) |
+| Network | 192.168.1.20 |
+| Resources | • CPU: 1 core<br>• Memory: 512MB |
+| Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
+| Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
+
+
+<br>
+
+#### 📋 Version Information
+
+| Component | Version | Release Date | Status |
+|-----------|---------|--------------|--------|
+| Oracle AI Database | 26ai Free | 2025 | ✅ Production-Ready |
+| Oracle APEX | 24.2.0 | October 2024 | ✅ Current Release |
+| Oracle ORDS | 25.3.1 | November 2024 | ✅ Current Release |
+| Oracle SQLcl | 25.3 | November 2024 | ✅ Current Release |
+| Oracle Instant Client | 23.7 | 2024 | ✅ Stable |
+| Node.js | 20.19.4 LTS | 2024 | ✅ Long-Term Support |
+| Docker Engine | 24.0.0+ | - | ✅ Required |
+| Docker Compose | v2.20.0+ | - | ✅ Required |
+
+<br>
+
+#### 🖥️ Platform Compatibility
+
+| Platform | Architecture | SQL*Plus | SQLcl | APEX | Status |
+|----------|-------------|----------|-------|------|--------|
+| **Linux (Ubuntu/Debian)** | AMD64 (x86_64) | ✅ | ✅ | ✅ | Fully Supported |
+| **Linux (Ubuntu/Debian)** | ARM64 (aarch64) | ⚠️ Fallback | ✅ | ✅ | Supported |
+| **macOS (Intel)** | AMD64 (x86_64) | ✅ | ✅ | ✅ | Fully Supported |
+| **macOS (Apple Silicon)** | ARM64 (M1/M2/M3) | ⚠️ Fallback | ✅ | ✅ | Supported |
+| **Windows (WSL2)** | AMD64 (x86_64) | ✅ | ✅ | ✅ | Supported |
+
+> ⚠️ **Note:** SQL*Plus is not natively available on ARM64. SQLcl is automatically used as a fallback.
+
+<br>
+
+## Scripts
+
+All scripts are organized in a structured directory layout for better maintainability:
+
+**Container Path Structure:**
+```
+/usr/demasy/scripts/
+├── cli/                    # User-facing CLI tools
+│   ├── sqlcl-connect.sh   # SQLcl database connection
+│   └── sqlplus-connect.sh # SQL*Plus connection
+│
+├── oracle/
+│   ├── admin/             # Administrative tools
+│   │   └── healthcheck.sh # System health monitoring
+│   │
+│   ├── apex/              # APEX management
+│   │   ├── install.sh    # APEX + ORDS installation
+│   │   ├── uninstall.sh  # APEX removal
+│   │   ├── start.sh      # Start ORDS
+│   │   └── stop.sh       # Stop ORDS
+
+```
+
+<br>
+
+**Command Aliases:**
+
+| Command Alias | Target Script | Purpose |
+|-------|--------------|----------|
+| `sqlcl` | `/usr/demasy/scripts/cli/sqlcl-connect.sh` | Connect via SQLcl |
+| `sqlplus` | `/usr/demasy/scripts/cli/sqlplus-connect.sh` | Connect via SQL*Plus |
+| `oracle` | `/usr/demasy/scripts/cli/sqlcl-connect.sh` | Alias for SQLcl |
+| `healthcheck` | `/usr/demasy/scripts/oracle/admin/healthcheck.sh` | Run health check |
+| `install-apex` | `/usr/demasy/scripts/oracle/apex/install.sh` | Install APEX |
+| `uninstall-apex` | `/usr/demasy/scripts/oracle/apex/uninstall.sh` | Remove APEX |
+| `start-apex` | `/usr/demasy/scripts/oracle/apex/start.sh` | Start ORDS |
+| `stop-apex` | `/usr/demasy/scripts/oracle/apex/stop.sh` | Stop ORDS |
+
+> 📝 **Note:** All scripts are organized using best practices with a flat structure (max three levels). For detailed documentation, see `src/scripts/README.md`.
 
 <br>
 
