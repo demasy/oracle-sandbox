@@ -270,12 +270,16 @@ All scripts are organized in a structured directory layout for better maintainab
 
 ## Quick Start
 
+<br>
+
 ### Step 1: Clone Repository
 
 ```bash
 git clone https://github.com/demasy/oracle-database.git
 cd oracle-database
 ```
+
+<br>
 
 ### Step 2: Environment Configuration
 
@@ -330,6 +334,8 @@ ENV_APEX_DEFAULT_WORKSPACE=INTERNAL
 > - Rotate passwords regularly in production environments
 > - Use different credentials for each environment
 
+<br>
+
 ### Step 3: Build Services
 
 Build the Docker images with a clean build:
@@ -339,6 +345,8 @@ docker-compose build --no-cache
 ```
 
 **Build time:** Approximately 10-15 minutes (first build)
+
+<br>
 
 ### Step 4: Start Services
 
@@ -374,6 +382,8 @@ docker-compose up -d demasylabs-oracle-database
 # Management server only
 docker-compose up -d demasylabs-oracle-server
 ```
+
+<br>
 
 ### Step 5: Verify Installation
 
@@ -430,7 +440,8 @@ Connect to the database:
 sqlcl
 ```
 
-**Expected output: 
+Expected output: 
+
 ```
 SQLcl: Release 25.3 Production on Thu Nov 13 11:13:11 1986
 
