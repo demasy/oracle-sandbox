@@ -75,47 +75,60 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 <br>
 
-# 📦 Prerequisites
-
-### Software Prerequisites
-
-1. **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Container platform (includes Docker Engine and Docker Compose)
-2. **[Git](https://git-scm.com/)** - Version control system for repository cloning
-3. **Modern web browser** - For accessing APEX and Enterprise Manager (Chrome, Firefox, Edge, or Safari)
-4. **Text editor** - For configuration file editing (VS Code, Sublime Text, or similar)
-
-### Network Requirements
-
-1. **Internet connection** - Required for initial setup and Docker image downloads
-2. **Available subnet** - 192.168.1.0/24 for container networking
-3. **Firewall configuration** - Allow Docker container communication
-4. **Port availability** - Ensure ports 1521, 5500, 3000, and 8080 are not in use
-
-> **Note:** Oracle APEX 24.2.0 is pre-installed in the container - no separate installation required.
+## 📦 Prerequisites
 
 <br>
 
-### System Requirements
+### 🖥️ Host System Requirements
 
-| Component | Minimum Specification |
-|-----------|----------------------|
-| **Docker Engine** | 24.0.0 or later |
-| **Docker Compose** | v2.20.0 or later |
-| **RAM** | 8 GB |
-| **Storage** | 20 GB available disk space |
-| **CPU** | 2 cores (x86_64 or ARM64) |
-| **Operating System** | Linux, macOS, or Windows with WSL2 |
+| Resource             | Minimum                            | Recommended                 |
+|-----------------     |------------------                  |-----------------------------|
+| **Operating System** | -                                  | Linux, macOS, or Windows with WSL2 |
+| **CPU**              | 2 cores (x86_64 or ARM64)          | 2+ cores (x86_64 or ARM64)  |
+| **RAM**              | 4 GB                               | **8 GB or more**            |
+| **Disk Space**       | 12 GB free                         | 20+ GB available disk space |
+| **Swap Space**       | -                                  | 2 GB (or twice RAM)         |
+| **Docker Engine**    | -                                  | 24.0.0 or later             |
+| **Docker Compose**   | -                                  | v2.20.0 or later            |
 
-### Required Ports
 
-Ensure the following ports are available:
+<br>
+
+### Software Requirements
+
+- **Docker Desktop** (or Docker Engine + Docker Compose): Required for running and managing all containers.
+- **Git**: Used for cloning the repository and pulling updates.
+- **Visual Studio Code**: Ideal for editing configuration files, environment variables, and scripts. It also offers excellent support through Docker and SQL/PLSQL extensions.
+- **Modern Web Browser**: Necessary for accessing APEX and ORDS. Supported browsers include Chrome, Firefox, Edge, and Safari.
+
+<br>
+
+### Network and Port Requirements
+
+- **Internet Connection:** Required to download Docker images during the initial setup.
+- **Docker Network:** The default subnet is 192.168.1.0/24 (this is customizable in the docker-compose.yml file).
+- **Firewall Permissions:** Docker must be granted permission to create and manage local container networks.
+- **Open Host Ports:** Ensure that the following ports are not in use by other services:
+
+
+
+#### Open Host Ports Table
 
 | Port | Service | Protocol |
 |------|---------|----------|
+| 3000 | Demasy Labs Management Server | HTTP |
+| 8080 / 8443 | ORDS and APEX web access | HTTP |
 | 1521 | Oracle Database Listener | TCP |
-| 5500 | Enterprise Manager Express | HTTP |
+| 5500 | Enterprise Manager (optional) | HTTP |
 | 3000 | Management API | HTTP |
 | 8080 | Oracle ORDS/APEX | HTTP |
+
+<br>
+
+> 📌 Notes
+>
+> - Oracle Database, SQLcl, and SQL*Plus are pre-installed in the container - no separate installation required.
+> - Oracle APEX and ORDS must be installed manually using the provided script inside the container.  ```bash /usr/demasy/scripts/apex/install-apex.sh ```
 
 <br>
 
