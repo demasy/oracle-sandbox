@@ -478,11 +478,24 @@ For comprehensive guides, see the [src/docs](src/docs) directory:
 
 <br>
 
-## 📜 Change Log
+## 📜 Change Log / Release History
 
-| Version | Date | Type | Description |
-|---------|------|------|-------------|
-|v1.0.0|01-DEC-2025| Release |Foundation Release (December 2025)|
+<br>
+
+| Version | Date       | Type     | Description                                                                                       |
+|---------|------------|----------|---------------------------------------------------------------------------------------------------|
+| v1.0.0  | 2025-12-01 | Release  | **Foundation Release** initial public release including Oracle 26ai Free, APEX 24.2, ORDS 25.3, SQLcl, Docker Compose setup, core scripts, and full documentation. |
+
+<br>
+
+### [v1.0.0] – 2025-12-01
+
+#### Added
+- Oracle Database 26ai Free container image  
+- APEX 24.2, ORDS 25.3, SQLcl integration  
+- Docker Compose setup (DB + Management Server)  
+- Core shell scripts (healthcheck, install-apex, SQLcl / SQL*Plus helpers)  
+- Complete documentation, including architecture diagram, environment variable descriptions, usage instructions, and directory structure  
 
 
 <br>
