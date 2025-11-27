@@ -32,7 +32,6 @@ Designed to facilitate learning through practical experience, this setup allows 
 <br>
 
 # 📑 Table of Contents
-#-prerequisites
 - [Overview](#overview) 
 - [Key Features](#key-features)
 - [Use Cases](#use-cases)
