@@ -39,6 +39,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - Architecture
+- [Built-in Tools & Scripts](#built-in-tools--scripts)
 - Configuration
 - Troubleshooting / FAQ
 - Documentation
