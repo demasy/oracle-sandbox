@@ -137,7 +137,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 <br>
 
-### Setup Instructions
+### Setup Guide
 
 <br>
 
@@ -318,7 +318,7 @@ SQL>
 
 <br>
 
-#### Quick Start Summary
+### Quick Start
 
 ```bash
 # 1. Clone and setup
