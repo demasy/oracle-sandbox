@@ -40,7 +40,7 @@ A professionally architected, fully containerized Oracle AI Database 26ai **deve
 - [Documentation](#-documentation)
 - [Change Log](#-change-log)
 - [Contributors](#-contributors)
-- [License](#-license)
+- [License](#license)
 
 <br>
 
