@@ -1169,7 +1169,7 @@ docker exec demasy-server start-apex
 
 | Version | Date | Type | Description |
 |---------|------|------|-------------|
-|v1.0.0|01-DEC-2025|------|Foundation Release (December 2025)|
+|v1.0.0|01-DEC-2025| Release |Foundation Release (December 2025)|
 
 
 <br>
