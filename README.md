@@ -186,7 +186,7 @@ The environment consists of two primary containerized services:
 
 <br>
 
-### 📋 Version Information
+#### 📋 Version Information
 
 | Component | Version | Release Date | Status |
 |-----------|---------|--------------|--------|
@@ -201,7 +201,7 @@ The environment consists of two primary containerized services:
 
 <br>
 
-### 🖥️ Platform Compatibility
+#### 🖥️ Platform Compatibility
 
 | Platform | Architecture | SQL*Plus | SQLcl | APEX | Status |
 |----------|-------------|----------|-------|------|--------|
