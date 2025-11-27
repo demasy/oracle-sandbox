@@ -589,7 +589,9 @@ docker exec demasy-server install-apex
 - Static image serving configuration
 - Workspace and admin user setup
 
-**Installation time:** Approximately 5-7 minutes
+> **Installation time:** Approximately 5-7 minutes
+
+<br>
 
 ### Access Endpoints
 
