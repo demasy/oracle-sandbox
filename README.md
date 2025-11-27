@@ -1389,68 +1389,8 @@ FROM dba_tablespace_usage_metrics;
 
 ---
 
-## 🗺️ Roadmap
 
-### Current Release: v1.0 Foundation (95% Complete)
 
-| Feature | Status | Version |
-|---------|--------|--------|
-| Docker Infrastructure | ✅ Complete | v1.0 |
-| Oracle AI Database 26ai | ✅ Complete | v1.0 |
-| APEX 24.2 + ORDS 25.3 | ✅ Complete | v1.0 |
-| SQLcl & SQL*Plus | ✅ Complete | v1.0 |
-| Health Monitoring | ✅ Complete | v1.0 |
-| CI/CD Workflows | ✅ Complete | v1.0 |
-| Comprehensive Docs | ✅ Complete | v1.0 |
-
-### Upcoming Features
-
-| Feature | Status | Target Version |
-|---------|--------|---------------|
-| APEX Sample Applications | 📋 Planned | v1.1 |
-| APEX Workspace Templates | 📋 Planned | v1.1 |
-| MCP Integration | 📋 Planned | v1.2 |
-| VS Code Dev Container | 📋 Planned | v1.2 |
-| Database Backup Scripts | 📋 Planned | v1.2 |
-| Sample Schemas (HR, OE) | 📋 Planned | v1.2 |
-| Full ARM64 Optimization | 📋 Planned | v1.3 |
-| Kubernetes Support | 📋 Planned | v2.0 |
-| Terraform Modules | 📋 Planned | v2.0 |
-
----
-
-## 📊 Performance Benchmarks
-
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Docker Image Size** | ~2.5 GB | Multi-stage optimized |
-| **Build Time (first)** | 10-15 min | Includes downloads |
-| **Build Time (cached)** | 2-3 min | With layer caching |
-| **Startup Time (DB)** | 5-10 min | First initialization |
-| **Startup Time (subsequent)** | 30-60 sec | From existing data |
-| **APEX Install Time** | 5-7 min | One-time setup |
-| **Memory Usage (DB)** | ~2-3 GB | Runtime |
-| **Memory Usage (Server)** | ~256 MB | Runtime |
-
----
-
-## 🎓 Learning Resources
-
-### Official Documentation
-- [Oracle AI Database 26ai Documentation](https://docs.oracle.com/en/database/oracle/oracle-database/23/)
-- [Oracle APEX Documentation](https://docs.oracle.com/en/database/oracle/apex/)
-- [Oracle ORDS Documentation](https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/)
-- [Oracle SQLcl Documentation](https://docs.oracle.com/en/database/oracle/sql-developer-command-line/)
-
-### Tutorials & Guides
-- [APEX Interactive Reports](https://apex.oracle.com/en/learn/tutorials/)
-- [REST API Development with ORDS](https://www.oracle.com/database/technologies/appdev/rest.html)
-- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
-
-### Community
-- [Oracle APEX Community](https://apex.oracle.com/community)
-- [Oracle Developer Community](https://community.oracle.com/)
-- [Stack Overflow - Oracle](https://stackoverflow.com/questions/tagged/oracle)
 
 ## 📜 Change Log
 
@@ -1460,53 +1400,6 @@ FROM dba_tablespace_usage_metrics;
 
 
 ## 🤝 Community & Contributing
-
-We welcome you to join and contribute to the Oracle Database project! Whether you're a developer, DBA, educator, or enthusiast, there's a place for you in our community.
-
-<div align="center">
-
-| 💬 **Discussions** | 🐛 **Issues** | 🎯 **Pull Requests** | 📧 **Contact** |
-|:---:|:---:|:---:|:---:|
-| [Join Discussion](https://github.com/demasy/oracle-database/discussions) | [Report Bug](https://github.com/demasy/oracle-database/issues/new) | [Submit PR](https://github.com/demasy/oracle-database/pulls) | [Email Us](mailto:founder@demasy.io) |
-
-</div>
-
-### 🌟 Ways to Contribute
-
-**Code Contributions:**
-- 🔧 Fix bugs and issues
-- ✨ Add new features
-- 📝 Improve documentation
-- 🧪 Write tests
-- 🎨 Enhance scripts
-
-**Non-Code Contributions:**
-- 📖 Write tutorials
-- 🎥 Create videos
-- 💡 Suggest features
-- ❓ Answer questions
-- 📢 Share the project
-
-### 🚀 Quick Start for Contributors
-
-```bash
-# 1. Fork and clone
-git clone https://github.com/YOUR_USERNAME/oracle-database.git
-cd oracle-database
-
-# 2. Create branch
-git checkout -b feature/your-feature
-
-# 3. Make changes and test
-docker-compose build --no-cache
-docker-compose up -d
-
-# 4. Commit and push
-git commit -m "feat: your feature description"
-git push origin feature/your-feature
-
-# 5. Create Pull Request on GitHub
-```
 
 # 🏆 Contributors
 
@@ -1533,69 +1426,6 @@ Thanks to everyone who contributes to this project! 🎉
 
 > Want to see your name here? [Start contributing today](#-ways-to-contribute)!
 
----
-
-### 💬 Get Help & Support
-
-**Having Issues?**
-1. 📖 Check [Documentation](#overview)
-2. 🔍 Search [existing issues](https://github.com/demasy/oracle-database/issues)
-3. 💬 Start a [discussion](https://github.com/demasy/oracle-database/discussions)
-4. 🐛 [Report a bug](https://github.com/demasy/oracle-database/issues/new)
-
-**Direct Contact:**
-- 📧 Email: founder@demasy.io
-- 💼 LinkedIn: [Ahmed El-Demasy](https://www.linkedin.com/in/demasy)
-- 🌐 Website: [www.demasy.io](https://www.demasy.io)
-
-
-# 📜 Code of Conduct
-
-We are committed to providing a welcoming environment for all contributors.
-
-**Our Standards:**
-- ✅ Use welcoming and inclusive language
-- ✅ Respect differing viewpoints
-- ✅ Accept constructive criticism gracefully
-- ✅ Focus on what's best for the community
-- ✅ Show empathy towards others
-
-**Unacceptable:**
-- ❌ Harassment or discrimination
-- ❌ Trolling or insulting comments
-- ❌ Personal or political attacks
-- ❌ Publishing private information
-- ❌ Unprofessional conduct
-
-Report issues to: founder@demasy.io
-
-# 💖 Support the Project
-
-- ⭐ **Star the repo** on GitHub
-- 🔀 **Fork it** and customize
-- 📢 **Share it** with others
-- 💬 **Give feedback**
-- 🐛 **Report bugs**
-- 💡 **Suggest features**
-- 💻 **Contribute code**
-
-<div align="center">
-
-### ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=demasy/oracle-database&type=Date)](https://star-history.com/#demasy/oracle-database&Date)
-
-</div>
-
-
-## 🙏 Acknowledgments
-
-- **Oracle Corporation** - Database technology
-- **Docker Community** - Containerization platform
-- **GitHub** - Hosting & CI/CD
-- **All Contributors** - Community support
-- **Users** - Valuable feedback
-<br>
 
 ## License
 
