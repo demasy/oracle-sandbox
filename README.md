@@ -474,7 +474,10 @@ All scripts are organized in a structured directory layout for better maintainab
 | `start-apex` | `/usr/demasy/scripts/oracle/apex/start.sh` | Start ORDS |
 | `stop-apex` | `/usr/demasy/scripts/oracle/apex/stop.sh` | Stop ORDS |
 
-> 📝 **Note:** All scripts are organized using best practices with a flat structure (max three levels). For detailed documentation, see `src/scripts/README.md`.
+<br>
+
+> [!NOTE]
+> All scripts are organized using best practices with a flat structure (max three levels). For detailed documentation, see `src/scripts/README.md`.
 
 <br>
 
