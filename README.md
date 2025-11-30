@@ -130,7 +130,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 <br>
 
-## 🚀 Getting Started
+## Getting Started
 
 
 <br>
