@@ -39,8 +39,6 @@ Designed to facilitate learning through practical experience, this setup allows 
 - [Getting Started](#getting-started)
 - [Architecture](#architecture)
 - [Built-in Tools & Scripts](#built-in-tools--scripts)
-- Configuration
-- Troubleshooting / FAQ
 - [Documentation](https://github.com/demasy/oracle-database/tree/main/src/docs)
 - [Change Log / Release History](#change-log--release-history)
 - [Contributors](#contributors)
