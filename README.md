@@ -524,13 +524,13 @@ For comprehensive guides, see the [src/docs](src/docs) directory:
 
 <br>
 
-### Contributing to the Oracle AI Database 26ai Free - Docker Development Environment. 
-We welcome you to join and contribute to the Oracle AI Database 26ai Free - Docker Development Environment. If you are interested in helping, please don’t hesitate to contact us at founder@demasy.io
+### Contributing to the "🚀 Oracle AI Database 26ai Free – Developer Environment". 
+We welcome you to join and contribute to the "🚀 Oracle AI Database 26ai Free – Developer Environment 🚀". If you are interested in helping, please don’t hesitate to contact us at founder@demasy.io
 
 <br>
 
 ###### Suggestions & Issues
-> If you find any issue or have a great idea in mind, please create an issue on <a href="https://github.com/demasy/oracle-database/issues">GitHub</a>.
+> If you find any issues or have a great idea in mind, please create an issue on <a href="https://github.com/demasy/oracle-database/issues">GitHub</a>.
 
 <br>
 
