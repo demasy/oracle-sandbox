@@ -1,4 +1,4 @@
-# 🚀 Oracle AI Database 26ai Free - Docker Development Environment
+# 🚀 Oracle AI Database 26ai Free – Developer Environment
 
 <div align="center">
 
@@ -16,117 +16,341 @@
 
 <br>
 
-> **⚠️ DEVELOPMENT AND TRAINING ENVIRONMENT ONLY**
-> 
-> **Enterprise-grade containerized Oracle AI Database 26ai Free Edition with integrated APEX & ORDS. Purpose-built for professional developers, database administrators, and technical education.**
+# Overview
+
+The **Oracle AI Database 26ai Free - Developer Environment** offers a clean, fully containerized development stack designed for modern application development, in-depth technical learning, and hands-on exploration of Oracle's latest AI-powered capabilities. By combining **Oracle Database 26ai Free**, **APEX 24.2**, **ORDS 25.3**, and **SQLcl** into a unified Docker-based environment, this setup simplifies installation. It provides a consistent, reproducible workspace across macOS, Linux, and Windows WSL2 environments.
+
+This environment is specifically tailored for **PL/SQL developers**, **APEX builders**, **database administrators (DBAs)**, **architects**, **instructors**, and the broader **Oracle community**. It serves as a reliable and portable foundation for rapid prototyping, REST API development, workshops, and classroom training. Users can discover and test the latest features of Oracle Database 26ai, experiment with AI-enhanced SQL and application patterns, and build full-stack solutions all without requiring production-scale infrastructure.
+
+Designed to facilitate learning through practical experience, this setup allows users to start instantly, iterate quickly, reset easily, and explore safely. With its isolated, predictable, and developer-friendly design, this environment accelerates experimentation, promotes community adoption, and helps professionals stay current with Oracle's evolving innovations. Whether you're showcasing new features, teaching future Oracle developers, contributing to community knowledge, or building internal tools, this environment provides a fast, modern, and reliable foundation for your projects.
 
 <br>
 
-# Overview
-
-A professionally architected, fully containerized Oracle AI Database 26ai **development and training environment** that seamlessly integrates enterprise-grade database capabilities with modern development tooling. This solution delivers a robust, isolated, and reproducible workspace for Oracle Database development, comprehensive testing, and professional training programs.
-
-> **⚠️ Important Notice:** This environment has been specifically engineered for **development, testing, and educational purposes**. It is **not hardened or optimized for production deployments**. Organizations seeking production-ready solutions should consult [Oracle's official production deployment guidelines](https://www.oracle.com/database/) and engage with Oracle's enterprise support channels.
-
+> **⚠️ DEVELOPMENT AND TRAINING ENVIRONMENT ONLY**
+> 
+> This environment is intended solely for **development**, **testing**, **evaluation**, and **educational** purposes. It is not secured, hardened, or optimized for production workloads. For production-grade deployments, organizations should consult Oracle's official deployment guidelines and work with Oracle Support or certified Oracle partners to ensure appropriate architecture, security, and compliance.
 <br>
 
 # 📑 Table of Contents
-
-- [What's Included](#-whats-included)
+- [Overview](#overview) 
+- [Key Features](#key-features)
 - [Use Cases](#use-cases)
-- [Prerequisites](#-prerequisites)
-- [Quick Start](#-quick-start)
-- [Architecture](#-architecture)
-
-### 🤝 Community
-
-- [Change Log](#-change-log)
-- [Community & Contributing](#-community--contributing)
-- [Code of Conduct](#-code-of-conduct)
-- [Contributors](#-contributors)
-- [Support](#-support-the-project)
-- [License](#license)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Architecture](#architecture)
+- [Built-in Tools & Scripts](#built-in-tools--scripts)
+- Configuration
+- Troubleshooting / FAQ
+- [Documentation](https://github.com/demasy/oracle-database/tree/main/src/docs)
+- [Change Log / Release History](#change-log--release-history)
+- [Contributors](#contributors)
+- [License](#overview)
 
 <br>
 
-## ✨ What's Included
-
-#### 🗄️ **Oracle Database**
-- **Oracle AI Database 26ai Free** - Latest release with AI capabilities
-- **Pluggable Database (FREEPDB1)** - Multi-tenant architecture
-
-#### 🛠️ **SQL Development Tools**
-- **Oracle SQLcl 25.3** - Modern command-line interface
-- **SQL*Plus** - Traditional SQL client
-- **SQL Developer Web** - Browser-based SQL IDE
-
-#### 🎨 **Low-Code Platform**
-- **Oracle APEX 24.2.0** - Enterprise application development
-- **Oracle ORDS 25.3** - RESTful web services
-
-#### 🐳 **Docker Environment**
-- **Docker Compose** - One-command deployment
-- **Multi-architecture** - AMD64 & ARM64 support
-- **Health Monitoring** - Built-in diagnostics
+## Key Features
+- Oracle Database 26ai Free, preconfigured for local development
+- APEX 24.2 + ORDS 25.3 fully integrated and ready to use
+- SQLcl & SQL*Plus included for scripting, labs, and automation
+- Clean Docker Compose setup (Database + Management Server)
+- Compatible with Linux, macOS (Intel/ARM), and Windows WSL2
+- Simple environment variables and port mapping for easy configuration
+- Built-in scripts for APEX installation, health checks, and utilities
+- Developer-friendly structure ideal for training, demos, and workshops
 
 <br>
 
 ## Use Cases
 
+<br>
+
 | Use Case | Description |
 |----------|-------------|
-| **Professional Training & Education** | Comprehensive learning environment for Oracle Database administration, SQL development, and APEX application development with hands-on practical experience |
-| **Proof of Concept (POC)** | Rapid prototyping and technical validation platform for evaluating Oracle AI Database 26ai features and enterprise solutions |
-| **APEX Application Development** | Full-stack low-code development environment with Oracle APEX 24.2.0, ORDS 25.3, and integrated database services for building enterprise applications |
-| **Technology Discovery** | Explore and evaluate the latest Oracle AI Database 26ai capabilities, new features, and enhancements in an isolated sandbox environment |
-| **Community & Open Source** | Accessible development platform enabling collaborative projects, community contributions, and knowledge sharing |
-| **Isolated Development Environment** | Containerized Oracle database instances providing consistent, reproducible development environments without impacting local system configuration |
+| **Isolated Development and Testing Environment** | Reproducible, containerized Oracle instances that enable developers to test changes, isolate work streams, and keep clean project environments without impacting the local system. |
+| **Technology Exploration and Feature Discovery** | A secure, isolated sandbox for exploring Oracle AI Database’s newest features, enhancements, and modern development workflows, enabling developers to learn through experimentation. |
+| **Proof of Concept (POC)** | A flexible, temporary environment for creating prototypes, validating technical approaches, and showcasing Oracle AI Database capabilities without the complexity of a complete production infrastructure. |
+| **APEX Application Development** | An all-in-one, low-code development platform featuring APEX 24.2, ORDS 25.3, and database services. Ideal for designing, testing, and deploying enterprise-level applications.|
+| **Community, Collaboration, and Open Source** | A shared workspace that supports testing, collaborative projects, hackathons, knowledge exchange, and community-driven innovation within the Oracle ecosystem. |
+| **Professional Training and Education** | A comprehensive, hands-on learning platform focusing on Oracle Database, SQL, PL/SQL, APEX, and Oracle REST Data Services (ORDS). Perfect for instructors, workshops, bootcamps, certification preparation, and Oracle community training projects.|
 
 <br>
 
-# 📦 Prerequisites
-
-### Software Prerequisites
-
-1. **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Container platform (includes Docker Engine and Docker Compose)
-2. **[Git](https://git-scm.com/)** - Version control system for repository cloning
-3. **Modern web browser** - For accessing APEX and Enterprise Manager (Chrome, Firefox, Edge, or Safari)
-4. **Text editor** - For configuration file editing (VS Code, Sublime Text, or similar)
-
-### Network Requirements
-
-1. **Internet connection** - Required for initial setup and Docker image downloads
-2. **Available subnet** - 192.168.1.0/24 for container networking
-3. **Firewall configuration** - Allow Docker container communication
-4. **Port availability** - Ensure ports 1521, 5500, 3000, and 8080 are not in use
-
-> **Note:** Oracle APEX 24.2.0 is pre-installed in the container - no separate installation required.
+## Prerequisites
 
 <br>
 
-### System Requirements
+### 🖥️ Host System Requirements
 
-| Component | Minimum Specification |
-|-----------|----------------------|
-| **Docker Engine** | 24.0.0 or later |
-| **Docker Compose** | v2.20.0 or later |
-| **RAM** | 8 GB |
-| **Storage** | 20 GB available disk space |
-| **CPU** | 2 cores (x86_64 or ARM64) |
-| **Operating System** | Linux, macOS, or Windows with WSL2 |
+| Resource             | Minimum                            | Recommended                 |
+|-----------------     |------------------                  |-----------------------------|
+| **Operating System** | -                                  | Linux, macOS, or Windows with WSL2 |
+| **CPU**              | 2 cores (x86_64 or ARM64)          | 2+ cores (x86_64 or ARM64)  |
+| **RAM**              | 4 GB                               | **8 GB or more**            |
+| **Disk Space**       | 12 GB free                         | 20+ GB available disk space |
+| **Swap Space**       | -                                  | 2 GB (or twice RAM)         |
+| **Docker Engine**    | -                                  | 24.0.0 or later             |
+| **Docker Compose**   | -                                  | v2.20.0 or later            |
 
-### Required Ports
 
-Ensure the following ports are available:
+<br>
 
+### Software Requirements
+
+- **Docker Desktop** (or Docker Engine + Docker Compose): Required for running and managing all containers.
+- **Git**: Used for cloning the repository and pulling updates.
+- **Visual Studio Code**: Ideal for editing configuration files, environment variables, and scripts. It also offers excellent support through Docker and SQL/PLSQL extensions.
+- **Modern Web Browser**: Necessary for accessing APEX and ORDS. Supported browsers include Chrome, Firefox, Edge, and Safari.
+
+<br>
+
+### Network and Port Requirements
+
+- **Internet Connection:** Required to download Docker images during the initial setup.
+- **Docker Network:** The default subnet is 192.168.1.0/24 (this is customizable in the docker-compose.yml file).
+- **Firewall Permissions:** Docker must be granted permission to create and manage local container networks.
+- **Open Host Ports:** Ensure that the following ports are not in use by other services:
+
+<div style="padding: 10px;">
+  
 | Port | Service | Protocol |
 |------|---------|----------|
+| 3000 | Demasy Labs Management Server | HTTP |
+| 8080 / 8443 | ORDS and APEX web access | HTTP |
 | 1521 | Oracle Database Listener | TCP |
-| 5500 | Enterprise Manager Express | HTTP |
+| 5500 | Enterprise Manager (optional) | HTTP |
 | 3000 | Management API | HTTP |
 | 8080 | Oracle ORDS/APEX | HTTP |
 
+</div>
+  
 <br>
+
+> 📌 Notes
+>
+> - Oracle Database, SQLcl, and SQL*Plus are pre-installed in the container - no separate installation required.
+> - Oracle APEX and ORDS must be installed manually using the provided script inside the container.  ```bash /usr/demasy/scripts/apex/install-apex.sh ```
+
+<br>
+
+## 🚀 Getting Started
+
+
+<br>
+
+### Setup Guide
+
+<br>
+
+#### Step 1: Clone Repository
+
+```bash
+git clone https://github.com/demasy/oracle-database.git
+cd oracle-database
+```
+
+<br>
+
+#### Step 2: Environment Configuration
+
+##### Create Environment File
+
+```bash
+cp .env.example .env
+chmod 600 .env
+```
+
+##### Configure Required Variables
+
+Edit `.env` and set the following required parameters:
+
+```bash
+# Absolutely Required - Container Won't Start Without These
+ENV_DB_PASSWORD=YourSecurePassword123!
+ENV_DB_SID=FREE
+ENV_DB_SERVICE=FREEPDB1
+ENV_DB_CHARACTERSET=AL32UTF8
+ENV_NETWORK_SUBNET=192.168.1.0/24
+ENV_NETWORK_GATEWAY=192.168.1.1
+ENV_IP_DB_SERVER=192.168.1.110
+ENV_IP_APP_SERVER=192.168.1.120
+ENV_DB_PORT_LISTENER=1521
+ENV_SERVER_PORT=3000
+ENV_DB_POOL_MIN=1
+ENV_DB_POOL_MAX=5
+ENV_DB_POOL_INCREMENT=1
+ENV_DB_USER=system
+ENV_DB_CLIENT=/opt/oracle/instantclient
+ENV_DB_CPU_LIMIT=2
+ENV_DB_MEMORY_LIMIT=4g
+ENV_SERVER_CPU_LIMIT=3.0
+ENV_SERVER_MEMORY_LIMIT=3g
+ENV_SRC_ORACLE_SQLCL=https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip
+ENV_SRC_ORACLE_SQLPLUS=https://download.oracle.com/otn_software/linux/instantclient/2390000/instantclient-sqlplus-linux.arm64-23.9.0.25.07.zip
+ENV_SRC_ORACLE_APEX=https://download.oracle.com/otn_software/apex/apex-latest.zip
+ENV_SRC_ORACLE_ORDS=https://download.oracle.com/otn_software/java/ords/ords-latest.zip
+
+# Required Only If Using APEX
+ENV_APEX_ADMIN_PASSWORD=YourAPEXPassword123
+ENV_APEX_ADMIN_USERNAME=ADMIN
+ENV_APEX_EMAIL=your-email@example.com
+ENV_APEX_DEFAULT_WORKSPACE=INTERNAL
+```
+
+> **Security Best Practices:**
+> - Use strong passwords with mixed case, numbers, and symbols
+> - Never commit `.env` files to version control
+> - Restrict file permissions to owner only (`chmod 600`)
+> - Rotate passwords regularly in production environments
+> - Use different credentials for each environment
+
+<br>
+
+#### Step 3: Build Services
+
+Build the Docker images with a clean build:
+
+```bash
+docker-compose build --no-cache
+```
+
+<br>
+
+#### Step 4: Start Services
+
+##### Option A: Production Mode (Recommended)
+
+Start all services in detached mode:
+
+```bash
+docker-compose up -d
+```
+
+##### Option B: Development Mode
+
+Start with real-time logs for debugging:
+
+```bash
+docker-compose up
+```
+
+To stop, press `Ctrl+C` and run:
+```bash
+docker-compose down
+```
+
+##### Option C: Selective Services
+
+Start only specific services:
+
+```bash
+# Database only
+docker-compose up -d demasylabs-oracle-database
+
+# Management server only
+docker-compose up -d demasylabs-oracle-server
+```
+
+<br>
+
+#### Step 5: Verify Installation
+
+##### 1. Check Container Status
+
+```bash
+docker ps --filter "name=oracle-al-database-26ai" --filter "name=demasy-server"
+```
+
+**Expected output:**
+```
+CONTAINER ID   IMAGE                    STATUS                    PORTS
+abc123def456   oracle-database:26ai     Up 2 minutes (healthy)    0.0.0.0:1521->1521/tcp
+def456ghi789   demasy-server:latest     Up 2 minutes (healthy)    0.0.0.0:3000->3000/tcp
+```
+
+##### 2. Wait for Database Initialization
+
+Monitor database startup (takes 5-10 minutes on first run):
+
+```bash
+docker logs -f oracle-al-database-26ai
+```
+
+**Look for:** `DATABASE IS READY TO USE!`
+
+##### 3. Verify Health Endpoints
+
+Test the management server:
+
+```bash
+curl http://localhost:3000/health
+```
+
+**Expected response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-11-25T12:00:00.000Z"
+}
+```
+
+##### 4. Test Database Connection
+
+Access the management container:
+
+```bash
+docker exec -it demasy-server bash
+```
+
+Connect to the database:
+
+```bash
+sqlcl
+```
+
+Expected output: 
+
+```
+Connected to:
+Oracle AI Database 26ai Free Release 23.26.0.0.0 - Develop, Learn, and Run for Free
+Version 23.26.0.0.0
+SQL>
+```
+
+<br>
+
+### Quick Start
+
+```bash
+# 1. Clone and setup
+git clone https://github.com/demasy/oracle-database.git
+cd oracle-database
+cp .env.example .env
+# Edit .env with your configuration
+
+# 2. Build and start
+docker-compose build --no-cache
+docker-compose up -d
+
+# 3. Verify
+docker ps
+docker logs -f oracle-al-database-26ai  # Wait for "READY TO USE"
+curl http://localhost:3000/health
+
+# 4. (Optional) Run the APEX & ORDS installer inside the database container
+docker exec -it oracle-db-container bash
+/usr/demasy/scripts/apex/install-apex.sh
+exit
+
+# APEX / ORDS Web UI: open http://localhost:8080 (or your configured port) in a browser
+
+
+# 5. Connect
+docker exec -it demasy-server sqlcl
+```
+
+<br>
+
+
 
 # Architecture
 The environment consists of two primary containerized services:
@@ -214,7 +438,7 @@ The environment consists of two primary containerized services:
 
 <br>
 
-## Scripts
+## Built-in Tools & Scripts
 
 All scripts are organized in a structured directory layout for better maintainability:
 
@@ -222,18 +446,18 @@ All scripts are organized in a structured directory layout for better maintainab
 ```
 /usr/demasy/scripts/
 ├── cli/                    # User-facing CLI tools
-│   ├── sqlcl-connect.sh   # SQLcl database connection
-│   └── sqlplus-connect.sh # SQL*Plus connection
+│   ├── sqlcl-connect.sh    # SQLcl database connection
+│   └── sqlplus-connect.sh  # SQL*Plus connection
 │
 ├── oracle/
-│   ├── admin/             # Administrative tools
-│   │   └── healthcheck.sh # System health monitoring
+│   ├── admin/              # Administrative tools
+│   │   └── healthcheck.sh  # System health monitoring
 │   │
-│   ├── apex/              # APEX management
-│   │   ├── install.sh    # APEX + ORDS installation
-│   │   ├── uninstall.sh  # APEX removal
-│   │   ├── start.sh      # Start ORDS
-│   │   └── stop.sh       # Stop ORDS
+│   ├── apex/               # APEX management
+│   │   ├── install.sh      # APEX + ORDS installation
+│   │   ├── uninstall.sh    # APEX removal
+│   │   ├── start.sh        # Start ORDS
+│   │   └── stop.sh         # Stop ORDS
 
 ```
 
@@ -256,220 +480,6 @@ All scripts are organized in a structured directory layout for better maintainab
 
 <br>
 
-
-## Quick Start
-
-<br>
-
-### Step 1: Clone Repository
-
-```bash
-git clone https://github.com/demasy/oracle-database.git
-cd oracle-database
-```
-
-<br>
-
-### Step 2: Environment Configuration
-
-#### Create Environment File
-
-```bash
-cp .env.example .env
-chmod 600 .env
-```
-
-#### Configure Required Variables
-
-Edit `.env` and set the following required parameters:
-
-```bash
-# Absolutely Required - Container Won't Start Without These
-ENV_DB_PASSWORD=YourSecurePassword123!
-ENV_DB_SID=FREE
-ENV_DB_SERVICE=FREEPDB1
-ENV_DB_CHARACTERSET=AL32UTF8
-ENV_NETWORK_SUBNET=192.168.1.0/24
-ENV_NETWORK_GATEWAY=192.168.1.1
-ENV_IP_DB_SERVER=192.168.1.110
-ENV_IP_APP_SERVER=192.168.1.120
-ENV_DB_PORT_LISTENER=1521
-ENV_SERVER_PORT=3000
-ENV_DB_POOL_MIN=1
-ENV_DB_POOL_MAX=5
-ENV_DB_POOL_INCREMENT=1
-ENV_DB_USER=system
-ENV_DB_CLIENT=/opt/oracle/instantclient
-ENV_DB_CPU_LIMIT=2
-ENV_DB_MEMORY_LIMIT=4g
-ENV_SERVER_CPU_LIMIT=3.0
-ENV_SERVER_MEMORY_LIMIT=3g
-ENV_SRC_ORACLE_SQLCL=https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip
-ENV_SRC_ORACLE_SQLPLUS=https://download.oracle.com/otn_software/linux/instantclient/2390000/instantclient-sqlplus-linux.arm64-23.9.0.25.07.zip
-ENV_SRC_ORACLE_APEX=https://download.oracle.com/otn_software/apex/apex-latest.zip
-ENV_SRC_ORACLE_ORDS=https://download.oracle.com/otn_software/java/ords/ords-latest.zip
-
-# Required Only If Using APEX
-ENV_APEX_ADMIN_PASSWORD=YourAPEXPassword123
-ENV_APEX_ADMIN_USERNAME=ADMIN
-ENV_APEX_EMAIL=your-email@example.com
-ENV_APEX_DEFAULT_WORKSPACE=INTERNAL
-```
-
-> **Security Best Practices:**
-> - Use strong passwords with mixed case, numbers, and symbols
-> - Never commit `.env` files to version control
-> - Restrict file permissions to owner only (`chmod 600`)
-> - Rotate passwords regularly in production environments
-> - Use different credentials for each environment
-
-<br>
-
-### Step 3: Build Services
-
-Build the Docker images with a clean build:
-
-```bash
-docker-compose build --no-cache
-```
-
-**Build time:** Approximately 10-15 minutes (first build)
-
-<br>
-
-### Step 4: Start Services
-
-#### Option A: Production Mode (Recommended)
-
-Start all services in detached mode:
-
-```bash
-docker-compose up -d
-```
-
-#### Option B: Development Mode
-
-Start with real-time logs for debugging:
-
-```bash
-docker-compose up
-```
-
-To stop, press `Ctrl+C` and run:
-```bash
-docker-compose down
-```
-
-#### Option C: Selective Services
-
-Start only specific services:
-
-```bash
-# Database only
-docker-compose up -d demasylabs-oracle-database
-
-# Management server only
-docker-compose up -d demasylabs-oracle-server
-```
-
-<br>
-
-### Step 5: Verify Installation
-
-#### 1. Check Container Status
-
-```bash
-docker ps --filter "name=oracle-al-database-26ai" --filter "name=demasy-server"
-```
-
-**Expected output:**
-```
-CONTAINER ID   IMAGE                    STATUS                    PORTS
-abc123def456   oracle-database:26ai     Up 2 minutes (healthy)    0.0.0.0:1521->1521/tcp
-def456ghi789   demasy-server:latest     Up 2 minutes (healthy)    0.0.0.0:3000->3000/tcp
-```
-
-#### 2. Wait for Database Initialization
-
-Monitor database startup (takes 5-10 minutes on first run):
-
-```bash
-docker logs -f oracle-al-database-26ai
-```
-
-**Look for:** `DATABASE IS READY TO USE!`
-
-#### 3. Verify Health Endpoints
-
-Test the management server:
-
-```bash
-curl http://localhost:3000/health
-```
-
-**Expected response:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-11-25T12:00:00.000Z"
-}
-```
-
-#### 4. Test Database Connection
-
-Access the management container:
-
-```bash
-docker exec -it demasy-server bash
-```
-
-Connect to the database:
-
-```bash
-sqlcl
-```
-
-Expected output: 
-
-```
-SQLcl: Release 25.3 Production on Thu Nov 13 11:13:11 1986
-
-Copyright (c) 1982, 2025, Oracle.  All rights reserved.
-
-Last Successful login time: Thu Nov 13 1986 13:29:04 +03:00
-
-Connected to:
-Oracle AI Database 26ai Free Release 23.26.0.0.0 - Develop, Learn, and Run for Free
-Version 23.26.0.0.0
-SQL>
-```
-
-<br>
-
-### Quick Start Summary
-
-```bash
-# 1. Clone and setup
-git clone https://github.com/demasy/oracle-database.git
-cd oracle-database
-cp .env.example .env
-# Edit .env with your configuration
-
-# 2. Build and start
-docker-compose build --no-cache
-docker-compose up -d
-
-# 3. Verify
-docker ps
-docker logs -f oracle-al-database-26ai  # Wait for "READY TO USE"
-curl http://localhost:3000/health
-
-# 4. Connect
-docker exec -it demasy-server sqlcl
-```
-
-<br>
-
 ## 📚 Documentation
 
 For comprehensive guides, see the [src/docs](src/docs) directory:
@@ -483,11 +493,24 @@ For comprehensive guides, see the [src/docs](src/docs) directory:
 
 <br>
 
-## 📜 Change Log
+## Change Log / Release History
 
-| Version | Date | Type | Description |
-|---------|------|------|-------------|
-|v1.0.0|01-DEC-2025| Release |Foundation Release (December 2025)|
+<br>
+
+| Version | Date       | Type     | Description                                                                                       |
+|---------|------------|----------|---------------------------------------------------------------------------------------------------|
+| v1.0.0  | 2025-12-01 | Release  | **Foundation Release** initial public release including Oracle 26ai Free, APEX 24.2, ORDS 25.3, SQLcl, Docker Compose setup, core scripts, and full documentation. |
+
+<br>
+
+### [v1.0.0] – 2025-12-01
+
+#### Added
+- Oracle Database 26ai Free container image  
+- APEX 24.2, ORDS 25.3, SQLcl integration  
+- Docker Compose setup (DB + Management Server)  
+- Core shell scripts (healthcheck, install-apex, SQLcl / SQL*Plus helpers)  
+- Complete documentation, including architecture diagram, environment variable descriptions, usage instructions, and directory structure  
 
 
 <br>
