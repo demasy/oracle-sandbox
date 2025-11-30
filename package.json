@@ -11,7 +11,7 @@
     "url": "git+https://github.com/demasy/oracle-database.git"
   },
   "keywords": [],
-  "author": "Demasy <founder@demasy.io> (https://github.com/demasy)",
+  "author": "Ahmed El-Demasy <founder@demasy.io> (https://github.com/demasy)",
   "license": "MIT",
   "type": "commonjs",
   "bugs": {
@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/demasy/oracle-database#readme",
   "dependencies": {
-    "oracledb": "^6.9.0"
+    "oracledb": "^6.9.0",
+    "cross-spawn": "^7.0.5",
+    "glob": "^10.5.0"
   }
 }
