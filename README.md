@@ -425,7 +425,7 @@ The environment consists of two primary containerized services:
 #### 🖥️ Platform Compatibility
 
 | Platform | Architecture | SQL*Plus | SQLcl | APEX | Status |
-|----------|-------------|----------|-------|------|--------|
+|----------|-------------|:----------:|:-------:|:------:|--------|
 | **Linux (Ubuntu/Debian)** | AMD64 (x86_64) | ✅ | ✅ | ✅ | Fully Supported |
 | **Linux (Ubuntu/Debian)** | ARM64 (aarch64) | ⚠️ Fallback | ✅ | ✅ | Supported |
 | **macOS (Intel)** | AMD64 (x86_64) | ✅ | ✅ | ✅ | Fully Supported |
