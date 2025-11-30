@@ -124,8 +124,7 @@ Designed to facilitate learning through practical experience, this setup allows 
   
 <br>
 
-> 📌 Notes
->
+> [!NOTE]
 > - Oracle Database, SQLcl, and SQL*Plus are pre-installed in the container - no separate installation required.
 > - Oracle APEX and ORDS must be installed manually using the provided script inside the container.  ```bash /usr/demasy/scripts/apex/install-apex.sh ```
 
