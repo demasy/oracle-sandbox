@@ -536,6 +536,13 @@ We welcome you to join and contribute to the "🚀 Oracle AI Database 26ai Free 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+<br>
+
+
+> [!IMPORTANT]
+> ## Disclaimer
+> This project is an independent development and is not affiliated with, endorsed by, or supported by Oracle Corporation. Oracle Corporation owns Oracle Database, Oracle APEX, Oracle ORDS, and related trademarks. Please use Oracle Database Free Edition in accordance with Oracle's license terms.
+
 </br>
 
 </br>
