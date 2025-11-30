@@ -1,7 +1,8 @@
 # Stage 1: Build Stage
-FROM node:20.19.4-slim AS demasylabs-builder
+FROM node:20-bookworm-slim AS demasylabs-builder
 
 RUN apt-get update && \
+  apt-get upgrade -y && \
   apt-get install -y --no-install-recommends curl unzip ca-certificates && \
   rm -rf /var/lib/apt/lists/*
 
@@ -68,7 +69,7 @@ RUN ARCH=$(uname -m) && \
     echo "Note: SQL*Plus not available for $ARCH architecture - SQLcl will be used as fallback"; \
   fi
 
-FROM node:20.19.4-slim
+FROM node:20-bookworm-slim
 
 RUN apt-get update && \
   apt-get upgrade -y && \
