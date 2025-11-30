@@ -446,18 +446,18 @@ All scripts are organized in a structured directory layout for better maintainab
 ```
 /usr/demasy/scripts/
 ├── cli/                    # User-facing CLI tools
-│   ├── sqlcl-connect.sh   # SQLcl database connection
-│   └── sqlplus-connect.sh # SQL*Plus connection
+│   ├── sqlcl-connect.sh    # SQLcl database connection
+│   └── sqlplus-connect.sh  # SQL*Plus connection
 │
 ├── oracle/
-│   ├── admin/             # Administrative tools
-│   │   └── healthcheck.sh # System health monitoring
+│   ├── admin/              # Administrative tools
+│   │   └── healthcheck.sh  # System health monitoring
 │   │
-│   ├── apex/              # APEX management
-│   │   ├── install.sh    # APEX + ORDS installation
-│   │   ├── uninstall.sh  # APEX removal
-│   │   ├── start.sh      # Start ORDS
-│   │   └── stop.sh       # Stop ORDS
+│   ├── apex/               # APEX management
+│   │   ├── install.sh      # APEX + ORDS installation
+│   │   ├── uninstall.sh    # APEX removal
+│   │   ├── start.sh        # Start ORDS
+│   │   └── stop.sh         # Stop ORDS
 
 ```
 
