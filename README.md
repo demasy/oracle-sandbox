@@ -432,7 +432,10 @@ The environment consists of two primary containerized services:
 | **macOS (Apple Silicon)** | ARM64 (M1/M2/M3) | ⚠️ Fallback | ✅ | ✅ | Supported |
 | **Windows (WSL2)** | AMD64 (x86_64) | ✅ | ✅ | ✅ | Supported |
 
-> ⚠️ **Note:** SQL*Plus is not natively available on ARM64. SQLcl is automatically used as a fallback.
+<br>
+
+> [!NOTE]
+> SQL*Plus is not natively available on ARM64. SQLcl is automatically used as a fallback.
 
 <br>
 
