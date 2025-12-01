@@ -1,0 +1,119 @@
+# ============================================
+# Demasy Labs - Oracle Sandbox Base Image
+# ============================================
+# 
+# PURPOSE: Publishable base image WITHOUT Oracle components
+# LICENSE: MIT (source code and scripts only)
+# 
+# This base image includes:
+# ✅ Node.js environment
+# ✅ System dependencies
+# ✅ Management scripts and utilities
+# ✅ Project structure
+# 
+# NOT included (due to Oracle licensing):
+# ❌ Oracle Instant Client
+# ❌ SQLcl
+# ❌ APEX
+# ❌ ORDS
+# ❌ SQL*Plus
+# 
+# Users must extend this image and add Oracle components themselves
+# See ORACLE_LICENSE_NOTICE.md for instructions
+# ============================================
+
+FROM node:20-bookworm-slim
+
+LABEL maintainer="Ahmed El-Demasy <founder@demasy.io>"
+LABEL org.opencontainers.image.title="Oracle Sandbox Base"
+LABEL org.opencontainers.image.description="Base image for Oracle 26ai development environment (Oracle components not included)"
+LABEL org.opencontainers.image.vendor="Demasy Labs"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.source="https://github.com/demasy/oracle-sandbox"
+LABEL org.opencontainers.image.documentation="https://github.com/demasy/oracle-sandbox/blob/main/README.md"
+
+# Install system dependencies
+RUN apt-get update && \
+  apt-get upgrade -y && \
+  apt-get install -y --no-install-recommends \
+    curl \
+    unzip \
+    libaio1 \
+    ca-certificates \
+    bash \
+    iputils-ping \
+    vim \
+    nano \
+    lsof \
+    telnet \
+    tcpdump \
+    net-tools \
+    htop \
+    jq \
+    openssl \
+    git && \
+  npm install -g nodemon && \
+  rm -rf /var/lib/apt/lists/*
+
+# Create application directories
+RUN mkdir -p /usr/demasy/app \
+  /usr/demasy/scripts/utils \
+  /usr/demasy/scripts/cli \
+  /usr/demasy/scripts/oracle/admin \
+  /usr/demasy/scripts/oracle/mcp \
+  /usr/demasy/scripts/oracle/apex \
+  /opt/oracle/instantclient \
+  /opt/oracle/apex \
+  /opt/oracle/ords
+
+# Copy application files
+WORKDIR /usr/demasy/app
+COPY package*.json ./
+COPY ./app.js ./app.js
+COPY ["LICENSE", "./"]
+
+# Copy utility scripts
+COPY ./src/scripts/utils/*.sh /usr/demasy/scripts/utils/
+COPY ./src/scripts/cli/*.sh /usr/demasy/scripts/cli/
+COPY ./src/scripts/oracle/admin/*.sh /usr/demasy/scripts/oracle/admin/
+COPY ./src/scripts/oracle/mcp/*.sh /usr/demasy/scripts/oracle/mcp/
+COPY ./src/scripts/oracle/apex/*.sh /usr/demasy/scripts/oracle/apex/
+
+# Set permissions
+RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
+    chmod +x /usr/demasy/scripts/cli/*.sh && \
+    chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
+    chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
+    chmod +x /usr/demasy/scripts/oracle/apex/*.sh
+
+# Create command aliases (will work once Oracle components are added)
+RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl && \
+    ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus && \
+    ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/oracle && \
+    ln -s /usr/demasy/scripts/oracle/apex/install.sh /usr/local/bin/install-apex && \
+    ln -s /usr/demasy/scripts/oracle/apex/start.sh /usr/local/bin/start-apex && \
+    ln -s /usr/demasy/scripts/oracle/apex/stop.sh /usr/local/bin/stop-apex && \
+    ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck
+
+# Install Node.js dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Environment variables for database connectivity
+ENV DEMASYLABS_DB_HOST=oracle-al-database-26ai \
+    DEMASYLABS_DB_PORT=1521 \
+    DEMASYLABS_DB_SERVICE=FREEPDB1 \
+    DEMASYLABS_DB_USER=system \
+    DEMASYLABS_ORDS_PORT=8080 \
+    NODE_ENV=production
+
+# Expose ports
+EXPOSE 3000 3001 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+WORKDIR /usr/demasy/app
+
+# Start the management server
+CMD ["node", "app.js"]

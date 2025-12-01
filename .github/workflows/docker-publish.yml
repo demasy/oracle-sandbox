@@ -60,43 +60,42 @@ jobs:
             type=semver,pattern={{major}}
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Note about Oracle License Requirements
+      - name: Build and push BASE image (without Oracle components)
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.base
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-base
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:base
+            ${{ env.REGISTRY_DOCKER_HUB }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-base
+            ${{ env.REGISTRY_DOCKER_HUB }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:base
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY_GHCR }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Create usage instructions
         run: |
-          echo "⚠️  IMPORTANT: Oracle component downloads require license acceptance"
-          echo "   Pre-built images cannot be automatically published to registries"
-          echo "   due to Oracle's download restrictions and license terms."
+          echo "✅ Base image published successfully!"
           echo ""
-          echo "📦 To build images locally:"
-          echo "   1. Clone this repository"
-          echo "   2. Download required Oracle components from oracle.com"
-          echo "   3. Update .env with download URLs or local paths"
-          echo "   4. Run: docker-compose build"
+          echo "📦 Available at:"
+          echo "   - ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:base"
+          echo "   - docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:base"
           echo ""
-          echo "See README.md for detailed instructions."
-          exit 1
-
-      # Disabled: Oracle downloads require manual license acceptance
-      # - name: Build and push Docker images
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: .
-      #     file: ./Dockerfile
-      #     platforms: linux/amd64
-      #     push: true
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     labels: ${{ steps.meta.outputs.labels }}
-      #     build-args: |
-      #       SRC_ORACLE_SQLCL=https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-25.3.0.322.2257.zip
-      #       SRC_ORACLE_APEX=https://download.oracle.com/otn_software/apex/apex_24.2.zip
-      #       SRC_ORACLE_ORDS=https://download.oracle.com/otn_software/java/ords/ords-25.3.1.365.2133.zip
-      #       SRC_ORACLE_SQLPLUS=https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-sqlplus-linux.x64-23.7.0.24.10.zip
-      #     cache-from: type=gha
-      #     cache-to: type=gha,mode=max
-
-      # Disabled: Depends on successful build step
-      # - name: Generate artifact attestation
-      #   uses: actions/attest-build-provenance@v1
-      #   with:
-      #     subject-name: ${{ env.REGISTRY_GHCR }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
-      #     subject-digest: ${{ steps.build.outputs.digest }}
-      #     push-to-registry: true
+          echo "⚠️  NOTE: This base image does NOT include Oracle components"
+          echo ""
+          echo "To extend with Oracle components:"
+          echo "   FROM ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:base"
+          echo "   # Add your Oracle Instant Client, APEX, ORDS, SQLcl"
+          echo ""
+          echo "See ORACLE_LICENSE_NOTICE.md for full instructions"
