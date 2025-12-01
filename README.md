@@ -503,7 +503,7 @@ For comprehensive guides, see the [src/docs](src/docs) directory:
 
 | Version | Date       | Type     | Description                                                                                       |
 |---------|------------|----------|---------------------------------------------------------------------------------------------------|
-| v1.0.0  | 2025-12-01 | Release  | **Foundation Release** initial public release including Oracle 26ai Free, APEX 24.2, ORDS 25.3, SQLcl, Docker Compose setup, core scripts, and full documentation. |
+| v1.0.0  | 2025-11-30 | Release  | **Foundation Release** initial public release including Oracle 26ai Free, APEX 24.2, ORDS 25.3, SQLcl, Docker Compose setup, core scripts, and full documentation. |
 
 <br>
 
