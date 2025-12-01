@@ -27,7 +27,8 @@ COPY ./app.js ./app.js
 # COPY ./src ./src
 COPY ["LICENSE", "./"]
 
-# COPY ./libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient
+# Copy Oracle Instant Client from local libs directory
+COPY ./libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient
 
 # Copy scripts to organized structure
 COPY ./src/scripts/utils/*.sh /usr/demasy/scripts/utils/
@@ -46,10 +47,11 @@ RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
 
 WORKDIR /usr/demasy/scripts
 
-# Download Oracle Instant Client
-RUN curl -L -o /tmp/instantclient.zip "$SRC_ORACLE_INSTANTCLIENT" && \
-  unzip -qo /tmp/instantclient.zip -d /opt/oracle && \
-  rm -f /tmp/instantclient.zip
+# Oracle Instant Client is now copied from local libs directory (see line 31)
+# # Download Oracle Instant Client
+# RUN curl -L -o /tmp/instantclient.zip "$SRC_ORACLE_INSTANTCLIENT" && \
+#   unzip -qo /tmp/instantclient.zip -d /opt/oracle && \
+#   rm -f /tmp/instantclient.zip
 
 # Download SQLcl
 RUN curl -L -o /tmp/sqlcl.zip "$SRC_ORACLE_SQLCL" && \

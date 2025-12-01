@@ -70,7 +70,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            SRC_ORACLE_INSTANTCLIENT=https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-basic-linux.x64-23.7.0.24.10.zip
             SRC_ORACLE_SQLCL=https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-25.3.0.322.2257.zip
             SRC_ORACLE_APEX=https://download.oracle.com/otn_software/apex/apex-latest.zip
             SRC_ORACLE_ORDS=https://download.oracle.com/otn_software/java/ords/ords-latest.zip
