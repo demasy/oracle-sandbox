@@ -1,4 +1,4 @@
-# 🚀 Oracle AI Database 26ai Free – Developer Environment
+# 🚀 Oracle Sandbox – Developer Environment
 
 <div align="center">
 
