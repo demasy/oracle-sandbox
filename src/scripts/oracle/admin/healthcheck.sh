@@ -1,11 +1,14 @@
 #!/bin/bash
 
-# Colors for out    echo -e "\e[0;33m-------------------------------------\e[0m"
-    echo -e "\e[0;33mDeveloped by \e[1m\e[0;33mDemasy Labs\e[0m\e[0;33m 🚀\e[0m"
-    echo -e "\e[0;33m👤 Ahmed El-Demasy ~ Founder @Demasy Labs \e[0m"
-    echo -e "\e[0;33m🏆 Oracle Solutions Architect | Oracle ACE\e[0m"
-    echo -e "\e[0;33m💻 www.github.com/demasy\e[0m"
-    echo -e "\e[0;33m🌐 www.demasy.io | founder@demasy.io | +966507630060\e[0m"D='\033[0;91m'      # Dark Red (Bright Red)
+# Get the actual script location (resolves symlinks)
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+
+# Source utilities from the actual script location
+source "$SCRIPT_DIR/../../utils/banner.sh"
+
+# Colors for output
+RED='\033[0;91m'      # Dark Red (Bright Red)
 GREEN='\033[0;92m'    # Dark Green (Bright Green)
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
@@ -19,30 +22,9 @@ TIMEOUT=10
 MAX_RETRIES=3
 CHECK_INTERVAL=2
 
-# Function to print banner
+# Function to print banner (wrapper)
 print_banner() {
-    clear
-    echo ""
-    echo -e "\e[0;33m ____  _____ __  __    _    ______   __\e[0m"
-    echo -e "\e[0;33m|  _ \| ____|  \/  |  / \  / ___\ \ / /\e[0m"
-    echo -e "\e[0;33m| | | |  _| | |\/| | / _ \ \___ \\\\ V /\e[0m" 
-    echo -e "\e[0;33m| |_| | |___| |  | |/ ___ \ ___) || |\e[0m"
-    echo -e "\e[0;33m|____/|_____|_|  |_/_/   \_\____/ |_|\e[0m"
-    echo ""
-    echo -e "                             \e[0;33m\e[5mL A B S\e[0m"
-    echo ""
-    echo -e "\e[0;33mDeveloped by: \e[1m\e[0;33mDemasy Labs\e[0m\e[0;33m 🚀\e[0m"
-    # echo -e "\e[0;33m\e[1mAhmed El-Demasy ~ Founder @Demasy Labs\e[0m"
-    # echo -e "\e[0;33mOracle Solutions Architect | Oracle ACE 🏆\e[0m"
-    # echo -e "\e[0;33mwww.github.com/demasy\e[0m"
-    # echo -e "\e[0;33mwww.demasy.io | founder@demasy.io | +966507630060\e[0m"
-    echo -e "\e[0;33m-----------------------------------------------------\e[0m"    
-    echo -e "\e[0;33m        Code with love ❤️  in Egypt \e[0m"     
-    # echo -e "\e[0;33m        Code with love \e[5m❤️\e[0m\e[0;33m  in Egypt \e[0m" 
-    echo ""
-    echo ""
-    echo -e "\e[1m************* Health Check! ************* \e[0m"
-    echo ""
+    print_demasy_banner "Health Check!"
 }
 
 # Function to check server HTTP health
