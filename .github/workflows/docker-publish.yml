@@ -65,14 +65,14 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             SRC_ORACLE_SQLCL=https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-25.3.0.322.2257.zip
-            SRC_ORACLE_APEX=https://download.oracle.com/otn_software/apex/apex-latest.zip
-            SRC_ORACLE_ORDS=https://download.oracle.com/otn_software/java/ords/ords-latest.zip
+            SRC_ORACLE_APEX=https://download.oracle.com/otn_software/apex/apex_24.2.zip
+            SRC_ORACLE_ORDS=https://download.oracle.com/otn_software/java/ords/ords-25.3.1.365.2133.zip
             SRC_ORACLE_SQLPLUS=https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-sqlplus-linux.x64-23.7.0.24.10.zip
           cache-from: type=gha
           cache-to: type=gha,mode=max
