@@ -1,7 +1,7 @@
 services:
   demasylabs-oracle-database:
     image: container-registry.oracle.com/database/free:latest
-    container_name: oracle-al-database-26ai
+    container_name: demasylabs-oracle-database
     ports:
       - "${ENV_DB_PORT_LISTENER}:1521"
       - "${ENV_DB_PORT_EM}:5500"
@@ -43,6 +43,7 @@ services:
           memory: "2g"
 
   demasylabs-oracle-server:
+    image: demasylabs-oracle-sandbox:latest
     build:
       context: ./
       args:
@@ -51,7 +52,7 @@ services:
         SRC_ORACLE_APEX: ${ENV_SRC_ORACLE_APEX}
         SRC_ORACLE_ORDS: ${ENV_SRC_ORACLE_ORDS}
         SRC_ORACLE_INSTANTCLIENT: ${ENV_SRC_ORACLE_INSTANTCLIENT}
-    container_name: demasy-server
+    container_name: demasylabs-oracle-server
     ports:
       - "${ENV_SERVER_PORT}:3000"
       - "${ENV_APEX_PORT:-8080}:8080" # for Apex
