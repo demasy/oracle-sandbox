@@ -27,9 +27,6 @@ COPY ./app.js ./app.js
 # COPY ./src ./src
 COPY ["LICENSE", "./"]
 
-# Copy Oracle Instant Client from local libs directory
-COPY ./libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient
-
 # Copy scripts to organized structure
 COPY ./src/scripts/utils/*.sh /usr/demasy/scripts/utils/
 COPY ./src/scripts/cli/sqlcl-connect.sh /usr/demasy/scripts/cli/sqlcl-connect.sh
@@ -47,11 +44,19 @@ RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
 
 WORKDIR /usr/demasy/scripts
 
-# Oracle Instant Client is now copied from local libs directory (see line 31)
-# # Download Oracle Instant Client
-# RUN curl -L -o /tmp/instantclient.zip "$SRC_ORACLE_INSTANTCLIENT" && \
-#   unzip -qo /tmp/instantclient.zip -d /opt/oracle && \
-#   rm -f /tmp/instantclient.zip
+# Download Oracle Instant Client (architecture-aware)
+RUN ARCH=$(uname -m) && \
+  if [ "$ARCH" = "x86_64" ]; then \
+    IC_URL="https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-basic-linux.x64-23.7.0.24.10.zip"; \
+  elif [ "$ARCH" = "aarch64" ]; then \
+    IC_URL="https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-basic-linux.arm64-23.7.0.24.10.zip"; \
+  else \
+    echo "Unsupported architecture: $ARCH" && exit 1; \
+  fi && \
+  echo "Downloading Instant Client for $ARCH from $IC_URL" && \
+  curl -L -o /tmp/instantclient.zip "$IC_URL" && \
+  unzip -qo /tmp/instantclient.zip -d /opt/oracle && \
+  rm -f /tmp/instantclient.zip
 
 # Download SQLcl
 RUN curl -L -o /tmp/sqlcl.zip "$SRC_ORACLE_SQLCL" && \
