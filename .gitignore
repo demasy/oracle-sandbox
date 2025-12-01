@@ -256,9 +256,6 @@ src/scripts/experimental
 # Documentation (if generated)
 docs/
 
-# GitHub workflows (if testing locally)
-.github/
-
 # Personal notes
 notes/
 TODO.md
