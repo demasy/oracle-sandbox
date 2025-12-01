@@ -166,6 +166,7 @@ docker-compose.override.yml
 
 # Oracle binaries/libs (if not custom code)
 libs/
+libsXX/
 
 # Oracle Instant Client archives
 *.zip
@@ -287,3 +288,6 @@ package-lock.json
 
 CONTRIBUTING.md
 CODE_OF_CONDUCT.md
+
+Dockerfile copy
+src/scripts/docker/

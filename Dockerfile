@@ -14,6 +14,8 @@ ENV SRC_ORACLE_SQLCL=$SRC_ORACLE_SQLCL
 ENV SRC_ORACLE_SQLPLUS=$SRC_ORACLE_SQLPLUS
 ENV SRC_ORACLE_APEX=$SRC_ORACLE_APEX
 ENV SRC_ORACLE_ORDS=$SRC_ORACLE_ORDS
+ARG SRC_ORACLE_INSTANTCLIENT
+ENV SRC_ORACLE_INSTANTCLIENT=$SRC_ORACLE_INSTANTCLIENT
 
 RUN mkdir -p /usr/demasy/app
 
@@ -25,7 +27,7 @@ COPY ./app.js ./app.js
 # COPY ./src ./src
 COPY ["LICENSE", "./"]
 
-COPY ./libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient
+# COPY ./libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient
 
 # Copy scripts to organized structure
 COPY ./src/scripts/cli/sqlcl-connect.sh /usr/demasy/scripts/cli/sqlcl-connect.sh
@@ -42,18 +44,25 @@ RUN chmod +x /usr/demasy/scripts/cli/*.sh && \
 
 WORKDIR /usr/demasy/scripts
 
-RUN curl -L -o sqlcl.zip "$SRC_ORACLE_SQLCL" && \
-  unzip sqlcl.zip -d /opt/oracle && \
-  rm sqlcl.zip
+# Download Oracle Instant Client
+RUN curl -L -o /tmp/instantclient.zip "$SRC_ORACLE_INSTANTCLIENT" && \
+  unzip -qo /tmp/instantclient.zip -d /opt/oracle && \
+  rm -f /tmp/instantclient.zip
 
-# Download APEX and ORDS
-RUN curl -L -o apex.zip "$SRC_ORACLE_APEX" && \
-  unzip apex.zip -d /opt/oracle && \
-  rm apex.zip
+# Download SQLcl
+RUN curl -L -o /tmp/sqlcl.zip "$SRC_ORACLE_SQLCL" && \
+  unzip -qo /tmp/sqlcl.zip -d /opt/oracle && \
+  rm -f /tmp/sqlcl.zip
 
-RUN curl -L -o ords.zip "$SRC_ORACLE_ORDS" && \
-  unzip ords.zip -d /opt/oracle/ords && \
-  rm ords.zip
+# Download APEX
+RUN curl -L -o /tmp/apex.zip "$SRC_ORACLE_APEX" && \
+  unzip -qo /tmp/apex.zip -d /opt/oracle && \
+  rm -f /tmp/apex.zip
+
+# Download ORDS
+RUN curl -L -o /tmp/ords.zip "$SRC_ORACLE_ORDS" && \
+  unzip -qo /tmp/ords.zip -d /opt/oracle/ords && \
+  rm -f /tmp/ords.zip
 
 # Download and install SQL*Plus
 # Updated by demasy on November 11, 2025
@@ -61,10 +70,10 @@ RUN curl -L -o ords.zip "$SRC_ORACLE_ORDS" && \
 # Note: Automatically detects architecture and provides appropriate solution
 RUN ARCH=$(uname -m) && \
   if [ "$ARCH" = "x86_64" ]; then \
-    curl -L -o sqlplus.zip "$SRC_ORACLE_SQLPLUS" && \
-    unzip sqlplus.zip -d /opt/oracle && \
+    curl -L -o /tmp/sqlplus.zip "$SRC_ORACLE_SQLPLUS" && \
+    unzip -q /tmp/sqlplus.zip -d /opt/oracle && \
     cp -r /opt/oracle/instantclient_*/* /opt/oracle/instantclient/ && \
-    rm sqlplus.zip; \
+    rm -f /tmp/sqlplus.zip; \
   else \
     echo "Note: SQL*Plus not available for $ARCH architecture - SQLcl will be used as fallback"; \
   fi
