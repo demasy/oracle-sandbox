@@ -266,7 +266,6 @@ NOTES.md
 scratch/
 
 .env.example
-package-lock.json
 
 # ===========================================
 # Optional: CI/CD & Deployment
