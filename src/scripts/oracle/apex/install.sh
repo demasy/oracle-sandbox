@@ -31,6 +31,21 @@ APEX_PASSWORD="${DEMASYLABS_APEX_ADMIN_PASSWORD}"
 APEX_EMAIL="${DEMASYLABS_APEX_EMAIL}"
 APEX_WORKSPACE="${DEMASYLABS_APEX_DEFAULT_WORKSPACE}"
 
+# Display Demasy Labs banner
+clear
+echo ""
+echo -e "\e[0;33m ____  _____ __  __    _    ______   __\e[0m"
+echo -e "\e[0;33m|  _ \| ____|  \/  |  / \  / ___\ \ / /\e[0m"
+echo -e "\e[0;33m| | | |  _| | |\/| | / _ \ \___ \\\\ V /\e[0m" 
+echo -e "\e[0;33m| |_| | |___| |  | |/ ___ \ ___) || |\e[0m"
+echo -e "\e[0;33m|____/|_____|_|  |_/_/   \_\____/ |_|\e[0m"
+echo ""
+echo -e "                             \e[0;33m\e[5mL A B S\e[0m"
+echo ""
+echo -e "\e[0;33mDeveloped by: \e[1m\e[0;33mDemasy Labs\e[0m\e[0;33m 🚀\e[0m"
+echo -e "\e[0;33m-----------------------------------------------------\e[0m"    
+echo -e "\e[0;33m        Code with love ❤️  in Egypt \e[0m"
+echo ""
 echo ""
 echo "=================================================================="
 log_step "Oracle APEX Complete Installation"
@@ -183,8 +198,12 @@ ALTER SESSION SET CONTAINER=FREEPDB1;
 EXIT
 SQL_EOF
 
-log_info "Running APEX installation (please wait, this takes 3-5 minutes)..."
-log_info "Monitor progress in another terminal: docker exec demasy-server tail -f /tmp/apex_install.log"
+echo ""
+echo -e "\e[1m☕ Grab a cup of coffee and relax...\e[0m"
+echo -e "\e[1m   Demasy will take care of installing Oracle APEX for you! 🚀\e[0m"
+echo ""
+log_info "Running APEX installation (this takes 3-5 minutes)..."
+log_info "Monitor progress in another terminal: docker exec demasylabs-oracle-server tail -f /tmp/apex_install.log"
 
 # Run installation from APEX directory (CRITICAL: cd is required)
 (cd /opt/oracle/apex && sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba @/opt/oracle/apex/install_apex.sql) > /tmp/apex_install.log 2>&1 &
@@ -858,12 +877,27 @@ fi
 ################################################################################
 # INSTALLATION COMPLETE
 ################################################################################
+
+# Clear terminal and show Demasy Labs banner
+clear
 echo ""
-echo "=================================================================="
+echo -e "\e[0;33m ____  _____ __  __    _    ______   __\e[0m"
+echo -e "\e[0;33m|  _ \| ____|  \/  |  / \  / ___\ \ / /\e[0m"
+echo -e "\e[0;33m| | | |  _| | |\/| | / _ \ \___ \\\\ V /\e[0m" 
+echo -e "\e[0;33m| |_| | |___| |  | |/ ___ \ ___) || |\e[0m"
+echo -e "\e[0;33m|____/|_____|_|  |_/_/   \_\____/ |_|\e[0m"
+echo ""
+echo -e "                             \e[0;33m\e[5mL A B S\e[0m"
+echo ""
+echo -e "\e[0;33mDeveloped by: \e[1m\e[0;33mDemasy Labs\e[0m\e[0;33m 🚀\e[0m"
+echo -e "\e[0;33m-----------------------------------------------------\e[0m"    
+echo -e "\e[0;33m        Code with love ❤️  in Egypt \e[0m"
+echo ""
+echo ""
 log_success "    ✅ APEX Installation Complete!"
-echo "=================================================================="
 echo ""
-echo "🚀 APEX Access URLs:"
+echo ""
+echo "🚀 APEX Details:"
 echo "  ─────────────────────────────────────────────────────────────"
 echo "  Application Builder:  http://localhost:8080/ords/f?p=4550:1"
 echo "  SQL Developer Web:    http://localhost:8080/ords/sql-developer/"
