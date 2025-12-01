@@ -10,12 +10,12 @@ ARG SRC_ORACLE_SQLCL
 ARG SRC_ORACLE_SQLPLUS
 ARG SRC_ORACLE_APEX
 ARG SRC_ORACLE_ORDS
+ARG USE_LOCAL_IC=false
 ENV SRC_ORACLE_SQLCL=$SRC_ORACLE_SQLCL
 ENV SRC_ORACLE_SQLPLUS=$SRC_ORACLE_SQLPLUS
 ENV SRC_ORACLE_APEX=$SRC_ORACLE_APEX
 ENV SRC_ORACLE_ORDS=$SRC_ORACLE_ORDS
-ARG SRC_ORACLE_INSTANTCLIENT
-ENV SRC_ORACLE_INSTANTCLIENT=$SRC_ORACLE_INSTANTCLIENT
+ENV USE_LOCAL_IC=$USE_LOCAL_IC
 
 RUN mkdir -p /usr/demasy/app
 
@@ -44,19 +44,24 @@ RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
 
 WORKDIR /usr/demasy/scripts
 
-# Download Oracle Instant Client (architecture-aware)
-RUN ARCH=$(uname -m) && \
+# Handle Oracle Instant Client - download from GitHub Release
+RUN mkdir -p /opt/oracle && \
+  ARCH=$(uname -m) && \
   if [ "$ARCH" = "x86_64" ]; then \
-    IC_URL="https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-basic-linux.x64-23.7.0.24.10.zip"; \
+    IC_FILE="instantclient-basic-linux-x64-23.7.0.24.10.zip"; \
   elif [ "$ARCH" = "aarch64" ]; then \
-    IC_URL="https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-basic-linux.arm64-23.7.0.24.10.zip"; \
+    echo "ARM64 build: Using x64 Instant Client with emulation"; \
+    IC_FILE="instantclient-basic-linux-x64-23.7.0.24.10.zip"; \
   else \
     echo "Unsupported architecture: $ARCH" && exit 1; \
   fi && \
-  echo "Downloading Instant Client for $ARCH from $IC_URL" && \
-  curl -L -o /tmp/instantclient.zip "$IC_URL" && \
-  unzip -qo /tmp/instantclient.zip -d /opt/oracle && \
-  rm -f /tmp/instantclient.zip
+  echo "Downloading Oracle Instant Client from GitHub Release..." && \
+  curl -L -f \
+    "https://github.com/demasy/oracle-sandbox/releases/download/oracle-ic-23.7/$IC_FILE" \
+    -o /tmp/instantclient.zip && \
+  unzip -qo /tmp/instantclient.zip -d /tmp && \
+  mv /tmp/libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient && \
+  rm -rf /tmp/instantclient.zip /tmp/libs
 
 # Download SQLcl
 RUN curl -L -o /tmp/sqlcl.zip "$SRC_ORACLE_SQLCL" && \
