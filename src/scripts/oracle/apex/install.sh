@@ -7,7 +7,14 @@
 
 set -e
 
-# Colors
+# Get the actual script location (resolves symlinks)
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+
+# Source utilities from the actual script location
+source "$SCRIPT_DIR/../../utils/banner.sh"
+
+# Colors (inline for this script)
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -15,6 +22,7 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# Logging functions (inline for this script)
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
@@ -32,25 +40,8 @@ APEX_EMAIL="${DEMASYLABS_APEX_EMAIL}"
 APEX_WORKSPACE="${DEMASYLABS_APEX_DEFAULT_WORKSPACE}"
 
 # Display Demasy Labs banner
-clear
-echo ""
-echo -e "\e[0;33m ____  _____ __  __    _    ______   __\e[0m"
-echo -e "\e[0;33m|  _ \| ____|  \/  |  / \  / ___\ \ / /\e[0m"
-echo -e "\e[0;33m| | | |  _| | |\/| | / _ \ \___ \\\\ V /\e[0m" 
-echo -e "\e[0;33m| |_| | |___| |  | |/ ___ \ ___) || |\e[0m"
-echo -e "\e[0;33m|____/|_____|_|  |_/_/   \_\____/ |_|\e[0m"
-echo ""
-echo -e "                             \e[0;33m\e[5mL A B S\e[0m"
-echo ""
-echo -e "\e[0;33mDeveloped by: \e[1m\e[0;33mDemasy Labs\e[0m\e[0;33m 🚀\e[0m"
-echo -e "\e[0;33m-----------------------------------------------------\e[0m"    
-echo -e "\e[0;33m        Code with love ❤️  in Egypt \e[0m"
-echo ""
-echo ""
-echo "=================================================================="
-log_step "Oracle APEX Complete Installation"
-echo "=================================================================="
-echo ""
+print_demasy_banner "Oracle APEX Complete Installation"
+
 log_info "Starting APEX installation from inside container..."
 
 ################################################################################
@@ -879,22 +870,7 @@ fi
 ################################################################################
 
 # Clear terminal and show Demasy Labs banner
-clear
-echo ""
-echo -e "\e[0;33m ____  _____ __  __    _    ______   __\e[0m"
-echo -e "\e[0;33m|  _ \| ____|  \/  |  / \  / ___\ \ / /\e[0m"
-echo -e "\e[0;33m| | | |  _| | |\/| | / _ \ \___ \\\\ V /\e[0m" 
-echo -e "\e[0;33m| |_| | |___| |  | |/ ___ \ ___) || |\e[0m"
-echo -e "\e[0;33m|____/|_____|_|  |_/_/   \_\____/ |_|\e[0m"
-echo ""
-echo -e "                             \e[0;33m\e[5mL A B S\e[0m"
-echo ""
-echo -e "\e[0;33mDeveloped by: \e[1m\e[0;33mDemasy Labs\e[0m\e[0;33m 🚀\e[0m"
-echo -e "\e[0;33m-----------------------------------------------------\e[0m"    
-echo -e "\e[0;33m        Code with love ❤️  in Egypt \e[0m"
-echo ""
-echo ""
-log_success "    ✅ APEX Installation Complete!"
+print_demasy_banner "APEX Installation Complete ✅"
 echo ""
 echo ""
 echo "🚀 APEX Details:"

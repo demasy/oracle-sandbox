@@ -3,6 +3,13 @@
 # Set default TERM if not set (prevents tput errors)
 export TERM=${TERM:-xterm}
 
+# Get the actual script location (resolves symlinks)
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+
+# Source utilities from the actual script location
+source "$SCRIPT_DIR/../utils/banner.sh"
+
 # Colors for output
 RED='\033[0;91m'
 GREEN='\033[0;92m'
@@ -12,29 +19,8 @@ CYAN='\033[1;36m'      # Bright Cyan for labels
 WHITE='\033[1;97m'     # Bright White for values
 NC='\033[0m' # No Color
 
-# Function to print banner
-print_banner() {
-    clear
-    echo ""
-    echo -e "\e[0;33m ____  _____ __  __    _    ______   __\e[0m"
-    echo -e "\e[0;33m|  _ \| ____|  \/  |  / \  / ___\ \ / /\e[0m"
-    echo -e "\e[0;33m| | | |  _| | |\/| | / _ \ \___ \\\\ V /\e[0m" 
-    echo -e "\e[0;33m| |_| | |___| |  | |/ ___ \ ___) || |\e[0m"
-    echo -e "\e[0;33m|____/|_____|_|  |_/_/   \_\____/ |_|\e[0m"
-    echo ""
-    echo -e "                             \e[0;33m\e[5mL A B S\e[0m"
-    echo ""
-    echo -e "\e[0;33mDeveloped by: \e[1m\e[0;33mDemasy Labs\e[0m\e[0;33m 🚀\e[0m"
-    echo -e "\e[0;33m-----------------------------------------------------\e[0m"    
-    echo -e "\e[0;33m        Code with love ❤️  in Egypt \e[0m"
-    echo ""
-    echo ""
-    echo -e "\e[1m************* Database Connection ************* \e[0m"
-    echo ""
-}
-
 # Print the banner
-print_banner
+print_demasy_banner "Database Connection"
 
 echo -e "\e[1mConnection Information:\e[0m"
 echo -e "${BLUE}$(date '+%Y-%m-%d %H:%M:%S')${NC} Preparing to connect to Oracle Database"

@@ -30,6 +30,7 @@ COPY ["LICENSE", "./"]
 # COPY ./libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient
 
 # Copy scripts to organized structure
+COPY ./src/scripts/utils/*.sh /usr/demasy/scripts/utils/
 COPY ./src/scripts/cli/sqlcl-connect.sh /usr/demasy/scripts/cli/sqlcl-connect.sh
 COPY ./src/scripts/cli/sqlplus-connect.sh /usr/demasy/scripts/cli/sqlplus-connect.sh
 COPY ./src/scripts/oracle/admin/healthcheck.sh /usr/demasy/scripts/oracle/admin/healthcheck.sh
@@ -37,7 +38,8 @@ COPY ./src/scripts/oracle/mcp/*.sh /usr/demasy/scripts/oracle/mcp/
 COPY ./src/scripts/oracle/apex/*.sh /usr/demasy/scripts/oracle/apex/
 
 # Set permissions for all scripts
-RUN chmod +x /usr/demasy/scripts/cli/*.sh && \
+RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
+    chmod +x /usr/demasy/scripts/cli/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/apex/*.sh
@@ -120,7 +122,8 @@ COPY --from=demasylabs-builder /opt/oracle /opt/oracle
 RUN npm install oracledb --build-from-source --unsafe-perm
 
 # Set permissions for all scripts in runtime stage
-RUN chmod +x /usr/demasy/scripts/cli/*.sh && \
+RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
+    chmod +x /usr/demasy/scripts/cli/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/apex/*.sh
