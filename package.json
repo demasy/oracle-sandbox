@@ -1,6 +1,6 @@
 {
-  "name": "oracle-database",
-  "version": "1.0.0",
+  "name": "oracle-sandbox",
+  "version": "1.0.1",
   "description": "<br>",
   "main": "app.js",
   "scripts": {
@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/demasy/oracle-database.git"
+    "url": "git+https://github.com/demasy/oracle-sandbox.git"
   },
   "keywords": [],
   "author": "Ahmed El-Demasy <founder@demasy.io> (https://github.com/demasy)",
   "license": "MIT",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/demasy/oracle-database/issues"
+    "url": "https://github.com/demasy/oracle-sandbox/issues"
   },
-  "homepage": "https://github.com/demasy/oracle-database#readme",
+  "homepage": "https://github.com/demasy/oracle-sandbox#readme",
   "dependencies": {
     "oracledb": "^6.9.0",
     "cross-spawn": "^7.0.5",
