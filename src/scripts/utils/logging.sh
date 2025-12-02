@@ -33,6 +33,11 @@ log_warning() {
     echo -e "${YELLOW}⚠ $(get_timestamp)${NC} $1"
 }
 
+# Alias for log_warning
+log_warn() {
+    log_warning "$1"
+}
+
 # Log info message
 log_info() {
     echo -e "${BLUE}ℹ $(get_timestamp)${NC} $1"
@@ -41,6 +46,11 @@ log_info() {
 # Log progress message
 log_progress() {
     echo -e "${CYAN}⏳ $(get_timestamp)${NC} $1"
+}
+
+# Log step message (alias for progress)
+log_step() {
+    log_progress "$1"
 }
 
 # Print section header

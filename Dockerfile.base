@@ -93,7 +93,14 @@ RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl && \
     ln -s /usr/demasy/scripts/oracle/apex/install.sh /usr/local/bin/install-apex && \
     ln -s /usr/demasy/scripts/oracle/apex/start.sh /usr/local/bin/start-apex && \
     ln -s /usr/demasy/scripts/oracle/apex/stop.sh /usr/local/bin/stop-apex && \
-    ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck
+    ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck && \
+    ln -s /usr/demasy/scripts/oracle/admin/install-all.sh /usr/local/bin/install-all && \
+    ln -s /usr/demasy/scripts/oracle/admin/install-client.sh /usr/local/bin/install-instant && \
+    ln -s /usr/demasy/scripts/oracle/admin/install-sqlcl.sh /usr/local/bin/install-sqlcl && \
+    ln -s /usr/demasy/scripts/oracle/admin/install-sqlplus.sh /usr/local/bin/install-sqlplus && \
+    ln -s /usr/demasy/scripts/oracle/admin/download-apex.sh /usr/local/bin/download-apex && \
+    ln -s /usr/demasy/scripts/oracle/admin/download-apex-standalone.sh /usr/local/bin/download-apex-standalone && \
+    ln -s /usr/demasy/scripts/oracle/admin/download-ords.sh /usr/local/bin/download-ords
 
 # Install Node.js dependencies
 RUN npm ci --only=production && npm cache clean --force

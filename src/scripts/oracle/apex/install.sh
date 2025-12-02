@@ -51,7 +51,13 @@ log_info "Step 1: Verifying APEX and ORDS installation files..."
 
 # APEX is already in /opt/oracle/apex from Docker build
 if [ ! -d "/opt/oracle/apex" ]; then
+    echo ""
     log_error "APEX directory not found at /opt/oracle/apex"
+    echo ""
+    log_info "APEX software is not installed. Please download it first:"
+    echo -e "  • Download APEX software: download-apex"
+    echo -e "  • Or download all Oracle components: install-all"
+    echo ""
     exit 1
 fi
 
@@ -60,7 +66,14 @@ log_success "APEX found (${APEX_SIZE})"
 
 # ORDS is already in /opt/oracle/ords from Docker build
 if [ ! -d "/opt/oracle/ords" ]; then
+    echo ""
     log_error "ORDS directory not found at /opt/oracle/ords"
+    echo ""
+    log_info "ORDS software is not installed. Please download it first:"
+    echo -e "  • Download ORDS software: ${CYAN}download-ords${RESET}"
+    echo -e "  • Download APEX & ORDS together: ${CYAN}download-apex${RESET}"
+    echo -e "  • Or download all Oracle components: ${CYAN}install-all${RESET}"
+    echo ""
     exit 1
 fi
 

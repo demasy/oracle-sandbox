@@ -31,7 +31,8 @@ COPY ["LICENSE", "./"]
 COPY ./src/scripts/utils/*.sh /usr/demasy/scripts/utils/
 COPY ./src/scripts/cli/sqlcl-connect.sh /usr/demasy/scripts/cli/sqlcl-connect.sh
 COPY ./src/scripts/cli/sqlplus-connect.sh /usr/demasy/scripts/cli/sqlplus-connect.sh
-COPY ./src/scripts/oracle/admin/healthcheck.sh /usr/demasy/scripts/oracle/admin/healthcheck.sh
+# COPY ./src/scripts/oracle/admin/download.sh /usr/demasy/scripts/oracle/admin/download.sh
+COPY ./src/scripts/oracle/admin/*.sh /usr/demasy/scripts/oracle/admin/
 COPY ./src/scripts/oracle/mcp/*.sh /usr/demasy/scripts/oracle/mcp/
 COPY ./src/scripts/oracle/apex/*.sh /usr/demasy/scripts/oracle/apex/
 
@@ -43,54 +44,55 @@ RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/apex/*.sh
 
 WORKDIR /usr/demasy/scripts
+RUN mkdir -p /opt/oracle
 
-# Handle Oracle Instant Client - download from GitHub Release
-RUN mkdir -p /opt/oracle && \
-  ARCH=$(uname -m) && \
-  if [ "$ARCH" = "x86_64" ]; then \
-    IC_FILE="instantclient-basic-linux-x64-23.7.0.24.10.zip"; \
-  elif [ "$ARCH" = "aarch64" ]; then \
-    echo "ARM64 build: Using x64 Instant Client with emulation"; \
-    IC_FILE="instantclient-basic-linux-x64-23.7.0.24.10.zip"; \
-  else \
-    echo "Unsupported architecture: $ARCH" && exit 1; \
-  fi && \
-  echo "Downloading Oracle Instant Client from GitHub Release..." && \
-  curl -L -f \
-    "https://github.com/demasy/oracle-sandbox/releases/download/oracle-ic-23.7/$IC_FILE" \
-    -o /tmp/instantclient.zip && \
-  unzip -qo /tmp/instantclient.zip -d /tmp && \
-  mv /tmp/libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient && \
-  rm -rf /tmp/instantclient.zip /tmp/libs
+# # Handle Oracle Instant Client - download from GitHub Release
+# RUN mkdir -p /opt/oracle && \
+#   ARCH=$(uname -m) && \
+#   if [ "$ARCH" = "x86_64" ]; then \
+#     IC_FILE="instantclient-basic-linux-x64-23.7.0.24.10.zip"; \
+#   elif [ "$ARCH" = "aarch64" ]; then \
+#     echo "ARM64 build: Using x64 Instant Client with emulation"; \
+#     IC_FILE="instantclient-basic-linux-x64-23.7.0.24.10.zip"; \
+#   else \
+#     echo "Unsupported architecture: $ARCH" && exit 1; \
+#   fi && \
+#   echo "Downloading Oracle Instant Client from GitHub Release..." && \
+#   curl -L -f \
+#     "https://github.com/demasy/oracle-sandbox/releases/download/oracle-ic-23.7/$IC_FILE" \
+#     -o /tmp/instantclient.zip && \
+#   unzip -qo /tmp/instantclient.zip -d /tmp && \
+#   mv /tmp/libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient && \
+#   rm -rf /tmp/instantclient.zip /tmp/libs
 
-# Download SQLcl
-RUN curl -L -o /tmp/sqlcl.zip "$SRC_ORACLE_SQLCL" && \
-  unzip -qo /tmp/sqlcl.zip -d /opt/oracle && \
-  rm -f /tmp/sqlcl.zip
+# # Download SQLcl
+# RUN curl -L -o /tmp/sqlcl.zip "$SRC_ORACLE_SQLCL" && \
+#   unzip -qo /tmp/sqlcl.zip -d /opt/oracle && \
+#   rm -f /tmp/sqlcl.zip
 
-# Download APEX
-RUN curl -L -o /tmp/apex.zip "$SRC_ORACLE_APEX" && \
-  unzip -qo /tmp/apex.zip -d /opt/oracle && \
-  rm -f /tmp/apex.zip
+# # Download APEX
+# RUN curl -L -o /tmp/apex.zip "$SRC_ORACLE_APEX" && \
+#   unzip -qo /tmp/apex.zip -d /opt/oracle && \
+#   rm -f /tmp/apex.zip
 
-# Download ORDS
-RUN curl -L -o /tmp/ords.zip "$SRC_ORACLE_ORDS" && \
-  unzip -qo /tmp/ords.zip -d /opt/oracle/ords && \
-  rm -f /tmp/ords.zip
+# # Download ORDS
+# RUN curl -L -o /tmp/ords.zip "$SRC_ORACLE_ORDS" && \
+#   unzip -qo /tmp/ords.zip -d /opt/oracle/ords && \
+#   rm -f /tmp/ords.zip
 
-# Download and install SQL*Plus
-# Updated by demasy on November 11, 2025
-# Added SQL*Plus support alongside SQLcl for enhanced Oracle client compatibility
-# Note: Automatically detects architecture and provides appropriate solution
-RUN ARCH=$(uname -m) && \
-  if [ "$ARCH" = "x86_64" ]; then \
-    curl -L -o /tmp/sqlplus.zip "$SRC_ORACLE_SQLPLUS" && \
-    unzip -q /tmp/sqlplus.zip -d /opt/oracle && \
-    cp -r /opt/oracle/instantclient_*/* /opt/oracle/instantclient/ && \
-    rm -f /tmp/sqlplus.zip; \
-  else \
-    echo "Note: SQL*Plus not available for $ARCH architecture - SQLcl will be used as fallback"; \
-  fi
+# # Download and install SQL*Plus
+# # Updated by demasy on November 11, 2025
+# # Added SQL*Plus support alongside SQLcl for enhanced Oracle client compatibility
+# # Note: Automatically detects architecture and provides appropriate solution
+# RUN ARCH=$(uname -m) && \
+#   if [ "$ARCH" = "x86_64" ]; then \
+#     curl -L -o /tmp/sqlplus.zip "$SRC_ORACLE_SQLPLUS" && \
+#     unzip -q /tmp/sqlplus.zip -d /opt/oracle && \
+#     cp -r /opt/oracle/instantclient_*/* /opt/oracle/instantclient/ && \
+#     rm -f /tmp/sqlplus.zip; \
+#   else \
+#     echo "Note: SQL*Plus not available for $ARCH architecture - SQLcl will be used as fallback"; \
+#   fi
 
 FROM node:20-bookworm-slim
 
@@ -152,35 +154,48 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
     chmod +x /usr/local/bin/sql
 
 # Symbolic links to Oracle tools and scripts
+
+
+RUN ln -s /usr/demasy/scripts/oracle/admin/download.sh /usr/local/bin/download-oracle-components
+
+
 # -------------------------------------------- [CLI Tools]
 RUN ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus
 RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/oracle
 
 # -------------------------------------------- [Oracle APEX Tools]
+RUN ln -s /usr/demasy/scripts/oracle/admin/download-apex.sh /usr/local/bin/download-apex
 RUN ln -s /usr/demasy/scripts/oracle/apex/install.sh /usr/local/bin/install-apex
 RUN ln -s /usr/demasy/scripts/oracle/apex/uninstall.sh /usr/local/bin/uninstall-apex
 RUN ln -s /usr/demasy/scripts/oracle/apex/start.sh /usr/local/bin/start-apex
 RUN ln -s /usr/demasy/scripts/oracle/apex/stop.sh /usr/local/bin/stop-apex
 
-# # -------------------------------------------- [MCP Tools]
-# RUN ln -s /usr/demasy/scripts/oracle/mcp/start.sh /usr/local/bin/start-mcp
+# -------------------------------------------- [Software Install Tools]
+RUN ln -s /usr/demasy/scripts/oracle/admin/install-all.sh /usr/local/bin/install-all
+RUN ln -s /usr/demasy/scripts/oracle/admin/install-client.sh /usr/local/bin/install-client
+RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlplus.sh /usr/local/bin/install-sqlplus
+RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlcl.sh /usr/local/bin/install-sqlcl
 
 # -------------------------------------------- [Admin & Diagnostics]
 RUN ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck
 
+# # -------------------------------------------- [MCP Tools]
+# RUN ln -s /usr/demasy/scripts/oracle/mcp/start.sh /usr/local/bin/start-mcp
+
+
 # Verify installation and test SQLcl
 # Updated by demasy on November 11, 2025
 # Enhanced verification to test both SQLcl and SQL*Plus installations
-RUN echo "Testing Java installation..." && \
-    java -version && \
-    DETECTED_JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::') && \
-    echo "Detected Java home: $DETECTED_JAVA_HOME" && \
-    echo "Testing SQLcl..." && \
-    cd /opt/oracle/sqlcl/bin && \
-    JAVA_HOME="$DETECTED_JAVA_HOME" ./sql -version && \
-    echo "Testing SQLPlus..." && \
-    (sqlplus -version || echo "SQLPlus not available - using Instant Client bundled version")
+# RUN echo "Testing Java installation..." && \
+#     java -version && \
+#     DETECTED_JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::') && \
+#     echo "Detected Java home: $DETECTED_JAVA_HOME" && \
+#     echo "Testing SQLcl..." && \
+#     cd /opt/oracle/sqlcl/bin && \
+#     JAVA_HOME="$DETECTED_JAVA_HOME" ./sql -version && \
+#     echo "Testing SQLPlus..." && \
+#     (sqlplus -version || echo "SQLPlus not available - using Instant Client bundled version")
 
 # Create MCP configuration directory
 RUN mkdir -p /root/.mcp

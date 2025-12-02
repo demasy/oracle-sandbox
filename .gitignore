@@ -287,3 +287,5 @@ CODE_OF_CONDUCT.md
 
 Dockerfile copy
 src/scripts/docker/
+
+.github/copilot-instructions.md
