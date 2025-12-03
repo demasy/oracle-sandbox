@@ -7,9 +7,9 @@
 # ============================================
 
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
-source "$SCRIPT_DIR/../../utils/colors.sh"
-source "$SCRIPT_DIR/../../utils/logging.sh"
-source "$SCRIPT_DIR/../../utils/banner.sh"
+source "$SCRIPT_DIR/../../backbone/utils/colors.sh"
+source "$SCRIPT_DIR/../../backbone/utils/logging.sh"
+source "$SCRIPT_DIR/../../backbone/utils/banner.sh"
 
 clear
 print_demasy_banner "Oracle APEX & ORDS Installer"

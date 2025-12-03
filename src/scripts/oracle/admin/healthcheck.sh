@@ -5,7 +5,7 @@ SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
 
 # Source utilities from the actual script location
-source "$SCRIPT_DIR/../../utils/banner.sh"
+source "$SCRIPT_DIR/../../backbone/utils/banner.sh"
 
 # Colors for output
 RED='\033[0;91m'      # Dark Red (Bright Red)
