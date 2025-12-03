@@ -10,12 +10,12 @@ ARG SRC_ORACLE_SQLCL
 ARG SRC_ORACLE_SQLPLUS
 ARG SRC_ORACLE_APEX
 ARG SRC_ORACLE_ORDS
-ARG USE_LOCAL_IC=false
+ARG INSTALL_APEX
 ENV SRC_ORACLE_SQLCL=$SRC_ORACLE_SQLCL
 ENV SRC_ORACLE_SQLPLUS=$SRC_ORACLE_SQLPLUS
 ENV SRC_ORACLE_APEX=$SRC_ORACLE_APEX
 ENV SRC_ORACLE_ORDS=$SRC_ORACLE_ORDS
-ENV USE_LOCAL_IC=$USE_LOCAL_IC
+ENV INSTALL_APEX=$INSTALL_APEX
 
 RUN mkdir -p /usr/demasy/app
 
@@ -28,57 +28,36 @@ COPY ./app.js ./app.js
 COPY ["LICENSE", "./"]
 
 # Copy scripts to organized structure
-COPY ./src/scripts/utils/*.sh /usr/demasy/scripts/utils/
+COPY ./src/scripts/backbone/utils/*.sh /usr/demasy/scripts/backbone/utils/
 COPY ./src/scripts/cli/sqlcl-connect.sh /usr/demasy/scripts/cli/sqlcl-connect.sh
 COPY ./src/scripts/cli/sqlplus-connect.sh /usr/demasy/scripts/cli/sqlplus-connect.sh
 # COPY ./src/scripts/oracle/admin/download.sh /usr/demasy/scripts/oracle/admin/download.sh
 COPY ./src/scripts/oracle/admin/*.sh /usr/demasy/scripts/oracle/admin/
 COPY ./src/scripts/oracle/mcp/*.sh /usr/demasy/scripts/oracle/mcp/
 COPY ./src/scripts/oracle/apex/*.sh /usr/demasy/scripts/oracle/apex/
+COPY ./src/scripts/backbone/build/*.sh /usr/demasy/scripts/build/
 
 # Set permissions for all scripts
-RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
+RUN chmod +x /usr/demasy/scripts/backbone/utils/*.sh && \
     chmod +x /usr/demasy/scripts/cli/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
-    chmod +x /usr/demasy/scripts/oracle/apex/*.sh
+    chmod +x /usr/demasy/scripts/oracle/apex/*.sh && \
+    chmod +x /usr/demasy/scripts/build/*.sh
 
 WORKDIR /usr/demasy/scripts
 RUN mkdir -p /opt/oracle
 
-# # Handle Oracle Instant Client - download from GitHub Release
-# RUN mkdir -p /opt/oracle && \
-#   ARCH=$(uname -m) && \
-#   if [ "$ARCH" = "x86_64" ]; then \
-#     IC_FILE="instantclient-basic-linux-x64-23.7.0.24.10.zip"; \
-#   elif [ "$ARCH" = "aarch64" ]; then \
-#     echo "ARM64 build: Using x64 Instant Client with emulation"; \
-#     IC_FILE="instantclient-basic-linux-x64-23.7.0.24.10.zip"; \
-#   else \
-#     echo "Unsupported architecture: $ARCH" && exit 1; \
-#   fi && \
-#   echo "Downloading Oracle Instant Client from GitHub Release..." && \
-#   curl -L -f \
-#     "https://github.com/demasy/oracle-sandbox/releases/download/oracle-ic-23.7/$IC_FILE" \
-#     -o /tmp/instantclient.zip && \
-#   unzip -qo /tmp/instantclient.zip -d /tmp && \
-#   mv /tmp/libs/oracle/clients/instantclient_23_7 /opt/oracle/instantclient && \
-#   rm -rf /tmp/instantclient.zip /tmp/libs
+# Install Oracle components (Instant Client + SQLcl)
+ENV TERM=xterm
+RUN /usr/demasy/scripts/build/builder-startup.sh
 
-# # Download SQLcl
-# RUN curl -L -o /tmp/sqlcl.zip "$SRC_ORACLE_SQLCL" && \
-#   unzip -qo /tmp/sqlcl.zip -d /opt/oracle && \
-#   rm -f /tmp/sqlcl.zip
-
-# # Download APEX
-# RUN curl -L -o /tmp/apex.zip "$SRC_ORACLE_APEX" && \
-#   unzip -qo /tmp/apex.zip -d /opt/oracle && \
-#   rm -f /tmp/apex.zip
-
-# # Download ORDS
-# RUN curl -L -o /tmp/ords.zip "$SRC_ORACLE_ORDS" && \
-#   unzip -qo /tmp/ords.zip -d /opt/oracle/ords && \
-#   rm -f /tmp/ords.zip
+# Download APEX and ORDS using download-apex.sh script (conditional)
+RUN if [ "$INSTALL_APEX" = "true" ]; then \
+      /usr/demasy/scripts/oracle/admin/download-apex.sh; \
+    else \
+      echo "Skipping APEX/ORDS download (INSTALL_APEX=$INSTALL_APEX)"; \
+    fi
 
 # # Download and install SQL*Plus
 # # Updated by demasy on November 11, 2025
@@ -129,6 +108,10 @@ RUN JAVA_HOME_CANDIDATE=$(find /usr/lib/jvm -name "java-17-openjdk*" -type d | h
 ENV JAVA_HOME_DYNAMIC=/usr/lib/jvm/java-17-openjdk-arm64
 ENV CLASSPATH="/opt/oracle/sqlcl/lib/*"
 
+# Pass build argument to runtime environment
+ARG INSTALL_APEX
+ENV INSTALL_APEX=${INSTALL_APEX}
+
 COPY --from=demasylabs-builder package*.json ./
 COPY --from=demasylabs-builder /usr/demasy /usr/demasy
 COPY --from=demasylabs-builder /opt/oracle /opt/oracle
@@ -136,7 +119,7 @@ COPY --from=demasylabs-builder /opt/oracle /opt/oracle
 RUN npm install oracledb --build-from-source --unsafe-perm
 
 # Set permissions for all scripts in runtime stage
-RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
+RUN chmod +x /usr/demasy/scripts/backbone/utils/*.sh && \
     chmod +x /usr/demasy/scripts/cli/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
@@ -157,7 +140,6 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
 
 
 RUN ln -s /usr/demasy/scripts/oracle/admin/download.sh /usr/local/bin/download-oracle-components
-
 
 # -------------------------------------------- [CLI Tools]
 RUN ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus
@@ -208,4 +190,6 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 WORKDIR /usr/demasy/app
 
-CMD ["node", "app.js"]
+# Use startup script to handle initialization
+CMD ["/usr/demasy/scripts/build/startup.sh"]
+

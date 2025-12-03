@@ -57,7 +57,7 @@ RUN apt-get update && \
 
 # Create application directories
 RUN mkdir -p /usr/demasy/app \
-  /usr/demasy/scripts/utils \
+  /usr/demasy/scripts/backbone/utils \
   /usr/demasy/scripts/cli \
   /usr/demasy/scripts/oracle/admin \
   /usr/demasy/scripts/oracle/mcp \
@@ -73,34 +73,44 @@ COPY ./app.js ./app.js
 COPY ["LICENSE", "./"]
 
 # Copy utility scripts
-COPY ./src/scripts/utils/*.sh /usr/demasy/scripts/utils/
+COPY ./src/scripts/backbone/utils/*.sh /usr/demasy/scripts/backbone/utils/
 COPY ./src/scripts/cli/*.sh /usr/demasy/scripts/cli/
 COPY ./src/scripts/oracle/admin/*.sh /usr/demasy/scripts/oracle/admin/
 COPY ./src/scripts/oracle/mcp/*.sh /usr/demasy/scripts/oracle/mcp/
 COPY ./src/scripts/oracle/apex/*.sh /usr/demasy/scripts/oracle/apex/
 
 # Set permissions
-RUN chmod +x /usr/demasy/scripts/utils/*.sh && \
+RUN chmod +x /usr/demasy/scripts/backbone/utils/*.sh && \
     chmod +x /usr/demasy/scripts/cli/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
     chmod +x /usr/demasy/scripts/oracle/apex/*.sh
 
-# Create command aliases (will work once Oracle components are added)
-RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl && \
-    ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus && \
-    ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/oracle && \
-    ln -s /usr/demasy/scripts/oracle/apex/install.sh /usr/local/bin/install-apex && \
-    ln -s /usr/demasy/scripts/oracle/apex/start.sh /usr/local/bin/start-apex && \
-    ln -s /usr/demasy/scripts/oracle/apex/stop.sh /usr/local/bin/stop-apex && \
-    ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck && \
-    ln -s /usr/demasy/scripts/oracle/admin/install-all.sh /usr/local/bin/install-all && \
-    ln -s /usr/demasy/scripts/oracle/admin/install-client.sh /usr/local/bin/install-instant && \
-    ln -s /usr/demasy/scripts/oracle/admin/install-sqlcl.sh /usr/local/bin/install-sqlcl && \
-    ln -s /usr/demasy/scripts/oracle/admin/install-sqlplus.sh /usr/local/bin/install-sqlplus && \
-    ln -s /usr/demasy/scripts/oracle/admin/download-apex.sh /usr/local/bin/download-apex && \
-    ln -s /usr/demasy/scripts/oracle/admin/download-apex-standalone.sh /usr/local/bin/download-apex-standalone && \
-    ln -s /usr/demasy/scripts/oracle/admin/download-ords.sh /usr/local/bin/download-ords
+# Symbolic links to Oracle tools and scripts
+
+RUN ln -s /usr/demasy/scripts/oracle/admin/download.sh /usr/local/bin/download-oracle-components
+
+# -------------------------------------------- [CLI Tools]
+RUN ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus
+RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl
+RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/oracle
+
+# -------------------------------------------- [Oracle APEX Tools]
+RUN ln -s /usr/demasy/scripts/oracle/admin/download-apex.sh /usr/local/bin/download-apex
+RUN ln -s /usr/demasy/scripts/oracle/apex/install.sh /usr/local/bin/install-apex
+RUN ln -s /usr/demasy/scripts/oracle/apex/uninstall.sh /usr/local/bin/uninstall-apex
+RUN ln -s /usr/demasy/scripts/oracle/apex/start.sh /usr/local/bin/start-apex
+RUN ln -s /usr/demasy/scripts/oracle/apex/stop.sh /usr/local/bin/stop-apex
+
+# -------------------------------------------- [Software Install Tools]
+RUN ln -s /usr/demasy/scripts/oracle/admin/install-all.sh /usr/local/bin/install-all
+RUN ln -s /usr/demasy/scripts/oracle/admin/install-client.sh /usr/local/bin/install-client
+RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlplus.sh /usr/local/bin/install-sqlplus
+RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlcl.sh /usr/local/bin/install-sqlcl
+
+# -------------------------------------------- [Admin & Diagnostics]
+RUN ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck
+
 
 # Install Node.js dependencies
 RUN npm ci --only=production && npm cache clean --force
