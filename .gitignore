@@ -72,8 +72,6 @@ lerna-debug.log*
 # Environment & Configuration
 # ===========================================
 .env
-.env.*
-!.env.example
 .env.local
 .env.development.local
 .env.test.local
@@ -262,7 +260,6 @@ TODO.md
 NOTES.md
 scratch/
 
-.env.example
 
 # ===========================================
 # Optional: CI/CD & Deployment
