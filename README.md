@@ -177,6 +177,8 @@ git status  # Should NOT show .env file
 
 **⚠️ Do not skip this step!** Default passwords are publicly known and insecure.
 
+<br>
+
 ### 📦 Installation
 
 <br>
