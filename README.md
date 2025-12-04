@@ -582,8 +582,8 @@ For comprehensive guides, see the [src/docs](src/docs) directory:
 
 <br>
 
-### Contributing to the "🚀 Oracle AI Database 26ai Free – Developer Environment". 
-We welcome you to join and contribute to the "🚀 Oracle AI Database 26ai Free – Developer Environment 🚀". If you are interested in helping, please don’t hesitate to contact us at founder@demasy.io
+### Contributing to the "Oracle Sandbox – Developer Environment". 
+We welcome you to join and contribute to the "🚀 **Oracle Sandbox – Developer Environment** 🚀". If you are interested in helping, please don’t hesitate to contact us at founder@demasy.io
 
 <br>
 
