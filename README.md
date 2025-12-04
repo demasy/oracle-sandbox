@@ -31,20 +31,6 @@ Designed to facilitate learning through practical experience, this setup allows 
 > 
 > This environment is intended solely for **development**, **testing**, **evaluation**, and **educational** purposes. It is not secured, hardened, or optimized for production workloads. For production-grade deployments, organizations should consult Oracle's official deployment guidelines and work with Oracle Support or certified Oracle partners to ensure appropriate architecture, security, and compliance.
 
-> [!IMPORTANT]
-> **⚠️ SECURITY WARNINGS - READ BEFORE FIRST USE**
-> 
-> **CRITICAL SECURITY STEPS:**
-> 1. **Change ALL default passwords** in `.env` file before starting containers
-> 2. **Never commit** your `.env` file to version control (already in `.gitignore`)
-> 3. **Use strong passwords**: Minimum 12 characters with mixed case, numbers, and symbols
-> 4. **Restrict network access**: Bind services to `localhost` only for local development
-> 5. **Keep software updated**: Regularly pull latest Oracle images and update components
-> 
-> **Default credentials are publicly visible in `.env.example` - you MUST change them!**
-
-<br>
-
 # 📑 Table of Contents
 - [Overview](#overview) 
 - [Key Features](#key-features)
@@ -144,6 +130,20 @@ Designed to facilitate learning through practical experience, this setup allows 
 <br>
 
 ## Getting Started
+
+> [!IMPORTANT]
+> **⚠️ SECURITY WARNINGS - READ BEFORE FIRST USE**
+> 
+> **CRITICAL SECURITY STEPS:**
+> 1. **Change ALL default passwords** in `.env` file before starting containers
+> 2. **Never commit** your `.env` file to version control (already in `.gitignore`)
+> 3. **Use strong passwords**: Minimum 12 characters with mixed case, numbers, and symbols
+> 4. **Restrict network access**: Bind services to `localhost` only for local development
+> 5. **Keep software updated**: Regularly pull the latest Oracle images and update components.
+> 
+> **Default credentials are publicly visible in `.env.example` - you MUST change them!**
+
+<br>
 
 ### 🔐 Security Setup (REQUIRED FIRST STEP)
 
