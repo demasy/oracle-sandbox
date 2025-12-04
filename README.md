@@ -42,8 +42,6 @@ Designed to facilitate learning through practical experience, this setup allows 
 > 5. **Keep software updated**: Regularly pull latest Oracle images and update components
 > 
 > **Default credentials are publicly visible in `.env.example` - you MUST change them!**
-> 
-> See [SECURITY.md](SECURITY.md) for complete security guidelines and best practices.
 
 <br>
 
