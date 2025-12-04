@@ -31,6 +31,8 @@ Designed to facilitate learning through practical experience, this setup allows 
 > 
 > This environment is intended solely for **development**, **testing**, **evaluation**, and **educational** purposes. It is not secured, hardened, or optimized for production workloads. For production-grade deployments, organizations should consult Oracle's official deployment guidelines and work with Oracle Support or certified Oracle partners to ensure appropriate architecture, security, and compliance.
 
+<br>
+
 # 📑 Table of Contents
 - [Overview](#overview) 
 - [Key Features](#key-features)
