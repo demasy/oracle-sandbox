@@ -30,6 +30,21 @@ Designed to facilitate learning through practical experience, this setup allows 
 > **DEVELOPMENT AND TRAINING ENVIRONMENT ONLY**
 > 
 > This environment is intended solely for **development**, **testing**, **evaluation**, and **educational** purposes. It is not secured, hardened, or optimized for production workloads. For production-grade deployments, organizations should consult Oracle's official deployment guidelines and work with Oracle Support or certified Oracle partners to ensure appropriate architecture, security, and compliance.
+
+> [!IMPORTANT]
+> **⚠️ SECURITY WARNINGS - READ BEFORE FIRST USE**
+> 
+> **CRITICAL SECURITY STEPS:**
+> 1. **Change ALL default passwords** in `.env` file before starting containers
+> 2. **Never commit** your `.env` file to version control (already in `.gitignore`)
+> 3. **Use strong passwords**: Minimum 12 characters with mixed case, numbers, and symbols
+> 4. **Restrict network access**: Bind services to `localhost` only for local development
+> 5. **Keep software updated**: Regularly pull latest Oracle images and update components
+> 
+> **Default credentials are publicly visible in `.env.example` - you MUST change them!**
+> 
+> See [SECURITY.md](SECURITY.md) for complete security guidelines and best practices.
+
 <br>
 
 # 📑 Table of Contents
@@ -132,6 +147,35 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 ## Getting Started
 
+### 🔐 Security Setup (REQUIRED FIRST STEP)
+
+**Before starting containers, you MUST configure secure credentials:**
+
+```bash
+# 1. Copy the example environment file
+cp .env.example .env
+
+# 2. Edit .env and change ALL passwords
+nano .env  # or use your preferred editor
+
+# Required changes:
+# - ENV_DB_PASSWORD=YOUR_SECURE_PASSWORD_HERE
+# - ENV_APEX_ADMIN_PASSWORD=YOUR_SECURE_PASSWORD_HERE
+# - ENV_APEX_ADMIN_EMAIL=your.email@example.com
+
+# 3. Verify .env is not tracked by git
+git status  # Should NOT show .env file
+```
+
+**Password Requirements:**
+- Minimum 12 characters
+- Mix of uppercase and lowercase letters
+- Include numbers and special characters
+- Avoid dictionary words and common patterns
+
+**⚠️ Do not skip this step!** Default passwords are publicly known and insecure.
+
+### 📦 Installation
 
 <br>
 
