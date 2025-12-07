@@ -9,8 +9,8 @@
 
 # Source colors if not already loaded
 if [ -z "$RED" ]; then
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    source "$SCRIPT_DIR/colors.sh"
+    _BANNER_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    source "$_BANNER_SCRIPT_DIR/colors.sh"
 fi
 
 # Function to print Demasy Labs banner

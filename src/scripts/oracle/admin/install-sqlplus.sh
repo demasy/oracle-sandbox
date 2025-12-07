@@ -22,8 +22,8 @@ if [ "$ARCH" != "x86_64" ]; then
     log_error "SQL*Plus is only available for x86_64 architecture"
     log_info "Current architecture: $ARCH"
     echo ""
-    log_info "Alternative: Use ${BOLD}${CYAN}SQLcl${RESET} which works on all architectures"
-    log_info "Install SQLcl: ${BOLD}${CYAN}install-sqlcl${RESET}"
+    log_info "Alternative: Use ${CYAN}SQLcl${NC} which works on all architectures"
+    log_info "Install SQLcl: ${CYAN}install-sqlcl${NC}"
     echo ""
     exit 1
 fi
@@ -33,7 +33,7 @@ if [ ! -d "/opt/oracle/instantclient" ] || [ -z "$(ls -A /opt/oracle/instantclie
     log_error "Oracle Instant Client is not installed"
     log_error "SQL*Plus requires Oracle Instant Client to be installed first"
     echo ""
-    log_info "Please run: ${BOLD}${CYAN}install-client${RESET}"
+    log_info "Please run: ${CYAN}install-client${NC}"
     echo ""
     exit 1
 fi
