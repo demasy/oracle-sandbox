@@ -22,7 +22,7 @@ The **Oracle AI Database 26ai Free - Developer Environment** offers a clean, ful
 
 This environment is specifically tailored for **PL/SQL developers**, **APEX builders**, **database administrators (DBAs)**, **architects**, **instructors**, and the broader **Oracle community**. It serves as a reliable and portable foundation for rapid prototyping, REST API development, workshops, and classroom training. Users can discover and test the latest features of Oracle Database 26ai, experiment with AI-enhanced SQL and application patterns, and build full-stack solutions all without requiring production-scale infrastructure.
 
-Designed to facilitate learning through practical experience, this setup allows users to start instantly, iterate quickly, reset easily, and explore safely. With its isolated, predictable, and developer-friendly design, this environment accelerates experimentation, promotes community adoption, and helps professionals stay current with Oracle's evolving innovations. Whether you're showcasing new features, teaching future Oracle developers, contributing to community knowledge, or building internal tools, this environment provides a fast, modern, and reliable foundation for your projects.
+Designed to facilitate learning through practical experience, this setup allows users to start instantly, iterate quickly, reset easily, and explore safely. With its isolated, predictable, and developer-friendly design, this environment **accelerates experimentation**, **promotes community adoption**, and **helps professionals** stay current with Oracle's evolving innovations. Whether you're showcasing **new features**, **teaching future Oracle developers**, **contributing to community knowledge**, or **building internal tools**, this environment provides a **fast**, **modern**, and **reliable** foundation for your projects.
 
 <br>
 
@@ -30,18 +30,6 @@ Designed to facilitate learning through practical experience, this setup allows 
 > **DEVELOPMENT AND TRAINING ENVIRONMENT ONLY**
 > 
 > This environment is intended solely for **development**, **testing**, **evaluation**, and **educational** purposes. It is not secured, hardened, or optimized for production workloads. For production-grade deployments, organizations should consult Oracle's official deployment guidelines and work with Oracle Support or certified Oracle partners to ensure appropriate architecture, security, and compliance.
-
-> [!IMPORTANT]
-> **⚠️ SECURITY WARNINGS - READ BEFORE FIRST USE**
-> 
-> **CRITICAL SECURITY STEPS:**
-> 1. **Change ALL default passwords** in `.env` file before starting containers
-> 2. **Never commit** your `.env` file to version control (already in `.gitignore`)
-> 3. **Use strong passwords**: Minimum 12 characters with mixed case, numbers, and symbols
-> 4. **Restrict network access**: Bind services to `localhost` only for local development
-> 5. **Keep software updated**: Regularly pull latest Oracle images and update components
-> 
-> **Default credentials are publicly visible in `.env.example` - you MUST change them!**
 
 <br>
 
@@ -145,6 +133,22 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 ## Getting Started
 
+<br>
+
+> [!IMPORTANT]
+> **⚠️ SECURITY WARNINGS - READ BEFORE FIRST USE**
+> 
+> **CRITICAL SECURITY STEPS:**
+> 1. **Change ALL default passwords** in `.env` file before starting containers
+> 2. **Never commit** your `.env` file to version control (already in `.gitignore`)
+> 3. **Use strong passwords**: Minimum 12 characters with mixed case, numbers, and symbols
+> 4. **Restrict network access**: Bind services to `localhost` only for local development
+> 5. **Keep software updated**: Regularly pull the latest Oracle images and update components.
+> 
+> **Default credentials are publicly visible in `.env.example` - you MUST change them!**
+
+<br>
+
 ### 🔐 Security Setup (REQUIRED FIRST STEP)
 
 **Before starting containers, you MUST configure secure credentials:**
@@ -172,6 +176,8 @@ git status  # Should NOT show .env file
 - Avoid dictionary words and common patterns
 
 **⚠️ Do not skip this step!** Default passwords are publicly known and insecure.
+
+<br>
 
 ### 📦 Installation
 
@@ -576,8 +582,8 @@ For comprehensive guides, see the [src/docs](src/docs) directory:
 
 <br>
 
-### Contributing to the "🚀 Oracle AI Database 26ai Free – Developer Environment". 
-We welcome you to join and contribute to the "🚀 Oracle AI Database 26ai Free – Developer Environment 🚀". If you are interested in helping, please don’t hesitate to contact us at founder@demasy.io
+### Contributing to the "Oracle Sandbox – Developer Environment". 
+We welcome you to join and contribute to the "🚀 **Oracle Sandbox – Developer Environment** 🚀". If you are interested in helping, please don’t hesitate to contact us at founder@demasy.io
 
 <br>
 
