@@ -29,8 +29,7 @@ COPY ["LICENSE", "./"]
 
 # Copy scripts to organized structure
 COPY ./src/scripts/backbone/utils/*.sh /usr/demasy/scripts/backbone/utils/
-COPY ./src/scripts/cli/sqlcl-connect.sh /usr/demasy/scripts/cli/sqlcl-connect.sh
-COPY ./src/scripts/cli/sqlplus-connect.sh /usr/demasy/scripts/cli/sqlplus-connect.sh
+COPY ./src/scripts/cli/*.sh /usr/demasy/scripts/cli/
 # COPY ./src/scripts/oracle/admin/download.sh /usr/demasy/scripts/oracle/admin/download.sh
 COPY ./src/scripts/oracle/admin/*.sh /usr/demasy/scripts/oracle/admin/
 COPY ./src/scripts/oracle/mcp/*.sh /usr/demasy/scripts/oracle/mcp/
@@ -142,6 +141,7 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
 RUN ln -s /usr/demasy/scripts/oracle/admin/download.sh /usr/local/bin/download-oracle-components
 
 # -------------------------------------------- [CLI Tools]
+RUN ln -s /usr/demasy/scripts/cli/commands.sh /usr/local/bin/commands
 RUN ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus
 RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/oracle

@@ -14,6 +14,7 @@ display_commands() {
     echo -e "${GREEN} 🚀 Demasy Labs: Oracle Sandbox - Available Commands${NC}"
     # echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
+    echo -e "  ${CYAN}commands${NC}           - Display this list of available commands"
     echo -e "  ${CYAN}sqlcl${NC}              - Connect to Oracle database with SQLcl"
     echo -e "  ${CYAN}sqlplus${NC}            - Connect to Oracle database with SQL*Plus"
     echo -e "  ${CYAN}install-client${NC}     - Install Oracle Instant Client"
