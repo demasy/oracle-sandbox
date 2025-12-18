@@ -405,24 +405,36 @@ The environment consists of two primary containerized services:
 
 #### Docker Architecture Diagram
 
+```mermaid
+
+---
+title: Oracle Sandbox Docker Environment
+---
+flowchart LR
+    subgraph docker[" Docker Environment "]
+
+
+
+        direction LR
+        
+        mgmt["<b>demasylabs-oracle-server</b><br/>(Management Server)<br/>(Node.js)<br/><br/>Services:<br/>- Health Check<br/>- API Endpoints<br/>- SQLcl Client<br/><br/>Port: 3000<br/><br/><b>192.168.1.20</b>"]
+        
+        db["<b>demasylabs-oracle-database</b><br/>(Database Server)<br/><br/>Components:<br/>+ Oracle AI Database 26ai<br/>+ APEX 24.2<br/>+ ORDS 25.3<br/><br/>Ports:<br/>- 1521, 5500, 8080<br/><br/><b>192.168.1.10</b>"]
+        
+         mgmt e1@---> |connects to| db
+         e1@{ animation: fast }
+
+    end
+    
+    style docker fill:#f9f9f9,stroke:#333,stroke-width:3px
+    style mgmt fill:#fff,stroke:#333,stroke-width:2px
+    style db fill:#fff,stroke:#333,stroke-width:2px
+
+
 ```
-┌───────────────────────────────────────────────────────┐
-│                   Docker Environment                  │
-│                                                       │
-│  ┌──────────────────┐         ┌──────────────────┐    │
-│  │  Management      │         │  Oracle AI       │    │
-│  │  Server          │◄────────┤  Database 26ai   │    │
-│  │  (Node.js)       │         │  + APEX 24.2     │    │
-│  │                  │         │  + ORDS 25.3     │    │
-│  │  - Health Check  │         │                  │    │
-│  │  - API Endpoints │         │  Ports:          │    │
-│  │  - SQLcl Client  │         │  - 1521 (DB)     │    │
-│  │                  │         │  - 5500 (EM)     │    │
-│  │  Port: 3000      │         │  - 8080 (ORDS)   │    │
-│  └──────────────────┘         └──────────────────┘    │
-│      192.168.1.20                192.168.1.10         │
-└───────────────────────────────────────────────────────┘
-```
+
+
+    
 
 <br>
 
