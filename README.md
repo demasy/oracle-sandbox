@@ -344,7 +344,7 @@ curl http://localhost:3000/health
 Access the management container:
 
 ```bash
-docker exec -it demasy-server bash
+docker exec -it demasylabs-oracle-server bash
 ```
 
 Connect to the database:
