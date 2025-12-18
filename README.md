@@ -417,9 +417,9 @@ flowchart LR
 
         direction LR
         
-        mgmt["<b>demasylabs-oracle-server</b><br/>(Management Server)<br/><br/>Components:<br/>+Node.js<br/><br/>Services:<br/>- Health Check<br/>- API Endpoints<br/>- SQLcl Client<br/><br/>Ports: <br/>- 3000<br/><br/><b>192.168.1.20</b>"]
+        mgmt["<b>demasylabs-oracle-server</b><br/>(Management Server)<br/><br/>Components:<br/>+Node.js<br/><br/>Services:<br/>- Health Check<br/>- API Endpoints<br/>- SQLcl Client<br/><br/>Ports: <br/>- 3000<br/><br/><b>192.168.1.120</b>"]
         
-        db["<b>demasylabs-oracle-database</b><br/>(Database Server)<br/><br/>Components:<br/>+ Oracle AI Database 26ai<br/>+ APEX 24.2<br/>+ ORDS 25.3<br/><br/>Ports:<br/>- 1521, 5500, 8080<br/><br/><b>192.168.1.10</b>"]
+        db["<b>demasylabs-oracle-database</b><br/>(Database Server)<br/><br/>Components:<br/>+ Oracle AI Database 26ai<br/>+ APEX 24.2<br/>+ ORDS 25.3<br/><br/>Ports:<br/>- 1521, 5500, 8080<br/><br/><b>192.168.1.110</b>"]
         
          mgmt e1@---> |connects to| db
          e1@{ animation: fast }
