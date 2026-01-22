@@ -286,3 +286,10 @@ Dockerfile copy
 src/scripts/docker/
 
 .github/copilot-instructions.md
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
+
+
+sandbox-brain
