@@ -383,7 +383,7 @@ docker logs -f oracle-al-database-26ai  # Wait for "READY TO USE"
 curl http://localhost:3000/health
 
 # 4. (Optional) Run the APEX & ORDS installer inside the database container
-docker exec -it oracle-db-container bash
+docker exec -it demasylabs-oracle-server bash
 /usr/demasy/scripts/apex/install-apex.sh
 exit
 
