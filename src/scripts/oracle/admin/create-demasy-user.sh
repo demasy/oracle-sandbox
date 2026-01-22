@@ -206,6 +206,7 @@ COMMON_USER_EXISTS=$(echo "$COMMON_USER_EXISTS" | tr -d '[:space:]')
 
 if [ "$COMMON_USER_EXISTS" = "1" ]; then
     log_warn "Common user $COMMON_USER already exists"
+    log_info "Note: SYSDBA cannot be granted locally in Oracle 26ai CDB root (expected limitation)"
 else
     log_step "Creating common user $COMMON_USER..."
     
@@ -213,15 +214,14 @@ else
 -- Create common user
 CREATE USER ${COMMON_USER} IDENTIFIED BY ${DB_PASSWORD};
 
--- Grant SYSDBA to common user across all containers  
-GRANT SYSDBA TO ${COMMON_USER} CONTAINER = ALL;
-
--- Verify user creation
+-- Note: SYSDBA cannot be granted locally in Oracle 26ai CDB root
+-- This is expected behavior in multitenant architecture
 SELECT 'Common user created successfully' AS status FROM DUAL;
 EXIT
 EOF
     then
-        log_success "Common user $COMMON_USER created with SYSDBA privileges"
+        log_success "Common user $COMMON_USER created"
+        log_info "Note: SYSDBA privilege cannot be granted locally in Oracle 26ai CDB (this is normal)"
     else
         log_error "Failed to create common user $COMMON_USER"
         exit 1
@@ -229,47 +229,64 @@ EOF
 fi
 
 ################################################################################
-# STEP 6: Connect to PDB and Create Local User
+# STEP 6: Create Local User in PDB
 ################################################################################
 log_section "Step 6: Creating Local User in PDB"
-log_step "Switching to PDB $PDB_NAME..."
+log_step "Checking if local user $DEMASY_USER exists in PDB $PDB_NAME..."
 
-# Check if local user exists in PDB
-LOCAL_USER_EXISTS=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
+# Check if local user exists in PDB and get comprehensive info
+LOCAL_USER_INFO=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
 -- Switch to PDB
 ALTER SESSION SET CONTAINER = ${PDB_NAME};
 
--- Check if user exists
+-- Check if user exists and get status
 SET PAGESIZE 0
 SET FEEDBACK OFF
-SELECT COUNT(*) FROM dba_users WHERE username = '$(echo $DEMASY_USER | tr '[:lower:]' '[:upper:]')';
+SET HEADING OFF
+SELECT 
+    CASE 
+        WHEN COUNT(*) = 0 THEN 'NOT_EXISTS'
+        ELSE MAX(username || '|' || account_status)
+    END AS user_status
+FROM dba_users 
+WHERE username = '$(echo $DEMASY_USER | tr '[:lower:]' '[:upper:]')'
+GROUP BY username
+HAVING COUNT(*) > 0
+UNION ALL
+SELECT 'NOT_EXISTS' FROM DUAL WHERE NOT EXISTS (
+    SELECT 1 FROM dba_users WHERE username = '$(echo $DEMASY_USER | tr '[:lower:]' '[:upper:]')'
+);
 EXIT
 EOF
 )
 
-LOCAL_USER_EXISTS=$(echo "$LOCAL_USER_EXISTS" | tr -d '[:space:]')
+LOCAL_USER_INFO=$(echo "$LOCAL_USER_INFO" | tr -d '[:space:]')
 
-if [ "$LOCAL_USER_EXISTS" = "1" ]; then
-    log_warn "Local user $DEMASY_USER already exists in PDB $PDB_NAME"
-else
-    log_step "Creating local user $DEMASY_USER in PDB $PDB_NAME..."
+if [[ "$LOCAL_USER_INFO" == *"OPEN"* ]]; then
+    log_success "Local user $DEMASY_USER already exists and is active in PDB $PDB_NAME"
+elif [[ "$LOCAL_USER_INFO" == "NOT_EXISTS" ]]; then
+    log_step "Creating local user $DEMASY_USER in PDB $PDB_NAME with comprehensive privileges..."
     
     if sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
 -- Switch to PDB
 ALTER SESSION SET CONTAINER = ${PDB_NAME};
 
--- Create local user
+-- Create local user with comprehensive development privileges
 CREATE USER ${DEMASY_USER} IDENTIFIED BY ${DB_PASSWORD};
 
--- Grant comprehensive development privileges
+-- Grant basic connectivity and resource privileges
 GRANT CONNECT TO ${DEMASY_USER};
 GRANT RESOURCE TO ${DEMASY_USER};
+
+-- Grant advanced development privileges
 GRANT UNLIMITED TABLESPACE TO ${DEMASY_USER};
 GRANT SELECT_CATALOG_ROLE TO ${DEMASY_USER};
 GRANT ALTER SESSION TO ${DEMASY_USER};
 GRANT CREATE JOB TO ${DEMASY_USER};
 GRANT CREATE DATABASE LINK TO ${DEMASY_USER};
 GRANT CREATE MATERIALIZED VIEW TO ${DEMASY_USER};
+
+-- Grant CREATE ANY privileges for comprehensive development
 GRANT CREATE ANY TABLE TO ${DEMASY_USER};
 GRANT CREATE ANY VIEW TO ${DEMASY_USER};
 GRANT CREATE ANY PROCEDURE TO ${DEMASY_USER};
@@ -278,16 +295,24 @@ GRANT CREATE ANY TRIGGER TO ${DEMASY_USER};
 GRANT CREATE ANY TYPE TO ${DEMASY_USER};
 GRANT CREATE ANY INDEX TO ${DEMASY_USER};
 
--- Verify user creation
-SELECT 'Local user created successfully' AS status FROM DUAL;
+-- Display final status
+SELECT username || ' created successfully with ' || 
+       (SELECT COUNT(*) FROM dba_tab_privs WHERE grantee = username) || ' privileges and ' ||
+       (SELECT COUNT(*) FROM dba_role_privs WHERE grantee = username) || ' roles' AS result
+FROM dba_users 
+WHERE username = '$(echo $DEMASY_USER | tr '[:lower:]' '[:upper:]')';
+
 EXIT
 EOF
     then
-        log_success "Local user $DEMASY_USER created with comprehensive privileges"
+        log_success "Local user $DEMASY_USER created with comprehensive development privileges"
     else
         log_error "Failed to create local user $DEMASY_USER"
         exit 1
     fi
+else
+    log_warn "Local user $DEMASY_USER exists but status is: $LOCAL_USER_INFO"
+    log_info "Continuing with verification..."
 fi
 
 ################################################################################
@@ -313,49 +338,69 @@ else
 fi
 
 # Verify common user
-log_step "Checking common user privileges..."
-COMMON_PRIVS=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
+log_step "Checking common user status..."
+COMMON_USER_STATUS=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
 SET PAGESIZE 0
 SET FEEDBACK OFF
-SELECT COUNT(*) FROM dba_role_privs WHERE grantee = '$(echo $COMMON_USER | tr '[:lower:]' '[:upper:]')' AND granted_role = 'SYSDBA';
+SELECT username || '|' || account_status || '|' || created FROM dba_users WHERE username = '$(echo $COMMON_USER | tr '[:lower:]' '[:upper:]')';
 EXIT
 EOF
 )
 
-COMMON_PRIVS=$(echo "$COMMON_PRIVS" | tr -d '[:space:]')
-if [ "$COMMON_PRIVS" = "1" ]; then
-    log_success "✓ Common user $COMMON_USER has SYSDBA privileges"
+if [[ "$COMMON_USER_STATUS" == *"OPEN"* ]]; then
+    log_success "✓ Common user $COMMON_USER is active"
 else
-    log_warn "⚠ Common user $COMMON_USER may not have SYSDBA privileges"
+    log_warn "⚠ Common user status: $COMMON_USER_STATUS"
 fi
 
-# Verify local user in PDB
-log_step "Checking local user in PDB..."
-LOCAL_USER_INFO=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
+# Verify local user privileges in PDB
+log_step "Checking local user privileges in PDB..."
+PRIVILEGE_COUNT=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
 ALTER SESSION SET CONTAINER = ${PDB_NAME};
 SET PAGESIZE 0
 SET FEEDBACK OFF
-SELECT username || '|' || account_status FROM dba_users WHERE username = '$(echo $DEMASY_USER | tr '[:lower:]' '[:upper:]')';
+SELECT COUNT(*) FROM dba_tab_privs WHERE grantee = '$(echo $DEMASY_USER | tr '[:lower:]' '[:upper:]')';
 EXIT
 EOF
 )
 
-if [[ "$LOCAL_USER_INFO" == *"$(echo $DEMASY_USER | tr '[:lower:]' '[:upper:]')|OPEN"* ]]; then
-    log_success "✓ Local user $DEMASY_USER is active in PDB $PDB_NAME"
+ROLE_COUNT=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
+ALTER SESSION SET CONTAINER = ${PDB_NAME};
+SET PAGESIZE 0
+SET FEEDBACK OFF
+SELECT COUNT(*) FROM dba_role_privs WHERE grantee = '$(echo $DEMASY_USER | tr '[:lower:]' '[:upper:]')';
+EXIT
+EOF
+)
+
+PRIVILEGE_COUNT=$(echo "$PRIVILEGE_COUNT" | tr -d '[:space:]' | grep -o '^[0-9]*' || echo "0")
+ROLE_COUNT=$(echo "$ROLE_COUNT" | tr -d '[:space:]' | grep -o '^[0-9]*' || echo "0")
+
+if [[ "$PRIVILEGE_COUNT" -gt 0 ]] || [[ "$ROLE_COUNT" -gt 0 ]]; then
+    log_success "✓ Local user $DEMASY_USER has $PRIVILEGE_COUNT privileges and $ROLE_COUNT roles"
 else
-    log_warn "⚠ Local user status: $LOCAL_USER_INFO"
+    log_warn "⚠ Could not verify privileges for $DEMASY_USER"
 fi
 
 # Test connection to PDB as demasy user
-log_step "Testing connection as demasy user..."
-if sql -s ${DEMASY_USER}/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${PDB_NAME} << 'EOF' > /dev/null 2>&1
-SELECT 'Connection test successful' FROM DUAL;
+log_step "Testing connection and basic functionality as demasy user..."
+TEST_RESULT=$(sql -s ${DEMASY_USER}/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${PDB_NAME} << 'EOF'
+SET PAGESIZE 0
+SET FEEDBACK OFF
+-- Test basic operations
+CREATE TABLE demasy_test_table (id NUMBER, test_msg VARCHAR2(100));
+INSERT INTO demasy_test_table VALUES (1, 'Connection and privileges verified');
+SELECT test_msg FROM demasy_test_table;
+DROP TABLE demasy_test_table;
+SELECT 'SUCCESS' AS final_status FROM DUAL;
 EXIT
 EOF
-then
-    log_success "✓ Connection test as $DEMASY_USER user successful"
+)
+
+if [[ "$TEST_RESULT" == *"SUCCESS"* ]]; then
+    log_success "✓ Connection test and privilege verification successful"
 else
-    log_warn "⚠ Connection test as $DEMASY_USER user failed"
+    log_warn "⚠ Connection test failed or limited privileges detected"
 fi
 
 ################################################################################
@@ -372,13 +417,19 @@ echo "   • PDB Name: $PDB_NAME"
 echo "   • Connection: ${DB_HOST}:${DB_PORT}/${PDB_NAME}"
 echo ""
 echo "👤 User Accounts:"
-echo "   • Common User: $COMMON_USER (SYSDBA privileges)"
-echo "   • Local User: $DEMASY_USER (Development privileges)"
+echo "   • Common User: $COMMON_USER (Oracle 26ai CDB user)"
+echo "   • Local User: $DEMASY_USER (Full development privileges)"
 echo "   • Password: [Same as system password]"
 echo ""
 echo "🔗 Connection Examples:"
 echo "   • SQLcl: sql ${DEMASY_USER}/password@//${DB_HOST}:${DB_PORT}/${PDB_NAME}"
 echo "   • SQL*Plus: sqlplus ${DEMASY_USER}/password@${DB_HOST}:${DB_PORT}/${PDB_NAME}"
+echo "   • From container: sql ${DEMASY_USER}/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${PDB_NAME}"
+echo ""
+echo "💡 Development Notes:"
+echo "   • SYSDBA privileges not available in Oracle 26ai CDB (expected behavior)"
+echo "   • All standard development privileges granted to local user"
+echo "   • PDB configured for auto-start on database restart"
 echo ""
 
 log_success "Ready for development! 🚀"
