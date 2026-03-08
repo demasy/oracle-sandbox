@@ -158,6 +158,7 @@ junit.xml
 docker-compose.override.yml
 .dockerignore.local
 
+
 # ===========================================
 # Oracle Database Specific
 # ===========================================
@@ -283,7 +284,6 @@ CONTRIBUTING.md
 CODE_OF_CONDUCT.md
 
 Dockerfile copy
-src/scripts/docker/
 
 .github/copilot-instructions.md
 
