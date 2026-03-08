@@ -176,11 +176,17 @@ deploy_file() {
             local link_path="/usr/local/bin/${link_name}"
             if $DRY_RUN; then
                 log_dry "docker exec ${CONTAINER_NAME} ln -sf ${container_path} ${link_path}"
+                log_dry "docker exec ${CONTAINER_NAME} ln -sf ${container_path} ${link_path}.sh"
             else
                 docker exec "$CONTAINER_NAME" bash -c \
                     "ln -sf '${container_path}' '${link_path}'" \
                     && log_success "Symlink:  ${link_name} → ${container_path}" \
                     || log_warn "Symlink failed: ${link_path}"
+                # Also create a .sh-suffixed alias so both forms work
+                docker exec "$CONTAINER_NAME" bash -c \
+                    "ln -sf '${container_path}' '${link_path}.sh'" \
+                    && log_success "Symlink:  ${link_name}.sh → ${container_path}" \
+                    || log_warn "Symlink (.sh alias) failed: ${link_path}.sh"
             fi
         fi
     fi
