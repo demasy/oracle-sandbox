@@ -77,20 +77,24 @@ DRY_RUN=false
 ERRORS=0
 DEPLOYED=0
 
-# ─── Symlink map ──────────────────────────────────────────────────────────────
-# Maps <script filename> → <symlink name in /usr/local/bin>
-declare -A SYMLINK_MAP=(
-    ["create_user.sh"]="create-user"
-    ["create-demasy-user.sh"]="create-demasy-user"
-    ["rollback-demasy-user.sh"]="rollback-demasy-user"
-    ["healthcheck.sh"]="healthcheck"
-    ["download-apex.sh"]="download-apex"
-    ["install-all.sh"]="install-all"
-    ["install-client.sh"]="install-client"
-    ["install-sqlcl.sh"]="install-sqlcl"
-    ["install-sqlplus.sh"]="install-sqlplus"
-    ["download.sh"]="download-oracle-components"
-)
+# ─── Symlink lookup (bash 3 compatible — no associative arrays) ───────────────
+# Returns the /usr/local/bin symlink name for a given script filename, or empty.
+get_symlink_name() {
+    local filename="$1"
+    case "$filename" in
+        create_user.sh)             echo "create-user" ;;
+        create-demasy-user.sh)      echo "create-demasy-user" ;;
+        rollback-demasy-user.sh)    echo "rollback-demasy-user" ;;
+        healthcheck.sh)             echo "healthcheck" ;;
+        download-apex.sh)           echo "download-apex" ;;
+        install-all.sh)             echo "install-all" ;;
+        install-client.sh)          echo "install-client" ;;
+        install-sqlcl.sh)           echo "install-sqlcl" ;;
+        install-sqlplus.sh)         echo "install-sqlplus" ;;
+        download.sh)                echo "download-oracle-components" ;;
+        *)                          echo "" ;;
+    esac
+}
 
 # ─── Argument parsing ─────────────────────────────────────────────────────────
 show_help() {
@@ -164,16 +168,19 @@ deploy_file() {
     fi
 
     # Create symlink if requested and mapping exists
-    if $CREATE_SYMLINK && [[ -n "${SYMLINK_MAP[$filename]+_}" ]]; then
-        local link_name="${SYMLINK_MAP[$filename]}"
-        local link_path="/usr/local/bin/${link_name}"
-        if $DRY_RUN; then
-            log_dry "docker exec ${CONTAINER_NAME} ln -sf ${container_path} ${link_path}"
-        else
-            docker exec "$CONTAINER_NAME" bash -c \
-                "ln -sf '${container_path}' '${link_path}' && echo 'Symlink: ${link_name} → ${container_path}'" \
-                && log_success "Symlink:  ${link_name} → ${container_path}" \
-                || log_warn "Symlink already exists or failed: ${link_path}"
+    if $CREATE_SYMLINK; then
+        local link_name
+        link_name=$(get_symlink_name "$filename")
+        if [[ -n "$link_name" ]]; then
+            local link_path="/usr/local/bin/${link_name}"
+            if $DRY_RUN; then
+                log_dry "docker exec ${CONTAINER_NAME} ln -sf ${container_path} ${link_path}"
+            else
+                docker exec "$CONTAINER_NAME" bash -c \
+                    "ln -sf '${container_path}' '${link_path}'" \
+                    && log_success "Symlink:  ${link_name} → ${container_path}" \
+                    || log_warn "Symlink failed: ${link_path}"
+            fi
         fi
     fi
 }

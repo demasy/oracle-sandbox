@@ -160,57 +160,106 @@ EOF
 done
 
 ################################################################################
-# STEP 2: Verify PDB Exists and Is Open
+# STEP 2: Ensure PDB Exists and Is Open (create if missing)
 ################################################################################
 log_section "Step 2: Checking Target PDB"
 log_step "Checking if $PDB_NAME exists and is open..."
 
-PDB_STATUS_RAW=$(sql -s sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF
+# Query 1: does the PDB exist at all?
+PDB_EXISTS_RAW=$(sql -s sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF
 SET PAGESIZE 0
 SET FEEDBACK OFF
-SELECT open_mode FROM v\$pdbs WHERE name = '${PDB_NAME}';
+SELECT COUNT(*) FROM v\$pdbs WHERE name = '${PDB_NAME}';
 EXIT
 EOF
 )
+PDB_EXISTS=$(echo "$PDB_EXISTS_RAW" | grep -o '[0-9]' | tail -n1 || echo "0")
 
-PDB_STATUS=$(echo "$PDB_STATUS_RAW" | grep -o 'READ WRITE\|MOUNTED\|READ ONLY' | head -n1 || echo "NOT_FOUND")
+if [ "$PDB_EXISTS" = "0" ]; then
+    log_warn "PDB $PDB_NAME does not exist — creating it..."
 
-if [ "$PDB_STATUS" = "NOT_FOUND" ]; then
-    log_error "PDB $PDB_NAME does not exist."
-    log_error "Please create the PDB first or specify a valid PDB name."
-    log_info "Available PDBs:"
-    sql -s sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF
+    # Derive a safe lowercase directory name from the PDB name
+    PDB_DIR=$(echo "$PDB_NAME" | tr '[:upper:]' '[:lower:]')
+
+    if sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF
+CREATE PLUGGABLE DATABASE ${PDB_NAME}
+  ADMIN USER pdb_admin IDENTIFIED BY ${NEW_USER_PASSWORD}
+  FILE_NAME_CONVERT = ('/opt/oracle/oradata/FREE/pdbseed/', '/opt/oracle/oradata/FREE/${PDB_DIR}/');
+
+SELECT 'PDB created: ' || name FROM v\$pdbs WHERE name = '${PDB_NAME}';
+EXIT
+EOF
+    then
+        log_success "PDB $PDB_NAME created successfully"
+    else
+        log_error "Failed to create PDB $PDB_NAME"
+        log_info "Available PDBs:"
+        sql -s sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF
 SET PAGESIZE 20
 SET FEEDBACK OFF
+COL name FORMAT A20
+COL open_mode FORMAT A15
 SELECT name, open_mode FROM v\$pdbs WHERE name != 'PDB\$SEED';
 EXIT
 EOF
-    exit 1
-elif [ "$PDB_STATUS" != "READ WRITE" ]; then
-    log_warn "PDB $PDB_NAME exists but is not open (status: $PDB_STATUS). Attempting to open..."
+        exit 1
+    fi
 
-    sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF > /dev/null 2>&1
+    # Open the newly created PDB and save state for auto-start
+    log_step "Opening PDB $PDB_NAME..."
+    PDB_OPEN_OUTPUT=$(sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF 2>&1
 ALTER PLUGGABLE DATABASE ${PDB_NAME} OPEN;
 ALTER PLUGGABLE DATABASE ${PDB_NAME} SAVE STATE;
+SELECT 'Status: ' || open_mode FROM v\$pdbs WHERE name = '${PDB_NAME}';
 EXIT
 EOF
+    )
 
-    # Verify it's now open
-    PDB_STATUS_RECHECK=$(sql -s sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF
+    if echo "$PDB_OPEN_OUTPUT" | grep -q "READ WRITE"; then
+        log_success "PDB $PDB_NAME is open and configured for auto-start"
+    else
+        log_error "Failed to open newly created PDB $PDB_NAME"
+        log_error "$PDB_OPEN_OUTPUT"
+        exit 1
+    fi
+
+else
+    # Query 2: PDB exists — check its open_mode
+    PDB_STATUS_RAW=$(sql -s sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF
 SET PAGESIZE 0
 SET FEEDBACK OFF
 SELECT open_mode FROM v\$pdbs WHERE name = '${PDB_NAME}';
 EXIT
 EOF
     )
-    if echo "$PDB_STATUS_RECHECK" | grep -q "READ WRITE"; then
-        log_success "PDB $PDB_NAME opened successfully"
+    PDB_STATUS=$(echo "$PDB_STATUS_RAW" | grep -o 'READ WRITE\|MOUNTED\|READ ONLY' | head -n1 || echo "UNKNOWN")
+
+    if [ "$PDB_STATUS" = "READ WRITE" ]; then
+        log_success "PDB $PDB_NAME is open and ready (READ WRITE)"
     else
-        log_error "Failed to open PDB $PDB_NAME - Status: $PDB_STATUS_RECHECK"
-        exit 1
+        log_warn "PDB $PDB_NAME exists but is not open (status: $PDB_STATUS). Attempting to open..."
+
+        sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF > /dev/null 2>&1
+ALTER PLUGGABLE DATABASE ${PDB_NAME} OPEN;
+ALTER PLUGGABLE DATABASE ${PDB_NAME} SAVE STATE;
+EXIT
+EOF
+
+        # Verify it's now open
+        PDB_STATUS_RECHECK=$(sql -s sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} as sysdba << EOF
+SET PAGESIZE 0
+SET FEEDBACK OFF
+SELECT open_mode FROM v\$pdbs WHERE name = '${PDB_NAME}';
+EXIT
+EOF
+        )
+        if echo "$PDB_STATUS_RECHECK" | grep -q "READ WRITE"; then
+            log_success "PDB $PDB_NAME opened successfully"
+        else
+            log_error "Failed to open PDB $PDB_NAME - Status: $PDB_STATUS_RECHECK"
+            exit 1
+        fi
     fi
-else
-    log_success "PDB $PDB_NAME is open and ready (READ WRITE)"
 fi
 
 ################################################################################
