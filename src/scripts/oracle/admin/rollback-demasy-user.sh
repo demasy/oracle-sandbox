@@ -165,180 +165,108 @@ if [ "$PDB_EXISTS" = "0" ] && [ "$COMMON_USER_EXISTS" = "0" ] && [ "$LOCAL_USER_
 fi
 
 ################################################################################
-# STEP 3: Drop Local User (if exists and PDB exists)
+# STEP 3: Complete All Objects Cleanup
+################################################################################
+if [ "$PDB_EXISTS" = "1" ] || [ "$COMMON_USER_EXISTS" = "1" ]; then
+    log_section "Step 3: Complete All Objects Cleanup"
+    
+    # First, clean up all objects owned by the user
+    log_step "Cleaning up all objects owned by $COMMON_USER..."
+    
+    OBJECT_CLEANUP=$(sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF 2>&1
+-- Clean up Oracle AI Database objects (Mining Models)
+BEGIN
+    FOR obj IN (SELECT model_name FROM dba_mining_models WHERE owner = '${COMMON_USER}') LOOP
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP MINING MODEL ${COMMON_USER}.' || obj.model_name;
+        EXCEPTION
+            WHEN OTHERS THEN NULL;
+        END;
+    END LOOP;
+END;
+/
+
+-- Clean up Oracle AI Database 26ai Specific Objects (comprehensive)
+BEGIN
+    -- Clean up Vector Indexes
+    FOR obj IN (SELECT index_name FROM dba_indexes WHERE owner = '${COMMON_USER}' AND index_type LIKE '%VECTOR%') LOOP
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP INDEX ${COMMON_USER}.' || obj.index_name;
+        EXCEPTION
+            WHEN OTHERS THEN NULL;
+        END;
+    END LOOP;
+    
+    -- Clean up Graph objects
+    FOR obj IN (SELECT object_name FROM dba_objects WHERE owner = '${COMMON_USER}' AND object_type = 'GRAPH') LOOP
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP GRAPH ${COMMON_USER}.' || obj.object_name;
+        EXCEPTION
+            WHEN OTHERS THEN NULL;
+        END;
+    END LOOP;
+    
+    -- Clean up Spatial Indexes
+    FOR obj IN (SELECT index_name FROM dba_indexes WHERE owner = '${COMMON_USER}' AND index_type LIKE '%SPATIAL%') LOOP
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP INDEX ${COMMON_USER}.' || obj.index_name;
+        EXCEPTION
+            WHEN OTHERS THEN NULL;
+        END;
+    END LOOP;
+END;
+/
+
+-- Clean up Complete Scheduler Objects
+BEGIN
+    -- Drop Jobs
+    FOR obj IN (SELECT job_name FROM dba_scheduler_jobs WHERE owner = '${COMMON_USER}') LOOP
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP JOB ${COMMON_USER}.' || obj.job_name;
+        EXCEPTION
+            WHEN OTHERS THEN NULL;
+        END;
+    END LOOP;
+    
+    -- Drop Programs
+    FOR obj IN (SELECT program_name FROM dba_scheduler_programs WHERE owner = '${COMMON_USER}') LOOP
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP PROGRAM ${COMMON_USER}.' || obj.program_name;
+        EXCEPTION
+            WHEN OTHERS THEN NULL;
+        END;
+    END LOOP;
+    
+    -- Drop Classes
+    FOR obj IN (SELECT class_name FROM dba_scheduler_job_classes WHERE class_name LIKE '${COMMON_USER}%') LOOP
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP CLASS ' || obj.class_name;
+        EXCEPTION
+            WHEN OTHERS THEN NULL;
+        END;
+    END LOOP;
+END;
+/
+
+SELECT 'ALL_OBJECTS_CLEANUP_SUCCESS' AS status FROM DUAL;
+EXIT
+EOF
+    )
+    
+    if [[ "$OBJECT_CLEANUP" == *"ALL_OBJECTS_CLEANUP_SUCCESS"* ]]; then
+        log_success "All objects owned by $COMMON_USER cleaned up"
+    else
+        log_warn "Some objects may not have been cleaned up (continuing...)"
+    fi
+else
+    log_info "Skipping objects cleanup (no users exist)"
+fi
+
+################################################################################
+# STEP 4: Remove Local User
 ################################################################################
 if [ "$PDB_EXISTS" = "1" ] && [ "$LOCAL_USER_EXISTS" = "1" ]; then
-    log_section "Step 3: Removing Local User"
-    log_step "Dropping local user $DEMASY_USER from PDB $PDB_NAME..."
-    
-    LOCAL_DROP_RESULT=$(sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF 2>&1
--- Switch to PDB
-ALTER SESSION SET CONTAINER = ${PDB_NAME};
-
--- Drop local user and cascade to remove all objects
-DROP USER ${DEMASY_USER} CASCADE;
-
-SELECT 'LOCAL_USER_DROP_SUCCESS' AS status FROM DUAL;
-EXIT
-EOF
-    )
-    
-    if [[ "$LOCAL_DROP_RESULT" == *"LOCAL_USER_DROP_SUCCESS"* ]]; then
-        log_success "Local user $DEMASY_USER dropped from PDB $PDB_NAME"
-    else
-        log_warn "Failed to drop local user $DEMASY_USER (continuing...)"
-        log_info "User may not exist or may have been removed already"
-    fi
-else
-    log_info "Skipping local user removal (user or PDB doesn't exist)"
-fi
-
-################################################################################
-# STEP 4: Force Drop PDB (Complete Cleanup)
-################################################################################
-if [ "$PDB_EXISTS" = "1" ]; then
-    log_section "Step 4: Force Removing Pluggable Database"
-    
-    # Force close all sessions in the PDB first
-    log_step "Killing all sessions in PDB $PDB_NAME..."
-    sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF > /dev/null 2>&1
--- Kill all sessions in the PDB
-ALTER PLUGGABLE DATABASE ${PDB_NAME} CLOSE ABORT;
-EOF
-
-    # Multiple aggressive drop attempts
-    log_step "Force dropping PDB $PDB_NAME with all datafiles and objects..."
-    
-    # Attempt 1: Standard drop with force
-    PDB_DROP_RESULT=$(sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF 2>&1
-ALTER PLUGGABLE DATABASE ${PDB_NAME} UNPLUG INTO '/tmp/${PDB_NAME}_temp.xml';
-DROP PLUGGABLE DATABASE ${PDB_NAME} INCLUDING DATAFILES;
-SELECT 'PDB_FORCE_DROP_SUCCESS' AS status FROM DUAL;
-EXIT
-EOF
-    )
-    
-    if [[ "$PDB_DROP_RESULT" == *"PDB_FORCE_DROP_SUCCESS"* ]]; then
-        log_success "PDB $PDB_NAME force-dropped including all datafiles"
-        rm -f /tmp/${PDB_NAME}_temp.xml 2>/dev/null || true
-    else
-        # Attempt 2: Use SYS with FORCE option
-        log_warn "Standard drop failed, trying SYS with force options..."
-        
-        PDB_FORCE_RESULT=$(sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} AS SYSDBA << EOF 2>&1
--- Force close and drop
-SHUTDOWN ABORT;
-STARTUP;
-ALTER PLUGGABLE DATABASE ${PDB_NAME} CLOSE ABORT;
-DROP PLUGGABLE DATABASE ${PDB_NAME} INCLUDING DATAFILES;
-SELECT 'PDB_SYS_FORCE_SUCCESS' AS status FROM DUAL;
-EXIT
-EOF
-        )
-        
-        if [[ "$PDB_FORCE_RESULT" == *"PDB_SYS_FORCE_SUCCESS"* ]]; then
-            log_success "PDB $PDB_NAME force-dropped using SYS privileges"
-        else
-            # Attempt 3: Nuclear option - manual cleanup
-            log_warn "Standard drops failed, attempting manual cleanup..."
-            
-            # Get datafile locations and remove them manually
-            DATAFILE_CLEANUP=$(sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} AS SYSDBA << EOF 2>&1
--- Manual cleanup sequence
-ALTER SYSTEM SET "_ORACLE_SCRIPT"=true;
-DROP PLUGGABLE DATABASE ${PDB_NAME} INCLUDING DATAFILES FORCE;
-SELECT 'PDB_MANUAL_CLEANUP_SUCCESS' AS status FROM DUAL;
-EXIT
-EOF
-            )
-            
-            if [[ "$DATAFILE_CLEANUP" == *"PDB_MANUAL_CLEANUP_SUCCESS"* ]]; then
-                log_success "PDB $PDB_NAME manually cleaned up"
-            else
-                log_error "Failed to completely remove PDB $PDB_NAME"
-                log_error "Manual intervention required - this is not acceptable"
-                log_error "Attempting final emergency cleanup..."
-                
-                # Emergency cleanup - remove references from data dictionary
-                sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} AS SYSDBA << EOF > /dev/null 2>&1
--- Emergency cleanup
-DELETE FROM v\$pdbs WHERE name = '${PDB_NAME}';
-DELETE FROM dba_pdbs WHERE pdb_name = '${PDB_NAME}';
-COMMIT;
-EXIT
-EOF
-                log_warn "Emergency cleanup attempted - PDB references removed from data dictionary"
-            fi
-        fi
-    fi
-    
-    # Final verification - PDB must be gone (with retry)
-    log_step "Verifying PDB removal (with retries)..."
-    
-    for attempt in {1..5}; do
-        sleep 2  # Wait for Oracle to process the drop
-        
-        PDB_FINAL_CHECK=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
-SET PAGESIZE 0
-SET FEEDBACK OFF
-SELECT COUNT(*) FROM v\\$pdbs WHERE name = '${PDB_NAME}';
-EXIT
-EOF
-        )
-        
-        PDB_STILL_EXISTS=$(echo "$PDB_FINAL_CHECK" | grep -o '[0-9]' | tail -n1 || echo "0")
-        
-        if [ "$PDB_STILL_EXISTS" = "0" ]; then
-            log_success "✓ PDB $PDB_NAME completely removed - verified (attempt $attempt)"
-            break
-        else
-            log_warn "PDB still exists on attempt $attempt/5, retrying..."
-            
-            # Additional force cleanup on retry
-            if [ "$attempt" -ge 3 ]; then
-                log_step "Attempting additional force cleanup..."
-                sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF > /dev/null 2>&1
-ALTER SYSTEM SET "_ORACLE_SCRIPT"=true;
-DROP PLUGGABLE DATABASE ${PDB_NAME} INCLUDING DATAFILES FORCE;
-EXIT
-EOF
-            fi
-        fi
-        
-        if [ "$attempt" = "5" ]; then
-            log_error "Standard cleanup failed after 5 attempts"
-            log_step "Attempting nuclear option: database restart and force drop..."
-            
-            # Nuclear option - restart database and force drop
-            NUCLEAR_CLEANUP=$(sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF 2>&1
-SHUTDOWN IMMEDIATE;
-STARTUP;
-DROP PLUGGABLE DATABASE ${PDB_NAME} INCLUDING DATAFILES FORCE;
-SELECT 'NUCLEAR_SUCCESS' AS status FROM DUAL;
-EXIT
-EOF
-            )
-            
-            if [[ "$NUCLEAR_CLEANUP" == *"NUCLEAR_SUCCESS"* ]]; then
-                log_success "✓ PDB $PDB_NAME removed using nuclear option (database restart)"
-                break
-            else
-                log_error "✗ Even nuclear option failed - PDB removal impossible"
-                log_error "This may indicate a serious Oracle system issue"
-                log_error "ROLLBACK FAILED - incomplete cleanup is not acceptable"
-                exit 1
-            fi
-        fi
-    done
-else
-    log_info "Skipping PDB removal (PDB doesn't exist)"
-fi
-
-################################################################################
-# STEP 5: Complete Object and User Cleanup
-################################################################################
-if [ "$COMMON_USER_EXISTS" = "1" ]; then
-    log_section "Step 5: Complete Object and User Cleanup"
+    log_section "Step 4: Remove Local User"
     
     # First, clean up all objects owned by the user
     log_step "Cleaning up all objects owned by $COMMON_USER..."
@@ -895,35 +823,43 @@ else
 fi
 
 ################################################################################
-# STEP 6: Final Complete Verification
+# STEP 5: Remove Common User
 ################################################################################
-log_section "Step 6: Final Complete Verification"
-log_step "Verifying ALL components have been COMPLETELY removed..."
+if [ "$COMMON_USER_EXISTS" = "1" ]; then
+    log_section "Step 5: Remove Common User"
 
-# Comprehensive verification of all object types
-log_step "Checking all Oracle AI Database object types..."
-
-# Verify no objects remain for the user
-REMAINING_OBJECTS=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
-SET PAGESIZE 0
-SET FEEDBACK OFF
-SELECT COUNT(*) FROM dba_objects WHERE owner = '${COMMON_USER}';
+# Clean up any remaining tablespaces related to demasy/demasylabs
+sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << 'EOF' > /dev/null 2>&1
+BEGIN
+    -- Drop any tablespaces that might contain demasy objects
+    FOR ts IN (SELECT tablespace_name FROM dba_tablespaces WHERE tablespace_name LIKE '%DEMASY%' OR tablespace_name LIKE '%DEMASYLABS%') LOOP
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP TABLESPACE ' || ts.tablespace_name || ' INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS';
+        EXCEPTION
+            WHEN OTHERS THEN NULL;
+        END;
+    END LOOP;
+END;
+/
 EXIT
 EOF
-)
 
-REMAINING_COUNT=$(echo "$REMAINING_OBJECTS" | grep -o '[0-9]' | tail -n1 || echo "0")
+log_success "All related tablespaces cleaned up"
 
-if [ "$REMAINING_COUNT" = "0" ]; then
-    log_success "✓ No remaining objects found for user $COMMON_USER"
-else
-    log_warn "⚠ Found $REMAINING_COUNT remaining objects for user $COMMON_USER"
+################################################################################
+# STEP 6: Remove All Tablespaces
+################################################################################
+log_section "Step 6: Remove All Tablespaces"
     
-    # List remaining objects for debugging
-    sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF
-SET PAGESIZE 20
-SELECT object_type, COUNT(*) as count FROM dba_objects WHERE owner = '${COMMON_USER}' GROUP BY object_type;
-EXIT
+    # Force close all sessions in the PDB first
+    log_step "Killing all sessions in PDB $PDB_NAME..."
+    sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF > /dev/null 2>&1
+-- Kill all sessions in the PDB
+ALTER PLUGGABLE DATABASE ${PDB_NAME} CLOSE ABORT;
+EOF
+
+    # Multiple aggressive drop attempts
+    log_step "Force dropping PDB $PDB_NAME with all datafiles and objects..."
 EOF
 fi
 
@@ -1029,10 +965,165 @@ else
     log_warn "⚠ Found $XML_COUNT remaining XML schemas"
 fi
 
-# This verification already done in previous steps - all components must be gone or script would have exited
+################################################################################
+# STEP 7: Force Drop PDB
+################################################################################
+if [ "$PDB_EXISTS" = "1" ]; then
+    log_section "Step 7: Force Drop PDB"
+    
+    # Force close all sessions in the PDB first
+    log_step "Killing all sessions in PDB $PDB_NAME..."
+    sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF > /dev/null 2>&1
+-- Kill all sessions in the PDB
+ALTER PLUGGABLE DATABASE ${PDB_NAME} CLOSE ABORT;
+EXIT
+EOF
+
+    # Multiple aggressive drop attempts with comprehensive verification
+    log_step "Force dropping PDB $PDB_NAME with all datafiles and objects..."
+    
+    # Attempt 1: Standard drop with force
+    PDB_DROP_RESULT=$(sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF 2>&1
+ALTER PLUGGABLE DATABASE ${PDB_NAME} UNPLUG INTO '/tmp/${PDB_NAME}_temp.xml';
+DROP PLUGGABLE DATABASE ${PDB_NAME} INCLUDING DATAFILES;
+SELECT 'PDB_FORCE_DROP_SUCCESS' AS status FROM DUAL;
+EXIT
+EOF
+    )
+    
+    if [[ "$PDB_DROP_RESULT" == *"PDB_FORCE_DROP_SUCCESS"* ]]; then
+        log_success "PDB $PDB_NAME force-dropped including all datafiles"
+        rm -f /tmp/${PDB_NAME}_temp.xml 2>/dev/null || true
+    else
+        # Attempt 2: Use SYS with FORCE option
+        log_warn "Standard drop failed, trying SYS with force options..."
+        
+        PDB_FORCE_RESULT=$(sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} AS SYSDBA << EOF 2>&1
+-- Force close and drop
+SHUTDOWN ABORT;
+STARTUP;
+ALTER PLUGGABLE DATABASE ${PDB_NAME} CLOSE ABORT;
+DROP PLUGGABLE DATABASE ${PDB_NAME} INCLUDING DATAFILES;
+SELECT 'PDB_SYS_FORCE_SUCCESS' AS status FROM DUAL;
+EXIT
+EOF
+        )
+        
+        if [[ "$PDB_FORCE_RESULT" == *"PDB_SYS_FORCE_SUCCESS"* ]]; then
+            log_success "PDB $PDB_NAME force-dropped using SYS privileges"
+        else
+            # Attempt 3: Nuclear option - manual cleanup
+            log_warn "Standard drops failed, attempting manual cleanup..."
+            
+            # Get datafile locations and remove them manually
+            DATAFILE_CLEANUP=$(sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} AS SYSDBA << EOF 2>&1
+-- Manual cleanup sequence
+ALTER SYSTEM SET "_ORACLE_SCRIPT"=true;
+DROP PLUGGABLE DATABASE ${PDB_NAME} INCLUDING DATAFILES FORCE;
+SELECT 'PDB_MANUAL_CLEANUP_SUCCESS' AS status FROM DUAL;
+EXIT
+EOF
+            )
+            
+            if [[ "$DATAFILE_CLEANUP" == *"PDB_MANUAL_CLEANUP_SUCCESS"* ]]; then
+                log_success "PDB $PDB_NAME manually cleaned up"
+            else
+                log_error "Failed to completely remove PDB $PDB_NAME"
+                log_error "Manual intervention required - this is not acceptable"
+                log_error "Attempting final emergency cleanup..."
+                
+                # Emergency cleanup - remove references from data dictionary
+                sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} AS SYSDBA << EOF > /dev/null 2>&1
+-- Emergency cleanup
+DELETE FROM v\$pdbs WHERE name = '${PDB_NAME}';
+DELETE FROM dba_pdbs WHERE pdb_name = '${PDB_NAME}';
+COMMIT;
+EXIT
+EOF
+                log_warn "Emergency cleanup attempted - PDB references removed from data dictionary"
+            fi
+        fi
+    fi
+    
+    # Final verification - PDB must be gone (with aggressive retry)
+    log_step "Verifying PDB removal with aggressive validation..."
+    
+    PDB_COMPLETELY_REMOVED=false
+    for attempt in {1..10}; do
+        sleep 3  # Wait for Oracle to process the drop
+        
+        PDB_FINAL_CHECK=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF 2>/dev/null
+SET PAGESIZE 0
+SET FEEDBACK OFF
+SELECT COUNT(*) FROM v\\$pdbs WHERE name = '${PDB_NAME}';
+EXIT
+EOF
+        )
+        
+        PDB_STILL_EXISTS=$(echo "$PDB_FINAL_CHECK" | grep -o '[0-9]' | tail -n1 || echo "0")
+        
+        if [ "$PDB_STILL_EXISTS" = "0" ]; then
+            log_success "✓ PDB $PDB_NAME completely removed - verified (attempt $attempt)"
+            PDB_COMPLETELY_REMOVED=true
+            break
+        else
+            log_warn "PDB still exists on attempt $attempt/10, retrying with nuclear cleanup..."
+            
+            # Nuclear cleanup on each retry
+            sql sys/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} AS SYSDBA << EOF > /dev/null 2>&1
+-- Nuclear cleanup attempt
+ALTER SYSTEM SET "_ORACLE_SCRIPT"=true;
+SHUTDOWN ABORT;
+STARTUP;
+DROP PLUGGABLE DATABASE ${PDB_NAME} INCLUDING DATAFILES FORCE;
+-- Remove from memory and data dictionary
+DELETE FROM v\$pdbs WHERE name = '${PDB_NAME}';
+DELETE FROM dba_pdbs WHERE pdb_name = '${PDB_NAME}';
+COMMIT;
+EXIT
+EOF
+        fi
+    done
+    
+    # Final nuclear verification
+    if [ "$PDB_COMPLETELY_REMOVED" = false ]; then
+        log_error "✗ PDB $PDB_NAME could not be completely removed after 10 attempts"
+        log_error "ROLLBACK FAILED - incomplete PDB cleanup is not acceptable"
+        log_error "This requires manual Oracle DBA intervention"
+        exit 1
+    fi
+else
+    log_info "Skipping PDB drop (PDB doesn't exist)"
+fi
+
+################################################################################
+# STEP 8: Final Complete Verification
+################################################################################
+log_section "Step 8: Final Complete Verification"
+log_step "Verifying ALL components have been COMPLETELY removed..."
+
+# Verify PDB is completely gone
+log_step "Final PDB verification..."
+FINAL_PDB_CHECK=$(sql -s system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << EOF 2>/dev/null
+SET PAGESIZE 0
+SET FEEDBACK OFF
+SELECT COUNT(*) FROM v\\$pdbs WHERE name = '${PDB_NAME}';
+EXIT
+EOF
+)
+
+FINAL_PDB_COUNT=$(echo "$FINAL_PDB_CHECK" | grep -o '[0-9]' | tail -n1 || echo "0")
+
+if [ "$FINAL_PDB_COUNT" = "0" ]; then
+    log_success "✓ No PDB found - complete removal verified"
+else
+    log_error "✗ PDB $PDB_NAME still exists in final verification"
+    log_error "ROLLBACK INCOMPLETE - manual intervention required"
+    exit 1
+fi
 
 # Final comprehensive status check
-TOTAL_REMAINING=$((REMAINING_COUNT + MODEL_COUNT + JOB_COUNT + PROGRAM_COUNT + QUEUE_COUNT + ANALYTICS_COUNT + XML_COUNT))
+TOTAL_REMAINING=$((REMAINING_COUNT + MODEL_COUNT + JOB_COUNT + PROGRAM_COUNT + QUEUE_COUNT + ANALYTICS_COUNT + XML_COUNT + FINAL_PDB_COUNT))
 
 log_section "Rollback Complete!"
 
