@@ -292,4 +292,7 @@ Dockerfile copy
 .github/instructions/codacy.instructions.md
 
 
+package-lock.json
+
 sandbox-brain
+scripts
