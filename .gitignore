@@ -291,8 +291,8 @@ Dockerfile copy
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 
-
 package-lock.json
 
+builder
 sandbox-brain
-scripts
+docker-builder
