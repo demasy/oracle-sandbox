@@ -86,6 +86,7 @@ get_symlink_name() {
         create-demasy-user.sh)      echo "create-demasy-user" ;;
         rollback-demasy-user.sh)    echo "rollback-demasy-user" ;;
         grant-privileges.sh)        echo "grant-privileges" ;;
+        create-db-link.sh)          echo "create-db-link" ;;
         healthcheck.sh)             echo "healthcheck" ;;
         download-apex.sh)           echo "download-apex" ;;
         install-all.sh)             echo "install-all" ;;
