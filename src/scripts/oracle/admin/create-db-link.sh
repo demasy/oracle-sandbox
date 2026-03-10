@@ -6,12 +6,13 @@
 # Creates a private database link for an existing local user in a PDB
 #
 # USAGE:
-#   create-db-link.sh <link_name> <owner_user> <remote_user> <remote_password> \
+#   create-db-link.sh <link_name> <owner_user> <owner_password> <remote_user> <remote_password> \
 #                     <remote_host> <remote_port> <remote_service> [pdb_name]
 #
 # PARAMETERS:
 #   link_name        (required) - Name for the database link
 #   owner_user       (required) - Local PDB user who will own the link
+#   owner_password   (required) - Password for the local PDB owner user
 #   remote_user      (required) - Username on the remote database
 #   remote_password  (required) - Password on the remote database
 #   remote_host      (required) - Remote database hostname or IP
@@ -20,9 +21,9 @@
 #   pdb_name         (optional) - Local PDB name (defaults to DEMASYLABS_PDB)
 #
 # EXAMPLES:
-#   create-db-link.sh ebs_link roketto apps apps ORACLE.ROKETTO.MOBI 1521 EBSDB ROKETTO_PDB
-#   create-db-link.sh prod_link myuser sys SysPass01 192.168.1.10 1521 PRODDB
-#   create-db-link.sh hr_link demasy hr hrpass 10.0.0.5 1521 HRPDB DEMASYLABS_PDB
+#   create-db-link.sh ebs_link roketto Roketto1986 apps apps ORACLE.ROKETTO.MOBI 1521 EBSDB ROKETTO_PDB
+#   create-db-link.sh prod_link myuser MyPass01 sys SysPass01 192.168.1.10 1521 PRODDB
+#   create-db-link.sh hr_link demasy Demasy1986 hr hrpass 10.0.0.5 1521 HRPDB DEMASYLABS_PDB
 #
 # NOTES:
 #   - Creates a PRIVATE database link (owned by owner_user, not PUBLIC)
@@ -47,13 +48,14 @@ source "$SCRIPT_DIR/../../backbone/utils/colors.sh"
 # PARSE PARAMETERS
 ################################################################################
 
-if [ $# -lt 7 ]; then
+if [ $# -lt 8 ]; then
     echo ""
-    echo "Usage: $(basename "$0") <link_name> <owner_user> <remote_user> <remote_password> \\"
+    echo "Usage: $(basename "$0") <link_name> <owner_user> <owner_password> <remote_user> <remote_password> \\"
     echo "                        <remote_host> <remote_port> <remote_service> [pdb_name]"
     echo ""
     echo "  link_name        (required) Name for the database link"
     echo "  owner_user       (required) Local PDB user who will own the link"
+    echo "  owner_password   (required) Password for the local PDB owner user"
     echo "  remote_user      (required) Username on the remote database"
     echo "  remote_password  (required) Password on the remote database"
     echo "  remote_host      (required) Remote database hostname or IP"
@@ -62,20 +64,21 @@ if [ $# -lt 7 ]; then
     echo "  pdb_name         (optional) Local PDB name (default: DEMASYLABS_PDB)"
     echo ""
     echo "Examples:"
-    echo "  $(basename "$0") ebs_link roketto apps apps ORACLE.ROKETTO.MOBI 1521 EBSDB ROKETTO_PDB"
-    echo "  $(basename "$0") prod_link myuser sys SysPass01 192.168.1.10 1521 PRODDB"
+    echo "  $(basename "$0") ebs_link roketto Roketto1986 apps apps ORACLE.ROKETTO.MOBI 1521 EBSDB ROKETTO_PDB"
+    echo "  $(basename "$0") prod_link myuser MyPass01 sys SysPass01 192.168.1.10 1521 PRODDB"
     echo ""
     exit 1
 fi
 
 LINK_NAME="$1"
 OWNER_USER="$2"
-REMOTE_USER="$3"
-REMOTE_PASSWORD="$4"
-REMOTE_HOST="$5"
-REMOTE_PORT="$6"
-REMOTE_SERVICE="$7"
-INPUT_PDB="${8:-}"
+OWNER_PASSWORD="$3"
+REMOTE_USER="$4"
+REMOTE_PASSWORD="$5"
+REMOTE_HOST="$6"
+REMOTE_PORT="$7"
+REMOTE_SERVICE="$8"
+INPUT_PDB="${9:-}"
 
 # Validate link name (Oracle identifier rules, max 128 chars)
 if [[ ! "$LINK_NAME" =~ ^[a-zA-Z][a-zA-Z0-9_$.]{0,127}$ ]]; then
@@ -153,6 +156,7 @@ echo "  Remote Host:      $REMOTE_HOST"
 echo "  Remote Port:      $REMOTE_PORT"
 echo "  Remote Service:   $REMOTE_SERVICE"
 echo "  Remote User:      $REMOTE_USER"
+echo "  Owner Password:   [provided]"
 echo "  Remote Password:  [provided]"
 echo ""
 
@@ -284,7 +288,7 @@ LINK_EXISTS=$(echo "$LINK_EXISTS_RAW" | grep -o '[0-9]' | tail -n1 || echo "0")
 
 if [ "$LINK_EXISTS" = "1" ]; then
     log_warn "Link $LINK_NAME_UPPER already exists for $OWNER_USER_UPPER — dropping and recreating..."
-    DROP_OUTPUT=$(sql ${OWNER_USER}/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${PDB_NAME} << EOF 2>&1
+    DROP_OUTPUT=$(sql ${OWNER_USER}/${OWNER_PASSWORD}@//${DB_HOST}:${DB_PORT}/${PDB_NAME} << EOF 2>&1
 DROP DATABASE LINK ${LINK_NAME};
 EXIT
 EOF
@@ -304,7 +308,7 @@ fi
 log_section "Step 5: Creating Database Link"
 log_step "Creating private database link $LINK_NAME for $OWNER_USER_UPPER..."
 
-CREATE_OUTPUT=$(sql ${OWNER_USER}/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${PDB_NAME} << EOF 2>&1
+CREATE_OUTPUT=$(sql ${OWNER_USER}/${OWNER_PASSWORD}@//${DB_HOST}:${DB_PORT}/${PDB_NAME} << EOF 2>&1
 CREATE DATABASE LINK ${LINK_NAME}
   CONNECT TO ${REMOTE_USER} IDENTIFIED BY "${REMOTE_PASSWORD}"
   USING '//${REMOTE_HOST}:${REMOTE_PORT}/${REMOTE_SERVICE}';
@@ -328,7 +332,7 @@ fi
 log_section "Step 6: Verifying Database Link"
 log_step "Testing link connectivity: SELECT FROM DUAL@${LINK_NAME}..."
 
-VERIFY_OUTPUT=$(sql -s ${OWNER_USER}/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${PDB_NAME} << EOF 2>&1
+VERIFY_OUTPUT=$(sql -s ${OWNER_USER}/${OWNER_PASSWORD}@//${DB_HOST}:${DB_PORT}/${PDB_NAME} << EOF 2>&1
 SET PAGESIZE 0
 SET FEEDBACK OFF
 SELECT 'LINK_OK' AS result FROM DUAL@${LINK_NAME};
