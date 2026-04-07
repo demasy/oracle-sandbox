@@ -52,11 +52,18 @@ src/scripts/
 
 ### CLI Tools
 ```bash
-# Connect with SQLcl
-docker exec -it demasy-server sqlcl
+# Connect with SQLcl — auto-login as system (uses DEMASYLABS_* env vars)
+docker exec -it demasylabs-oracle-server sqlcl
 
-# Connect with SQL*Plus
-docker exec -it demasy-server sqlplus
+# Connect with SQLcl — custom credentials / connection string (pass-through)
+docker exec -it demasylabs-oracle-server sqlcl roketto/Roketto1986@//192.168.1.110:1521/ROKETTO_PDB
+docker exec -it demasylabs-oracle-server sqlcl -version
+
+# Connect with SQL*Plus — auto-login as system
+docker exec -it demasylabs-oracle-server sqlplus
+
+# Connect with SQL*Plus — custom credentials (pass-through)
+docker exec -it demasylabs-oracle-server sqlplus roketto/Roketto1986@//192.168.1.110:1521/ROKETTO_PDB
 ```
 
 ### Admin Tools

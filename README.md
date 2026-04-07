@@ -303,14 +303,14 @@ docker-compose up -d demasylabs-oracle-server
 ##### 1. Check Container Status
 
 ```bash
-docker ps --filter "name=oracle-al-database-26ai" --filter "name=demasy-server"
+docker ps --filter "name=demasylabs-oracle-database" --filter "name=demasylabs-oracle-server"
 ```
 
 **Expected output:**
 ```
-CONTAINER ID   IMAGE                    STATUS                    PORTS
-abc123def456   oracle-database:26ai     Up 2 minutes (healthy)    0.0.0.0:1521->1521/tcp
-def456ghi789   demasy-server:latest     Up 2 minutes (healthy)    0.0.0.0:3000->3000/tcp
+CONTAINER ID   IMAGE                                               STATUS                    PORTS                                              NAMES
+abc123def456   container-registry.oracle.com/database/free:latest  Up 2 minutes (healthy)    0.0.0.0:1521->1521/tcp, 0.0.0.0:5500->5500/tcp   demasylabs-oracle-database
+def456ghi789   demasylabs-oracle-sandbox:latest                    Up 2 minutes (healthy)    0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp   demasylabs-oracle-server
 ```
 
 ##### 2. Wait for Database Initialization
@@ -318,7 +318,7 @@ def456ghi789   demasy-server:latest     Up 2 minutes (healthy)    0.0.0.0:3000->
 Monitor database startup (takes 5-10 minutes on first run):
 
 ```bash
-docker logs -f oracle-al-database-26ai
+docker logs -f demasylabs-oracle-database
 ```
 
 **Look for:** `DATABASE IS READY TO USE!`
@@ -379,7 +379,7 @@ docker-compose up -d
 
 # 3. Verify
 docker ps
-docker logs -f oracle-al-database-26ai  # Wait for "READY TO USE"
+docker logs -f demasylabs-oracle-database  # Wait for "READY TO USE"
 curl http://localhost:3000/health
 
 # 4. (Optional) Run the APEX & ORDS installer inside the database container
@@ -391,7 +391,7 @@ exit
 
 
 # 5. Connect
-docker exec -it demasy-server sqlcl
+docker exec -it demasylabs-oracle-server sqlcl
 ```
 
 <br>
@@ -443,10 +443,10 @@ flowchart LR
 | Component | Details |
 |-----------|---------|
 | Base Image | Oracle AI Database 26ai Free Edition |
-| Container Name | `oracle-al-database-26ai` |
+| Container Name | `demasylabs-oracle-database` |
 | Database Name | DEMASY |
 | Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
-| Network | 192.168.1.10 |
+| Network | 192.168.1.110 |
 | Resources | • CPU: 1 core<br>• Memory: 3GB |
 | Health Check | Every 30s via SQL connectivity test |
 
@@ -457,9 +457,9 @@ flowchart LR
 | Component | Details |
 |-----------|---------|
 | Base Image | Node.js 20.19.4 |
-| Container Name | `demasy-server` |
+| Container Name | `demasylabs-oracle-server` |
 | Exposed Port | 3000 (API & Health Check) |
-| Network | 192.168.1.20 |
+| Network | 192.168.1.120 |
 | Resources | • CPU: 1 core<br>• Memory: 512MB |
 | Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
 | Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |

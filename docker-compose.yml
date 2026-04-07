@@ -15,7 +15,10 @@ services:
     volumes:
       - demasylabs_oracle_vol:/opt/oracle/oradata
     logging:
-      driver: "none"
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
       test:
         [

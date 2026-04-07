@@ -31,6 +31,50 @@ if [ ! -d "/opt/oracle/sqlcl" ] || [ ! -d "/opt/oracle/sqlcl/bin" ] || [ ! -f "/
   exit 1
 fi
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Mode: pass-through — forward all arguments directly to SQLcl
+# Usage: sqlcl <user>/<pass>@//<host>:<port>/<service>  |  sqlcl -version  etc.
+# ─────────────────────────────────────────────────────────────────────────────
+if [[ $# -gt 0 ]]; then
+  # If first arg looks like a connection string, parse and display info
+  if [[ "$1" == *"@"* ]]; then
+    CONN_USER="${1%%/*}"
+    CONN_AFTER_AT="${1#*@}"
+    CONN_AFTER_AT="${CONN_AFTER_AT#//}"
+    CONN_HOST="${CONN_AFTER_AT%%:*}"
+    CONN_REST="${CONN_AFTER_AT#*:}"
+    CONN_PORT="${CONN_REST%%/*}"
+    CONN_SERVICE="${CONN_REST#*/}"
+
+    echo "Connection Information:"
+    echo ""
+    echo "Host:    $CONN_HOST"
+    echo "Port:    $CONN_PORT"
+    echo "Service: $CONN_SERVICE"
+    echo "User:    $CONN_USER"
+    echo ""
+    echo "Connecting to database..."
+    echo ""
+  fi
+  sql "$@" || {
+    echo ""
+    log_error "Connection Failed"
+    echo ""
+    log_info "Troubleshooting steps:"
+    echo -e "  1. Check if database container is running: ${BOLD}${CYAN}docker ps${RESET}"
+    echo -e "  2. Check database logs: ${BOLD}${CYAN}docker logs demasylabs-oracle-database${RESET}"
+    echo -e "  3. Verify database is accessible: ${BOLD}${CYAN}docker exec demasylabs-oracle-server ping $DEMASYLABS_DB_HOST${RESET}"
+    echo "  4. Verify credentials and service name"
+    echo ""
+    exit 2
+  }
+  exit 0
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Mode: default — auto-connect using DEMASYLABS_* environment variables
+# Usage: sqlcl  (connects as system to FREEPDB1)
+# ─────────────────────────────────────────────────────────────────────────────
 echo "Connection Information:"
 echo ""
 echo "Host:    $DEMASYLABS_DB_HOST"
