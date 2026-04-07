@@ -83,6 +83,46 @@ if [[ "$SQLPLUS_AVAILABLE" != true ]]; then
     exit 1
 fi
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Mode: pass-through — forward all arguments directly to SQL*Plus / SQLcl
+# Usage: sqlplus <user>/<pass>@<host>:<port>/<service>  |  sqlplus -version  etc.
+# ─────────────────────────────────────────────────────────────────────────────
+if [[ $# -gt 0 ]]; then
+  echo -e "${YELLOW}⏳ Connecting with provided credentials...${NC}"
+  echo ""
+  if [[ "$ARCH" = "x86_64" ]] && [[ -f "/opt/oracle/instantclient/sqlplus" ]]; then
+    /opt/oracle/instantclient/sqlplus "$@" || {
+      echo ""
+      echo -e "${RED}✗ Connection Failed${NC}"
+      echo ""
+      echo "Troubleshooting steps:"
+      echo "  1. Check if database container is running: docker ps"
+      echo "  2. Check database logs: docker logs demasylabs-oracle-database"
+      echo "  3. Verify credentials and service name"
+      echo ""
+      exit 2
+    }
+  else
+    echo -e "${YELLOW}Using SQLcl as fallback...${NC}"
+    sql "$@" || {
+      echo ""
+      echo -e "${RED}✗ Connection Failed${NC}"
+      echo ""
+      echo "Troubleshooting steps:"
+      echo "  1. Check if database container is running: docker ps"
+      echo "  2. Check database logs: docker logs demasylabs-oracle-database"
+      echo "  3. Verify credentials and service name"
+      echo ""
+      exit 2
+    }
+  fi
+  exit 0
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Mode: default — auto-connect using DEMASYLABS_* environment variables
+# Usage: sqlplus  (connects as system to FREEPDB1)
+# ─────────────────────────────────────────────────────────────────────────────
 echo -e "${YELLOW}⏳ Connecting to database...${NC}"
 echo ""
 
@@ -94,8 +134,8 @@ if [[ "$ARCH" = "x86_64" ]] && [[ -f "/opt/oracle/instantclient/sqlplus" ]]; the
         echo ""
         echo "Troubleshooting steps:"
         echo "  1. Check if database container is running: docker ps"
-        echo "  2. Check database logs: docker logs demasy-oracle"
-        echo "  3. Verify database is accessible: docker exec demasy-server ping $DEMASYLABS_DB_HOST"
+        echo "  2. Check database logs: docker logs demasylabs-oracle-database"
+        echo "  3. Verify database is accessible: docker exec demasylabs-oracle-server ping $DEMASYLABS_DB_HOST"
         echo "  4. Verify credentials and service name"
         echo ""
         exit 2
@@ -109,8 +149,8 @@ else
         echo ""
         echo "Troubleshooting steps:"
         echo "  1. Check if database container is running: docker ps"
-        echo "  2. Check database logs: docker logs demasy-oracle"
-        echo "  3. Verify database is accessible: docker exec demasy-server ping $DEMASYLABS_DB_HOST"
+        echo "  2. Check database logs: docker logs demasylabs-oracle-database"
+        echo "  3. Verify database is accessible: docker exec demasylabs-oracle-server ping $DEMASYLABS_DB_HOST"
         echo "  4. Verify credentials and service name"
         echo ""
         exit 2

@@ -460,8 +460,6 @@ END;
 /
 
 -- Grant Complete Scheduler Objects (comprehensive)
-GRANT ALTER ANY JOB TO ${DEMASY_USER};
-GRANT DROP ANY JOB TO ${DEMASY_USER};
 BEGIN
     -- Scheduler Programs
     EXECUTE IMMEDIATE 'GRANT CREATE ANY PROGRAM TO ${DEMASY_USER}';
