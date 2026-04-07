@@ -161,6 +161,7 @@ RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlcl.sh /usr/local/bin/insta
 
 # -------------------------------------------- [Admin & Diagnostics]
 RUN ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck
+RUN ln -s /usr/demasy/scripts/oracle/admin/create-pdb.sh /usr/local/bin/create-pdb
 RUN ln -s /usr/demasy/scripts/oracle/admin/create-demasy-user.sh /usr/local/bin/create-demasy-user
 RUN ln -s /usr/demasy/scripts/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
 
