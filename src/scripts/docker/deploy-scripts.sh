@@ -65,11 +65,13 @@ HOST_ADMIN_DIR="$WORKSPACE_ROOT/src/scripts/oracle/admin"
 HOST_APEX_DIR="$WORKSPACE_ROOT/src/scripts/oracle/apex"
 HOST_CLI_DIR="$WORKSPACE_ROOT/src/scripts/cli"
 HOST_UTILS_DIR="$WORKSPACE_ROOT/src/scripts/backbone/utils"
+HOST_BUILD_DIR="$WORKSPACE_ROOT/src/scripts/backbone/build"
 
 CONTAINER_ADMIN_DIR="/usr/demasy/scripts/oracle/admin"
 CONTAINER_APEX_DIR="/usr/demasy/scripts/oracle/apex"
 CONTAINER_CLI_DIR="/usr/demasy/scripts/cli"
 CONTAINER_UTILS_DIR="/usr/demasy/scripts/backbone/utils"
+CONTAINER_BUILD_DIR="/usr/demasy/scripts/build"
 
 TARGET_FILE=""
 CREATE_SYMLINK=false
@@ -83,6 +85,7 @@ get_symlink_name() {
     local filename="$1"
     case "$filename" in
         create_user.sh)             echo "create-user" ;;
+        create-pdb.sh)              echo "create-pdb" ;;
         create-demasy-user.sh)      echo "create-demasy-user" ;;
         rollback-demasy-user.sh)    echo "rollback-demasy-user" ;;
         grant-privileges.sh)        echo "grant-privileges" ;;
@@ -252,7 +255,8 @@ if [[ -n "$TARGET_FILE" ]]; then
         "${HOST_ADMIN_DIR}:${CONTAINER_ADMIN_DIR}" \
         "${HOST_APEX_DIR}:${CONTAINER_APEX_DIR}" \
         "${HOST_CLI_DIR}:${CONTAINER_CLI_DIR}" \
-        "${HOST_UTILS_DIR}:${CONTAINER_UTILS_DIR}"
+        "${HOST_UTILS_DIR}:${CONTAINER_UTILS_DIR}" \
+        "${HOST_BUILD_DIR}:${CONTAINER_BUILD_DIR}"
     do
         host_dir="${pair%%:*}"
         container_dir="${pair##*:}"
@@ -271,6 +275,7 @@ if [[ -n "$TARGET_FILE" ]]; then
         log_info  "  ${HOST_APEX_DIR}"
         log_info  "  ${HOST_CLI_DIR}"
         log_info  "  ${HOST_UTILS_DIR}"
+        log_info  "  ${HOST_BUILD_DIR}"
         exit 1
     fi
 
@@ -279,6 +284,7 @@ else
     log_step "Deploying All Scripts"
 
     deploy_directory "$HOST_UTILS_DIR"  "$CONTAINER_UTILS_DIR"  "backbone/utils"
+    deploy_directory "$HOST_BUILD_DIR"  "$CONTAINER_BUILD_DIR"  "backbone/build"
     deploy_directory "$HOST_CLI_DIR"    "$CONTAINER_CLI_DIR"    "cli"
     deploy_directory "$HOST_ADMIN_DIR"  "$CONTAINER_ADMIN_DIR"  "oracle/admin"
     deploy_directory "$HOST_APEX_DIR"   "$CONTAINER_APEX_DIR"   "oracle/apex"
