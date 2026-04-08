@@ -15,9 +15,10 @@
 #
 # Resources:
 #   download:                       apex | ords
-#   install / uninstall:            oracle | client | sqlcl | sqlplus
-#   start / stop:                   mcp | system
-#   run:                            oracle | mcp | system
+#   install / uninstall:            oracle | client | sqlcl | sqlplus | apex
+#   start:                          apex | mcp | healthcheck | system
+#   stop / restart:                 apex | mcp | system
+#   run:                            oracle | mcp | sqlcl | system
 #
 # Examples:
 #   sandbox download apex -s
@@ -26,6 +27,9 @@
 #   sandbox download apex --all
 #   sandbox download ords
 #   sandbox install sqlcl
+#   sandbox run sqlcl -user system
+#   sandbox run sqlcl -user demasy
+#   sandbox run sqlcl -user sandbox
 #   sandbox start mcp -d
 #   sandbox start mcp --default
 #   sandbox start mcp -conn mcp-saved
@@ -45,7 +49,7 @@ resources_for() {
         install|uninstall)          echo "oracle client sqlcl sqlplus apex" ;;
         start)                      echo "apex mcp healthcheck system" ;;
         stop|restart)               echo "apex mcp system" ;;
-        run)                        echo "oracle mcp system" ;;
+        run)                        echo "oracle mcp sqlcl system" ;;
         *)                          echo "" ;;
     esac
 }
@@ -78,6 +82,10 @@ parse_apex_param() {
     esac
 }
 
+# ─── SQLcl user configuration ─────────────────────────────────────────────────
+
+VALID_SQLCL_USERS="sys system demasy sandbox demasylabs demasy_ai"
+
 # ─── Usage ───────────────────────────────────────────────────────────────────
 
 print_usage() {
@@ -93,7 +101,11 @@ print_usage() {
     echo -e "    ${CYAN}start${NC}      apex | mcp | healthcheck | system"
     echo -e "    ${CYAN}stop${NC}       apex | mcp | system"
     echo -e "    ${CYAN}restart${NC}    apex | mcp | system"
-    echo -e "    ${CYAN}run${NC}        oracle | mcp | system"
+    echo -e "    ${CYAN}run${NC}        oracle | mcp | sqlcl | system"
+    echo ""
+    echo -e "  ${YELLOW}SQLcl parameters:${NC}"
+    echo -e "    ${CYAN}-user${NC} sys | system | demasy | sandbox | demasylabs | demasy_ai"
+    echo -e "    ${CYAN}-pass${NC} <password>   (default: \$DEMASYLABS_DB_PASSWORD)"
     echo ""
     echo -e "  ${YELLOW}Download parameters:${NC}"
     echo -e "    ${CYAN}apex -s${NC}, ${CYAN}-standalone${NC}   Download APEX only"
@@ -104,6 +116,9 @@ print_usage() {
     echo -e "    sandbox download apex --all"
     echo -e "    sandbox download ords"
     echo -e "    sandbox install sqlcl"
+    echo -e "    sandbox run sqlcl -user system"
+    echo -e "    sandbox run sqlcl -user demasy"
+    echo -e "    sandbox run sqlcl -user sandbox"
     echo -e "    sandbox start apex"
     echo -e "    sandbox stop apex"
     echo -e "    sandbox restart apex"
@@ -324,6 +339,94 @@ case "$ACTION" in
         ;;
     run)
         case "$RESOURCE" in
+            sqlcl)
+                SQLCL_USER="" SQLCL_PASS=""
+                set -- $PARAMS
+                while [[ $# -gt 0 ]]; do
+                    case "$1" in
+                        -user)
+                            if [[ -z "${2:-}" ]]; then
+                                echo ""
+                                log_error "-user requires a value"
+                                echo -e "  ${YELLOW}Valid users:${NC} ${CYAN}${VALID_SQLCL_USERS}${NC}"
+                                echo ""
+                                exit 1
+                            fi
+                            SQLCL_USER="$2"; shift 2
+                            ;;
+                        -pass)
+                            if [[ -z "${2:-}" ]]; then
+                                echo ""
+                                log_error "-pass requires a value"
+                                echo ""
+                                exit 1
+                            fi
+                            SQLCL_PASS="$2"; shift 2
+                            ;;
+                        *)
+                            echo ""
+                            log_error "Unknown parameter '${1}' for sandbox run sqlcl"
+                            echo -e "  ${YELLOW}Parameters:${NC}"
+                            echo -e "    ${CYAN}-user${NC} <user>       Required. One of: ${VALID_SQLCL_USERS}"
+                            echo -e "    ${CYAN}-pass${NC} <password>   Optional. Default: \$DEMASYLABS_DB_PASSWORD"
+                            echo ""
+                            exit 1
+                            ;;
+                    esac
+                done
+
+                if [[ -z "$SQLCL_USER" ]]; then
+                    echo ""
+                    log_error "sandbox run sqlcl requires -user <user>"
+                    echo -e "  ${YELLOW}Valid users:${NC} ${CYAN}${VALID_SQLCL_USERS}${NC}"
+                    echo -e "  ${YELLOW}Example:${NC}    ${CYAN}sandbox run sqlcl -user system${NC}"
+                    echo ""
+                    exit 1
+                fi
+
+                VALID_USER=false
+                for u in $VALID_SQLCL_USERS; do
+                    [[ "$u" == "$SQLCL_USER" ]] && VALID_USER=true && break
+                done
+                if [[ "$VALID_USER" == false ]]; then
+                    echo ""
+                    log_error "Unknown user '${SQLCL_USER}' for sandbox run sqlcl"
+                    echo -e "  ${YELLOW}Valid users:${NC} ${CYAN}${VALID_SQLCL_USERS}${NC}"
+                    echo ""
+                    exit 1
+                fi
+
+                CONN_PASS="${SQLCL_PASS:-${DEMASYLABS_DB_PASSWORD}}"
+                CONN_HOST="${DEMASYLABS_DB_HOST}"
+                CONN_PORT="${DEMASYLABS_DB_PORT}"
+
+                case "$SQLCL_USER" in
+                    sys)
+                        log_step "Connecting as SYS (sysdba) @ ${DEMASYLABS_DB_SERVICE}..."
+                        sql "sys/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${DEMASYLABS_DB_SERVICE}" as sysdba
+                        ;;
+                    system)
+                        log_step "Connecting as SYSTEM @ ${DEMASYLABS_DB_SERVICE}..."
+                        sql "system/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${DEMASYLABS_DB_SERVICE}"
+                        ;;
+                    demasy)
+                        log_step "Connecting as DEMASY @ DEMASYLABS_PDB..."
+                        sql "demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                        ;;
+                    sandbox)
+                        log_step "Connecting as SANDBOX @ DEMASYLABS_PDB..."
+                        sql "sandbox/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                        ;;
+                    demasylabs)
+                        log_step "Connecting as C##DEMASY (common user) @ DEMASYLABS_PDB..."
+                        sql "c##demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                        ;;
+                    demasy_ai)
+                        log_step "Connecting as ${DEMASYLABS_DB_MCP_USER} (AI/MCP user) @ DEMASYLABS_PDB..."
+                        sql "${DEMASYLABS_DB_MCP_USER}/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                        ;;
+                esac
+                ;;
             oracle)   log_warn "sandbox run oracle — not implemented yet" ;;
             mcp)      log_warn "sandbox run mcp    — not implemented yet" ;;
             system)   log_warn "sandbox run system — not implemented yet" ;;
