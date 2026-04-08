@@ -43,7 +43,8 @@ resources_for() {
     case "$1" in
         download)                   echo "apex ords" ;;
         install|uninstall)          echo "oracle client sqlcl sqlplus apex" ;;
-        start|stop|restart)         echo "apex mcp system" ;;
+        start)                      echo "apex mcp healthcheck system" ;;
+        stop|restart)               echo "apex mcp system" ;;
         run)                        echo "oracle mcp system" ;;
         *)                          echo "" ;;
     esac
@@ -89,7 +90,7 @@ print_usage() {
     echo -e "    ${CYAN}download${NC}   apex | ords"
     echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus | apex"
     echo -e "    ${CYAN}uninstall${NC}  oracle | client | sqlcl | sqlplus | apex"
-    echo -e "    ${CYAN}start${NC}      apex | mcp | system"
+    echo -e "    ${CYAN}start${NC}      apex | mcp | healthcheck | system"
     echo -e "    ${CYAN}stop${NC}       apex | mcp | system"
     echo -e "    ${CYAN}restart${NC}    apex | mcp | system"
     echo -e "    ${CYAN}run${NC}        oracle | mcp | system"
@@ -292,6 +293,10 @@ case "$ACTION" in
             apex)
                 log_step "Starting APEX (ORDS)..."
                 bash /usr/demasy/scripts/oracle/apex/start.sh
+                ;;
+            healthcheck)
+                log_step "Running healthcheck..."
+                bash /usr/demasy/scripts/oracle/admin/healthcheck.sh
                 ;;
             system)   log_warn "sandbox start system — not implemented yet" ;;
         esac
