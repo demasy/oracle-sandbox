@@ -18,6 +18,7 @@ ENV SRC_ORACLE_ORDS=$SRC_ORACLE_ORDS
 ENV INSTALL_APEX=$INSTALL_APEX
 
 RUN mkdir -p /usr/demasy/app
+RUN mkdir -p /usr/sandbox/app
 
 COPY package*.json ./
 
