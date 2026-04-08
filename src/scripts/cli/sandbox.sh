@@ -42,7 +42,7 @@ source /usr/demasy/scripts/backbone/utils/banner.sh
 resources_for() {
     case "$1" in
         download)                   echo "apex ords" ;;
-        install|uninstall)          echo "oracle client sqlcl sqlplus" ;;
+        install|uninstall)          echo "oracle client sqlcl sqlplus apex" ;;
         start|stop)                 echo "mcp system" ;;
         run)                        echo "oracle mcp system" ;;
         *)                          echo "" ;;
@@ -87,7 +87,7 @@ print_usage() {
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
     echo -e "    ${CYAN}download${NC}   apex | ords"
-    echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus"
+    echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus | apex"
     echo -e "    ${CYAN}uninstall${NC}  oracle | client | sqlcl | sqlplus"
     echo -e "    ${CYAN}start${NC}      mcp | system"
     echo -e "    ${CYAN}stop${NC}       mcp | system"
@@ -209,6 +209,10 @@ case "$ACTION" in
             sqlplus)
                 log_step "Installing SQL*Plus..."
                 bash /usr/demasy/scripts/oracle/admin/install-sqlplus.sh
+                ;;
+            apex)
+                log_step "Installing APEX + ORDS..."
+                bash /usr/demasy/scripts/oracle/apex/install.sh
                 ;;
         esac
         ;;
