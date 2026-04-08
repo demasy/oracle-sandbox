@@ -15,7 +15,7 @@ case "${ACTION}/${RESOURCE}" in
         echo ""
         echo -e "  ${YELLOW}Parameters:${NC}"
         echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} <user>       Required. Database user to connect as"
-        echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: \$DEMASYLABS_DB_PASSWORD"
+        echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: Default Password"
         echo ""
         echo -e "  ${YELLOW}Valid users:${NC}"
         echo -e "    ${CYAN}sys${NC}          SYS (sysdba) — CDB root"
