@@ -6,31 +6,25 @@
 # Usage: sandbox <action> <resource> [parameters]
 #
 # Actions:
-#   download   Download Oracle components
-#   install    Install Oracle components
-#   uninstall  Uninstall Oracle components
+#   run        Run / connect to a service
 #   start      Start a service
 #   stop       Stop a service
-#   run        Run / connect to a service
+#   restart    Restart a service
+#   install    Install Oracle components
+#   uninstall  Uninstall Oracle components
+#   download   Download Oracle components
 #
 # Resources:
-#   download:                       apex | ords
+#   run:                            oracle | mcp | sqlcl | healthcheck
+#   start / stop / restart:         apex | mcp
 #   install:                        oracle | client | sqlcl | sqlplus | apex
 #   uninstall:                      apex
-#   start:                          apex | mcp
-#   stop / restart:                 apex | mcp
-#   run:                            oracle | mcp | sqlcl | healthcheck
+#   download:                       apex | ords
 #
 # Examples:
-#   sandbox download apex -s
-#   sandbox download apex -standalone
-#   sandbox download apex -a
-#   sandbox download apex --all
-#   sandbox download ords
-#   sandbox install sqlcl
-#   sandbox run sqlcl --user system
+#   sandbox run healthcheck
 #   sandbox run sqlcl -u system
-#   sandbox run sqlcl -s
+#   sandbox start mcp --conn sandbox-mcp-conn
 # ============================================
 
 source /usr/sandbox/app/system/utils/colors.sh
@@ -62,13 +56,13 @@ print_usage() {
     echo -e "           sandbox <action> -h | --help"
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
-    echo -e "    ${CYAN}download${NC}   apex | ords"
-    echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus | apex"
-    echo -e "    ${CYAN}uninstall${NC}  apex"
+    echo -e "    ${CYAN}run${NC}        oracle | mcp | sqlcl | healthcheck"
     echo -e "    ${CYAN}start${NC}      apex | mcp"
     echo -e "    ${CYAN}stop${NC}       apex | mcp"
     echo -e "    ${CYAN}restart${NC}    apex | mcp"
-    echo -e "    ${CYAN}run${NC}        oracle | mcp | sqlcl | healthcheck"
+    echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus | apex"
+    echo -e "    ${CYAN}uninstall${NC}  apex"
+    echo -e "    ${CYAN}download${NC}   apex | ords"
     echo ""
     echo -e "  ${YELLOW}SQLcl parameters:${NC}"
     echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} sys | system | demasy | sandbox | demasylabs | demasy_ai"
@@ -79,24 +73,9 @@ print_usage() {
     echo -e "    ${CYAN}apex -a${NC}, ${CYAN}--all${NC}         Download APEX + ORDS"
     echo ""
     echo -e "  ${YELLOW}Examples:${NC}"
-    echo -e "    sandbox download apex -s"
-    echo -e "    sandbox download apex --all"
-    echo -e "    sandbox download ords"
-    echo -e "    sandbox install sqlcl"
-    echo -e "    sandbox run sqlcl --user system"
-    echo -e "    sandbox run sqlcl --user demasy"
-    echo -e "    sandbox run sqlcl --user sandbox"
-    echo -e "    sandbox run sqlcl -u system"
-
-    echo -e "    sandbox stop apex"
-    echo -e "    sandbox restart apex"
-    echo -e "    sandbox start mcp -d"
-    echo -e "    sandbox start mcp --default"
-    echo -e "    sandbox start mcp -c mcp-saved"
-    echo -e "    sandbox start mcp --conn mcp-saved"
-    echo -e "    sandbox start mcp --connection mcp-saved"
-    echo -e "    sandbox run mcp"
     echo -e "    sandbox run healthcheck"
+    echo -e "    sandbox run sqlcl -u system"
+    echo -e "    sandbox start mcp --conn sandbox-mcp-conn"
     echo ""
 }
 
