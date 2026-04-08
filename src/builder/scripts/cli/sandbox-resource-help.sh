@@ -24,7 +24,6 @@ case "${ACTION}/${RESOURCE}" in
         echo -e "    ${CYAN}sandbox_ai${NC}   SANDBOX_AI — AI/MCP user (PDB)"
         echo -e "    ${CYAN}demasy${NC}       DEMASY — application user (PDB)"
         echo -e "    ${CYAN}demasy_ai${NC}    DEMASY_AI — AI/MCP user (PDB)"
-        echo -e "    ${CYAN}demasylabs${NC}   C##DEMASY — common user (PDB)"
         echo ""
         echo -e "  ${YELLOW}Examples:${NC}"
         echo -e "    sandbox run sqlcl --user system"

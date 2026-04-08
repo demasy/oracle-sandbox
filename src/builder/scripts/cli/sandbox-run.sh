@@ -3,7 +3,7 @@
 # Variables inherited: ACTION, RESOURCE, PARAMS, logging/color functions
 # ─────────────────────────────────────────────────────────────────────────────
 
-VALID_SQLCL_USERS="sys system sandbox sandbox_ai demasy demasy_ai demasylabs"
+VALID_SQLCL_USERS="sys system sandbox sandbox_ai demasy demasy_ai"
 
 case "$RESOURCE" in
     sqlcl)
@@ -91,10 +91,6 @@ case "$RESOURCE" in
             demasy_ai)
                 log_step "Connecting as ${DEMASYLABS_DB_MCP_USER} (AI/MCP user) @ DEMASYLABS_PDB..."
                 sql "${DEMASYLABS_DB_MCP_USER}/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
-                ;;
-            demasylabs)
-                log_step "Connecting as C##DEMASY (common user) @ DEMASYLABS_PDB..."
-                sql "c##demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
                 ;;
         esac
         ;;
