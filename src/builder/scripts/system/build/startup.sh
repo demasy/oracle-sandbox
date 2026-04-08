@@ -10,10 +10,10 @@
 export TERM=${TERM:-xterm}
 
 # Source utility scripts using absolute paths
-source /usr/demasy/scripts/backbone/utils/colors.sh
-source /usr/demasy/scripts/backbone/utils/logging.sh
-source /usr/demasy/scripts/backbone/utils/banner.sh
-source /usr/demasy/scripts/backbone/utils/commands.sh
+source /usr/sandbox/app/system/utils/colors.sh
+source /usr/sandbox/app/system/utils/logging.sh
+source /usr/sandbox/app/system/utils/banner.sh
+source /usr/sandbox/app/system/utils/commands.sh
 
 print_demasy_banner "Oracle Sandbox Startup"
 
@@ -191,7 +191,7 @@ EOF
                     
         #             # Run installation with visible output
         #             set +e  # Don't exit on error
-        #             timeout ${DEMASYLABS_APEX_INSTALL_TIMEOUT:-600} bash /usr/demasy/scripts/oracle/apex/install.sh 2>&1 | tee /tmp/apex-startup-install.log
+        #             timeout ${DEMASYLABS_APEX_INSTALL_TIMEOUT:-600} bash /usr/sandbox/app/oracle/apex/install.sh 2>&1 | tee /tmp/apex-startup-install.log
         #             INSTALL_EXIT_CODE=${PIPESTATUS[0]}
         #             set -e  # Re-enable exit on error
                     
@@ -203,7 +203,7 @@ EOF
                     
         #             # Run installation in background
         #             set +e
-        #             timeout ${DEMASYLABS_APEX_INSTALL_TIMEOUT:-600} bash /usr/demasy/scripts/oracle/apex/install.sh > /tmp/apex-startup-install.log 2>&1 &
+        #             timeout ${DEMASYLABS_APEX_INSTALL_TIMEOUT:-600} bash /usr/sandbox/app/oracle/apex/install.sh > /tmp/apex-startup-install.log 2>&1 &
         #             INSTALL_PID=$!
                     
         #             # Wait for installation to complete
@@ -277,12 +277,12 @@ EOF
         # Create default users — idempotent (skips if already exists)
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating default database users..." >> "$AUTO_USER_LOG"
 
-        bash /usr/demasy/scripts/oracle/admin/create_user.sh demasy Demasy1986 DEMASYLABS_PDB \
+        bash /usr/sandbox/app/oracle/admin/create-user.sh demasy Demasy1986 DEMASYLABS_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy user setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/demasy/scripts/oracle/admin/create_user.sh demasylabs Demasy1986 DEMASYLABS_PDB \
+        bash /usr/sandbox/app/oracle/admin/create-user.sh demasylabs Demasy1986 DEMASYLABS_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasylabs user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasylabs user setup failed" >> "$AUTO_USER_LOG"
@@ -291,7 +291,7 @@ EOF
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setting up MCP saved connection..." >> "$AUTO_USER_LOG"
         DEMASYLABS_DB_MCP_USER="${DEMASYLABS_DB_MCP_USER:-${DEMASYLABS_DB_USER}}" \
         DEMASYLABS_DB_PASSWORD="${DEMASYLABS_DB_PASSWORD:-${DEMASYLABS_DB_PASS}}" \
-        bash /usr/demasy/scripts/oracle/mcp/setup-saved-connection.sh \
+        bash /usr/sandbox/app/oracle/mcp/setup-saved-connection.sh \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] MCP saved connection ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] MCP saved connection setup failed" >> "$AUTO_USER_LOG"

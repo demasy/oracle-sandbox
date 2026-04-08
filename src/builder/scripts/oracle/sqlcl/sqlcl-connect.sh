@@ -4,9 +4,9 @@
 export TERM=${TERM:-xterm}
 
 # Source utilities using absolute paths
-source /usr/demasy/scripts/backbone/utils/banner.sh
-source /usr/demasy/scripts/backbone/utils/logging.sh
-source /usr/demasy/scripts/backbone/utils/colors.sh
+source /usr/sandbox/app/system/utils/banner.sh
+source /usr/sandbox/app/system/utils/logging.sh
+source /usr/sandbox/app/system/utils/colors.sh
 
 # Print the banner
 print_demasy_banner "Database Connection"

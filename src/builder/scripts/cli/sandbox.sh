@@ -37,9 +37,9 @@
 #   sandbox run mcp
 # ============================================
 
-source /usr/demasy/scripts/backbone/utils/colors.sh
-source /usr/demasy/scripts/backbone/utils/logging.sh
-source /usr/demasy/scripts/backbone/utils/banner.sh
+source /usr/sandbox/app/system/utils/colors.sh
+source /usr/sandbox/app/system/utils/logging.sh
+source /usr/sandbox/app/system/utils/banner.sh
 
 # ─── Resource sets per action ─────────────────────────────────────────────────
 
@@ -151,7 +151,7 @@ if [[ "$ACTION" == "-h" || "$ACTION" == "--help" ]]; then
     exit 0
 fi
 if [[ "$RESOURCE" == "-h" || "$RESOURCE" == "--help" ]]; then
-    source /usr/demasy/scripts/cli/sandbox-help.sh
+    source /usr/sandbox/app/cli/sandbox-help.sh
     exit 0
 fi
 
@@ -174,6 +174,6 @@ echo ""
 log_step "sandbox ${ACTION} ${RESOURCE}${PARAMS:+ ${PARAMS}}"
 echo ""
 
-source /usr/demasy/scripts/cli/sandbox-${ACTION}.sh
+source /usr/sandbox/app/cli/sandbox-${ACTION}.sh
 
 echo ""
