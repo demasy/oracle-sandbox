@@ -17,7 +17,7 @@ case "$RESOURCE" in
                     if [[ -z "${2:-}" ]]; then
                         echo ""
                         log_error "--conn requires a connection name"
-                        echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox start mcp --conn mcp-saved${NC}"
+                        echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox start mcp --conn sandbox-mcp-conn${NC}"
                         echo ""
                         exit 1
                     fi
