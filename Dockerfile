@@ -141,35 +141,33 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
 RUN ln -s /usr/demasy/scripts/oracle/admin/download.sh /usr/local/bin/download-oracle-components
 
 # -------------------------------------------- [CLI Tools]
-RUN ln -s /usr/demasy/scripts/cli/commands.sh /usr/local/bin/commands
 RUN ln -s /usr/demasy/scripts/cli/sandbox.sh /usr/local/bin/sandbox
-RUN ln -s /usr/demasy/scripts/cli/sandbox.sh /usr/local/bin/demasy
-RUN ln -s /usr/demasy/scripts/cli/sandbox.sh /usr/local/bin/demasylabs
+RUN ln -s /usr/demasy/scripts/cli/commands.sh /usr/local/bin/commands
 RUN ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus
 RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/oracle
 
 # -------------------------------------------- [Oracle APEX Tools]
-RUN ln -s /usr/demasy/scripts/oracle/admin/download-apex.sh /usr/local/bin/download-apex
-RUN ln -s /usr/demasy/scripts/oracle/apex/install.sh /usr/local/bin/install-apex
-RUN ln -s /usr/demasy/scripts/oracle/apex/uninstall.sh /usr/local/bin/uninstall-apex
-RUN ln -s /usr/demasy/scripts/oracle/apex/start.sh /usr/local/bin/start-apex
-RUN ln -s /usr/demasy/scripts/oracle/apex/stop.sh /usr/local/bin/stop-apex
+# RUN ln -s /usr/demasy/scripts/oracle/admin/download-apex.sh /usr/local/bin/download-apex
+# RUN ln -s /usr/demasy/scripts/oracle/apex/install.sh /usr/local/bin/install-apex
+# RUN ln -s /usr/demasy/scripts/oracle/apex/uninstall.sh /usr/local/bin/uninstall-apex
+# RUN ln -s /usr/demasy/scripts/oracle/apex/start.sh /usr/local/bin/start-apex
+# RUN ln -s /usr/demasy/scripts/oracle/apex/stop.sh /usr/local/bin/stop-apex
 
 # -------------------------------------------- [Software Install Tools]
-RUN ln -s /usr/demasy/scripts/oracle/admin/install-all.sh /usr/local/bin/install-all
-RUN ln -s /usr/demasy/scripts/oracle/admin/install-client.sh /usr/local/bin/install-client
-RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlplus.sh /usr/local/bin/install-sqlplus
-RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlcl.sh /usr/local/bin/install-sqlcl
+# RUN ln -s /usr/demasy/scripts/oracle/admin/install-all.sh /usr/local/bin/install-all
+# RUN ln -s /usr/demasy/scripts/oracle/admin/install-client.sh /usr/local/bin/install-client
+# RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlplus.sh /usr/local/bin/install-sqlplus
+# RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlcl.sh /usr/local/bin/install-sqlcl
 
 # -------------------------------------------- [Admin & Diagnostics]
-RUN ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck
+# RUN ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck
 RUN ln -s /usr/demasy/scripts/oracle/admin/create-pdb.sh /usr/local/bin/create-pdb
 RUN ln -s /usr/demasy/scripts/oracle/admin/create-demasy-user.sh /usr/local/bin/create-demasy-user
 RUN ln -s /usr/demasy/scripts/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
 
 # -------------------------------------------- [MCP Tools]
-RUN ln -s /usr/demasy/scripts/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp
+# RUN ln -s /usr/demasy/scripts/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp
 
 
 # Verify installation and test SQLcl
