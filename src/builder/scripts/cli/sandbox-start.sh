@@ -13,11 +13,11 @@ case "$RESOURCE" in
                     MCP_FLAG="default"
                     shift
                     ;;
-                -conn|--connection)
+                -c|-conn|--conn|--connection)
                     if [[ -z "${2:-}" ]]; then
                         echo ""
-                        log_error "-conn / --connection requires a connection name"
-                        echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox start mcp -conn mcp-saved${NC}"
+                        log_error "--conn requires a connection name"
+                        echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox start mcp --conn mcp-saved${NC}"
                         echo ""
                         exit 1
                     fi
@@ -29,8 +29,8 @@ case "$RESOURCE" in
                     echo ""
                     log_error "Unknown parameter '${1}' for sandbox start mcp"
                     echo -e "  ${YELLOW}Parameters:${NC}"
-                    echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}              Start MCP using the default saved connection"
-                    echo -e "    ${CYAN}-conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
+                    echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Start MCP using the default saved connection"
+                    echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
                     echo ""
                     exit 1
                     ;;
@@ -41,8 +41,8 @@ case "$RESOURCE" in
             echo ""
             log_error "sandbox start mcp requires a parameter"
             echo -e "  ${YELLOW}Parameters:${NC}"
-            echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}              Start MCP using the default saved connection (demasylabs-ai-conn)"
-            echo -e "    ${CYAN}-conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
+            echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Start MCP using the default saved connection (demasylabs-ai-conn)"
+            echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
             echo ""
             exit 1
         fi
