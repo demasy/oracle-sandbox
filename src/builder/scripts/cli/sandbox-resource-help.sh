@@ -90,9 +90,9 @@ case "${ACTION}/${RESOURCE}" in
         echo -e "  ${YELLOW}Examples:${NC}"
         echo -e "    sandbox start mcp -d"
         echo -e "    sandbox start mcp --default"
-        echo -e "    sandbox start mcp -c mcp-saved"
-        echo -e "    sandbox start mcp --conn mcp-saved"
-        echo -e "    sandbox start mcp --connection mcp-saved"
+        echo -e "    sandbox start mcp -c sandbox-mcp-conn"
+        echo -e "    sandbox start mcp --conn sandbox-mcp-conn"
+        echo -e "    sandbox start mcp --connection demasy-mcp-conn"
         echo ""
         ;;
 
