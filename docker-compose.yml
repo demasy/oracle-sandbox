@@ -89,6 +89,7 @@ services:
       - DEMASYLABS_STARTUP_DB_WAIT_INTERVAL=${ENV_STARTUP_DB_WAIT_INTERVAL}
     volumes:  
       - demasylabs_logs_vol:/home/oracle/logs
+      - demasylabs_dbtools_vol:/root/.dbtools
     logging:
       driver: "json-file"
       options:
@@ -136,3 +137,6 @@ volumes:
   demasylabs_logs_vol:
     driver: local
     name: demasylabs_logs_vol
+  demasylabs_dbtools_vol:
+    driver: local
+    name: demasylabs_dbtools_vol
