@@ -61,6 +61,8 @@ print_usage() {
     echo -e "  ${CYAN}sandbox${NC} — Oracle Sandbox CLI"
     echo ""
     echo -e "  ${WHITE}Usage:${NC}   sandbox <action> <resource> [parameters]"
+    echo -e "           sandbox -h | --help"
+    echo -e "           sandbox <action> -h | --help"
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
     echo -e "    ${CYAN}download${NC}   apex | ords"
@@ -142,6 +144,16 @@ ACTION="$1"
 RESOURCE="${2:-}"
 shift 2 2>/dev/null || true
 PARAMS="$*"
+
+# ─── Help intercept ──────────────────────────────────────────────────────────
+if [[ "$ACTION" == "-h" || "$ACTION" == "--help" ]]; then
+    print_usage
+    exit 0
+fi
+if [[ "$RESOURCE" == "-h" || "$RESOURCE" == "--help" ]]; then
+    source /usr/demasy/scripts/cli/sandbox-help.sh
+    exit 0
+fi
 
 validate_action "$ACTION"
 
