@@ -17,7 +17,6 @@ ENV SRC_ORACLE_APEX=$SRC_ORACLE_APEX
 ENV SRC_ORACLE_ORDS=$SRC_ORACLE_ORDS
 ENV INSTALL_APEX=$INSTALL_APEX
 
-RUN mkdir -p /usr/demasy/app
 RUN mkdir -p /usr/sandbox/app/cli
 RUN mkdir -p /usr/sandbox/app/system/utils
 RUN mkdir -p /usr/sandbox/app/system/build
@@ -32,7 +31,7 @@ RUN mkdir -p /usr/sandbox/app/oracle/sqlplus
 
 COPY package*.json ./
 
-WORKDIR /usr/demasy/app
+WORKDIR /usr/sandbox/app
 
 COPY ./app.js ./app.js
 # COPY ./src ./src
@@ -132,7 +131,6 @@ ARG INSTALL_APEX
 ENV INSTALL_APEX=${INSTALL_APEX}
 
 COPY --from=demasylabs-builder package*.json ./
-COPY --from=demasylabs-builder /usr/demasy /usr/demasy
 COPY --from=demasylabs-builder /usr/sandbox/app /usr/sandbox/app
 COPY --from=demasylabs-builder /opt/oracle /opt/oracle
 
@@ -219,7 +217,7 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
-WORKDIR /usr/demasy/app
+WORKDIR /usr/sandbox/app
 
 # Use startup script to handle initialization
 CMD ["/usr/sandbox/app/system/build/startup.sh"]
