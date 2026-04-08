@@ -3,7 +3,7 @@
 # Architecture Detection Utility
 # ============================================
 # Detects system architecture and sets appropriate variables
-# Usage: source /usr/demasy/scripts/utils/detect-arch.sh
+# Usage: source /usr/sandbox/app/system/utils/detect-arch.sh
 # ============================================
 
 # Detect system architecture

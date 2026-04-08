@@ -6,18 +6,18 @@
 case "$RESOURCE" in
     oracle|client)
         log_step "Installing Oracle Instant Client..."
-        bash /usr/demasy/scripts/oracle/admin/install-client.sh
+        bash /usr/sandbox/app/system/install/install-client.sh
         ;;
     sqlcl)
         log_step "Installing SQLcl..."
-        bash /usr/demasy/scripts/oracle/admin/install-sqlcl.sh
+        bash /usr/sandbox/app/system/install/install-sqlcl.sh
         ;;
     sqlplus)
         log_step "Installing SQL*Plus..."
-        bash /usr/demasy/scripts/oracle/admin/install-sqlplus.sh
+        bash /usr/sandbox/app/system/install/install-sqlplus.sh
         ;;
     apex)
         log_step "Installing APEX + ORDS..."
-        bash /usr/demasy/scripts/oracle/apex/install.sh
+        bash /usr/sandbox/app/oracle/apex/install.sh
         ;;
 esac

@@ -9,9 +9,9 @@
 set -e  # Exit on error
 
 # Source utility scripts using absolute paths
-source /usr/demasy/scripts/backbone/utils/colors.sh
-source /usr/demasy/scripts/backbone/utils/logging.sh
-source /usr/demasy/scripts/backbone/utils/banner.sh
+source /usr/sandbox/app/system/utils/colors.sh
+source /usr/sandbox/app/system/utils/logging.sh
+source /usr/sandbox/app/system/utils/banner.sh
 
 print_demasy_banner "Docker Build - Installing Oracle Components"
 
@@ -21,7 +21,7 @@ echo ""
 # Install Oracle Instant Client
 # ============================================
 log_step "Installing Oracle Instant Client..."
-/usr/demasy/scripts/oracle/admin/install-client.sh
+/usr/sandbox/app/system/install/install-client.sh
 
 echo ""
 
@@ -29,7 +29,7 @@ echo ""
 # Install SQLcl
 # ============================================
 log_step "Installing SQLcl..."
-/usr/demasy/scripts/oracle/admin/install-sqlcl.sh
+/usr/sandbox/app/system/install/install-sqlcl.sh
 
 echo ""
 

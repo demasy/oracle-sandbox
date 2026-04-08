@@ -7,7 +7,7 @@
 # ============================================
 
 # Source the display function
-source /usr/demasy/scripts/backbone/utils/commands.sh
+source /usr/sandbox/app/system/utils/commands.sh
 
 # Execute the display function
 display_commands

@@ -50,21 +50,21 @@ case "$RESOURCE" in
         case "$MCP_FLAG" in
             default)
                 log_step "Starting MCP server with default saved connection..."
-                bash /usr/demasy/scripts/oracle/mcp/start-mcp-with-saved-connection.sh
+                bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh
                 ;;
             conn)
                 log_step "Starting MCP server with saved connection: ${MCP_CONN_NAME}..."
-                bash /usr/demasy/scripts/oracle/mcp/start-mcp-with-saved-connection.sh "$MCP_CONN_NAME"
+                bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh "$MCP_CONN_NAME"
                 ;;
         esac
         ;;
     apex)
         log_step "Starting APEX (ORDS)..."
-        bash /usr/demasy/scripts/oracle/apex/start.sh
+        bash /usr/sandbox/app/oracle/apex/start.sh
         ;;
     healthcheck)
         log_step "Running healthcheck..."
-        bash /usr/demasy/scripts/oracle/admin/healthcheck.sh
+        bash /usr/sandbox/app/system/admin/healthcheck.sh
         ;;
     system)   log_warn "sandbox start system — not implemented yet" ;;
 esac

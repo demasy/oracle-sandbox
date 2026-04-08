@@ -39,16 +39,16 @@ case "$RESOURCE" in
         case "$APEX_MODE" in
             standalone)
                 log_step "Downloading APEX (standalone)..."
-                bash /usr/demasy/scripts/oracle/admin/download-apex-standalone.sh
+                bash /usr/sandbox/app/system/download/download-apex-standalone.sh
                 ;;
             full)
                 log_step "Downloading APEX + ORDS..."
-                bash /usr/demasy/scripts/oracle/admin/download-apex.sh
+                bash /usr/sandbox/app/system/download/download-apex.sh
                 ;;
         esac
         ;;
     ords)
         log_step "Downloading ORDS..."
-        bash /usr/demasy/scripts/oracle/admin/download-ords.sh
+        bash /usr/sandbox/app/system/download/download-ords.sh
         ;;
 esac

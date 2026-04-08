@@ -5,8 +5,8 @@
 # Shows list of available CLI commands
 # Usage: Source this file or call display_commands
 # ============================================
-source /usr/demasy/scripts/backbone/utils/colors.sh
-source /usr/demasy/scripts/backbone/utils/logging.sh
+source /usr/sandbox/app/system/utils/colors.sh
+source /usr/sandbox/app/system/utils/logging.sh
 
 display_commands() {
     echo ""

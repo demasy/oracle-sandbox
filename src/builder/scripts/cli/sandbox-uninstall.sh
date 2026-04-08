@@ -10,6 +10,6 @@ case "$RESOURCE" in
     sqlplus)  log_warn "sandbox uninstall sqlplus — not implemented yet" ;;
     apex)
         log_step "Uninstalling APEX + ORDS..."
-        bash /usr/demasy/scripts/oracle/apex/uninstall.sh
+        bash /usr/sandbox/app/oracle/apex/uninstall.sh
         ;;
 esac
