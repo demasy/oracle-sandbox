@@ -15,10 +15,11 @@
 #
 # Resources:
 #   download:                       apex | ords
-#   install / uninstall:            oracle | client | sqlcl | sqlplus | apex
-#   start:                          apex | mcp | system
-#   stop / restart:                 apex | mcp | system
-#   run:                            oracle | mcp | sqlcl | system | healthcheck
+#   install:                        oracle | client | sqlcl | sqlplus | apex
+#   uninstall:                      apex
+#   start:                          apex | mcp
+#   stop / restart:                 apex | mcp
+#   run:                            oracle | mcp | sqlcl | healthcheck
 #
 # Examples:
 #   sandbox download apex -s
@@ -41,10 +42,11 @@ source /usr/sandbox/app/system/utils/banner.sh
 resources_for() {
     case "$1" in
         download)                   echo "apex ords" ;;
-        install|uninstall)          echo "oracle client sqlcl sqlplus apex" ;;
-        start)                      echo "apex mcp system" ;;
-        stop|restart)               echo "apex mcp system" ;;
-        run)                        echo "oracle mcp sqlcl system healthcheck" ;;
+        install)                    echo "oracle client sqlcl sqlplus apex" ;;
+        uninstall)                  echo "apex" ;;
+        start)                      echo "apex mcp" ;;
+        stop|restart)               echo "apex mcp" ;;
+        run)                        echo "oracle mcp sqlcl healthcheck" ;;
         *)                          echo "" ;;
     esac
 }
@@ -62,11 +64,11 @@ print_usage() {
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
     echo -e "    ${CYAN}download${NC}   apex | ords"
     echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus | apex"
-    echo -e "    ${CYAN}uninstall${NC}  oracle | client | sqlcl | sqlplus | apex"
-    echo -e "    ${CYAN}start${NC}      apex | mcp | system"
-    echo -e "    ${CYAN}stop${NC}       apex | mcp | system"
-    echo -e "    ${CYAN}restart${NC}    apex | mcp | system"
-    echo -e "    ${CYAN}run${NC}        oracle | mcp | sqlcl | system | healthcheck"
+    echo -e "    ${CYAN}uninstall${NC}  apex"
+    echo -e "    ${CYAN}start${NC}      apex | mcp"
+    echo -e "    ${CYAN}stop${NC}       apex | mcp"
+    echo -e "    ${CYAN}restart${NC}    apex | mcp"
+    echo -e "    ${CYAN}run${NC}        oracle | mcp | sqlcl | healthcheck"
     echo ""
     echo -e "  ${YELLOW}SQLcl parameters:${NC}"
     echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} sys | system | demasy | sandbox | demasylabs | demasy_ai"
