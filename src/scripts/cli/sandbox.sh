@@ -14,12 +14,17 @@
 #   run        Run / connect to a service
 #
 # Resources:
-#   download / install / uninstall: oracle | client | sqlcl | sqlplus
+#   download:                       apex | ords
+#   install / uninstall:            oracle | client | sqlcl | sqlplus
 #   start / stop:                   mcp | system
 #   run:                            oracle | mcp | system
 #
 # Examples:
-#   sandbox download oracle
+#   sandbox download apex -s
+#   sandbox download apex -standalone
+#   sandbox download apex -a
+#   sandbox download apex --all
+#   sandbox download ords
 #   sandbox install sqlcl
 #   sandbox start mcp -d
 #   sandbox start mcp --default
@@ -36,10 +41,39 @@ source /usr/demasy/scripts/backbone/utils/banner.sh
 
 resources_for() {
     case "$1" in
-        download|install|uninstall) echo "oracle client sqlcl sqlplus" ;;
+        download)                   echo "apex ords" ;;
+        install|uninstall)          echo "oracle client sqlcl sqlplus" ;;
         start|stop)                 echo "mcp system" ;;
         run)                        echo "oracle mcp system" ;;
         *)                          echo "" ;;
+    esac
+}
+
+# ─── Apex parameter parser ────────────────────────────────────────────────────
+
+parse_apex_param() {
+    local param="$1"
+    if [[ -z "$param" ]]; then
+        echo ""
+        log_error "sandbox download apex requires a parameter"
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}-s${NC}, ${CYAN}-standalone${NC}   Download APEX only"
+        echo -e "    ${CYAN}-a${NC}, ${CYAN}--all${NC}         Download APEX + ORDS"
+        echo ""
+        exit 1
+    fi
+    case "$param" in
+        -s|-standalone) echo "standalone" ;;
+        -a|--all)       echo "full" ;;
+        *)
+            echo ""
+            log_error "Unknown parameter '${param}' for sandbox download apex"
+            echo -e "  ${YELLOW}Parameters:${NC}"
+            echo -e "    ${CYAN}-s${NC}, ${CYAN}-standalone${NC}   Download APEX only"
+            echo -e "    ${CYAN}-a${NC}, ${CYAN}--all${NC}         Download APEX + ORDS"
+            echo ""
+            exit 1
+            ;;
     esac
 }
 
@@ -52,15 +86,21 @@ print_usage() {
     echo -e "  ${WHITE}Usage:${NC}   sandbox <action> <resource> [parameters]"
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
-    echo -e "    ${CYAN}download${NC}   oracle | client | sqlcl | sqlplus"
+    echo -e "    ${CYAN}download${NC}   apex | ords"
     echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus"
     echo -e "    ${CYAN}uninstall${NC}  oracle | client | sqlcl | sqlplus"
     echo -e "    ${CYAN}start${NC}      mcp | system"
     echo -e "    ${CYAN}stop${NC}       mcp | system"
     echo -e "    ${CYAN}run${NC}        oracle | mcp | system"
     echo ""
+    echo -e "  ${YELLOW}Download parameters:${NC}"
+    echo -e "    ${CYAN}apex -s${NC}, ${CYAN}-standalone${NC}   Download APEX only"
+    echo -e "    ${CYAN}apex -a${NC}, ${CYAN}--all${NC}         Download APEX + ORDS"
+    echo ""
     echo -e "  ${YELLOW}Examples:${NC}"
-    echo -e "    sandbox download oracle"
+    echo -e "    sandbox download apex -s"
+    echo -e "    sandbox download apex --all"
+    echo -e "    sandbox download ords"
     echo -e "    sandbox install sqlcl"
     echo -e "    sandbox start mcp -d"
     echo -e "    sandbox start mcp --default"
@@ -137,10 +177,23 @@ echo ""
 case "$ACTION" in
     download)
         case "$RESOURCE" in
-            oracle)   log_warn "sandbox download oracle  — not implemented yet" ;;
-            client)   log_warn "sandbox download client  — not implemented yet" ;;
-            sqlcl)    log_warn "sandbox download sqlcl   — not implemented yet" ;;
-            sqlplus)  log_warn "sandbox download sqlplus — not implemented yet" ;;
+            apex)
+                APEX_MODE=$(parse_apex_param "$PARAMS")
+                case "$APEX_MODE" in
+                    standalone)
+                        log_step "Downloading APEX (standalone)..."
+                        bash /usr/demasy/scripts/oracle/admin/download-apex-standalone.sh
+                        ;;
+                    full)
+                        log_step "Downloading APEX + ORDS..."
+                        bash /usr/demasy/scripts/oracle/admin/download-apex.sh
+                        ;;
+                esac
+                ;;
+            ords)
+                log_step "Downloading ORDS..."
+                bash /usr/demasy/scripts/oracle/admin/download-ords.sh
+                ;;
         esac
         ;;
     install)
