@@ -142,6 +142,7 @@ RUN ln -s /usr/demasy/scripts/oracle/admin/download.sh /usr/local/bin/download-o
 
 # -------------------------------------------- [CLI Tools]
 RUN ln -s /usr/demasy/scripts/cli/commands.sh /usr/local/bin/commands
+RUN ln -s /usr/demasy/scripts/cli/sandbox.sh /usr/local/bin/sandbox
 RUN ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus
 RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/oracle

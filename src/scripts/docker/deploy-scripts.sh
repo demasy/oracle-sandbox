@@ -100,6 +100,7 @@ get_symlink_name() {
         install-sqlplus.sh)         echo "install-sqlplus" ;;
         download.sh)                echo "download-oracle-components" ;;
         start-mcp-with-saved-connection.sh) echo "start-mcp" ;;
+        sandbox.sh)                         echo "sandbox" ;;
         *)                          echo "" ;;
     esac
 }
