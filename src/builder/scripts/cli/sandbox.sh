@@ -73,7 +73,7 @@ print_usage() {
     echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   (default: \$DEMASYLABS_DB_PASSWORD)"
     echo ""
     echo -e "  ${YELLOW}Download parameters:${NC}"
-    echo -e "    ${CYAN}apex -s${NC}, ${CYAN}-standalone${NC}   Download APEX only"
+    echo -e "    ${CYAN}apex -s${NC}, ${CYAN}--standalone${NC}   Download APEX only"
     echo -e "    ${CYAN}apex -a${NC}, ${CYAN}--all${NC}         Download APEX + ORDS"
     echo ""
     echo -e "  ${YELLOW}Examples:${NC}"

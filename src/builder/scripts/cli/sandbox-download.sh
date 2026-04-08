@@ -11,19 +11,19 @@ parse_apex_param() {
         echo ""
         log_error "sandbox download apex requires a parameter"
         echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}-s${NC}, ${CYAN}-standalone${NC}   Download APEX only"
+        echo -e "    ${CYAN}-s${NC}, ${CYAN}--standalone${NC}   Download APEX only"
         echo -e "    ${CYAN}-a${NC}, ${CYAN}--all${NC}         Download APEX + ORDS"
         echo ""
         exit 1
     fi
     case "$param" in
-        -s|-standalone) echo "standalone" ;;
-        -a|--all)       echo "full" ;;
+        -s|--standalone) echo "standalone" ;;
+        -a|--all)        echo "full" ;;
         *)
             echo ""
             log_error "Unknown parameter '${param}' for sandbox download apex"
             echo -e "  ${YELLOW}Parameters:${NC}"
-            echo -e "    ${CYAN}-s${NC}, ${CYAN}-standalone${NC}   Download APEX only"
+            echo -e "    ${CYAN}-s${NC}, ${CYAN}--standalone${NC}   Download APEX only"
             echo -e "    ${CYAN}-a${NC}, ${CYAN}--all${NC}         Download APEX + ORDS"
             echo ""
             exit 1
