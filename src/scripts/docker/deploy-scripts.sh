@@ -61,19 +61,29 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 CONTAINER_NAME="demasylabs-oracle-server"
-HOST_ADMIN_DIR="$WORKSPACE_ROOT/src/scripts/oracle/admin"
-HOST_APEX_DIR="$WORKSPACE_ROOT/src/scripts/oracle/apex"
-HOST_MCP_DIR="$WORKSPACE_ROOT/src/scripts/oracle/mcp"
-HOST_CLI_DIR="$WORKSPACE_ROOT/src/scripts/cli"
-HOST_UTILS_DIR="$WORKSPACE_ROOT/src/scripts/backbone/utils"
-HOST_BUILD_DIR="$WORKSPACE_ROOT/src/scripts/backbone/build"
+HOST_ADMIN_DIR="$WORKSPACE_ROOT/src/builder/scripts/oracle/admin"
+HOST_APEX_DIR="$WORKSPACE_ROOT/src/builder/scripts/oracle/apex"
+HOST_MCP_DIR="$WORKSPACE_ROOT/src/builder/scripts/oracle/mcp"
+HOST_CLI_DIR="$WORKSPACE_ROOT/src/builder/scripts/cli"
+HOST_UTILS_DIR="$WORKSPACE_ROOT/src/builder/scripts/system/utils"
+HOST_BUILD_DIR="$WORKSPACE_ROOT/src/builder/scripts/system/build"
+HOST_SYSADMIN_DIR="$WORKSPACE_ROOT/src/builder/scripts/system/admin"
+HOST_DOWNLOAD_DIR="$WORKSPACE_ROOT/src/builder/scripts/system/download"
+HOST_INSTALL_DIR="$WORKSPACE_ROOT/src/builder/scripts/system/install"
+HOST_SQLCL_DIR="$WORKSPACE_ROOT/src/builder/scripts/oracle/sqlcl"
+HOST_SQLPLUS_DIR="$WORKSPACE_ROOT/src/builder/scripts/oracle/sqlplus"
 
-CONTAINER_ADMIN_DIR="/usr/demasy/scripts/oracle/admin"
-CONTAINER_APEX_DIR="/usr/demasy/scripts/oracle/apex"
-CONTAINER_MCP_DIR="/usr/demasy/scripts/oracle/mcp"
-CONTAINER_CLI_DIR="/usr/demasy/scripts/cli"
-CONTAINER_UTILS_DIR="/usr/demasy/scripts/backbone/utils"
-CONTAINER_BUILD_DIR="/usr/demasy/scripts/build"
+CONTAINER_ADMIN_DIR="/usr/sandbox/app/oracle/admin"
+CONTAINER_APEX_DIR="/usr/sandbox/app/oracle/apex"
+CONTAINER_MCP_DIR="/usr/sandbox/app/oracle/mcp"
+CONTAINER_CLI_DIR="/usr/sandbox/app/cli"
+CONTAINER_UTILS_DIR="/usr/sandbox/app/system/utils"
+CONTAINER_BUILD_DIR="/usr/sandbox/app/system/build"
+CONTAINER_SYSADMIN_DIR="/usr/sandbox/app/system/admin"
+CONTAINER_DOWNLOAD_DIR="/usr/sandbox/app/system/download"
+CONTAINER_INSTALL_DIR="/usr/sandbox/app/system/install"
+CONTAINER_SQLCL_DIR="/usr/sandbox/app/oracle/sqlcl"
+CONTAINER_SQLPLUS_DIR="/usr/sandbox/app/oracle/sqlplus"
 
 TARGET_FILE=""
 CREATE_SYMLINK=false
@@ -86,7 +96,7 @@ DEPLOYED=0
 get_symlink_name() {
     local filename="$1"
     case "$filename" in
-        create_user.sh)             echo "create-user" ;;
+        create-user.sh)             echo "create-user" ;;
         create-pdb.sh)              echo "create-pdb" ;;
         create-demasy-user.sh)      echo "create-demasy-user" ;;
         rollback-demasy-user.sh)    echo "rollback-demasy-user" ;;
@@ -261,7 +271,12 @@ if [[ -n "$TARGET_FILE" ]]; then
         "${HOST_MCP_DIR}:${CONTAINER_MCP_DIR}" \
         "${HOST_CLI_DIR}:${CONTAINER_CLI_DIR}" \
         "${HOST_UTILS_DIR}:${CONTAINER_UTILS_DIR}" \
-        "${HOST_BUILD_DIR}:${CONTAINER_BUILD_DIR}"
+        "${HOST_BUILD_DIR}:${CONTAINER_BUILD_DIR}" \
+        "${HOST_SYSADMIN_DIR}:${CONTAINER_SYSADMIN_DIR}" \
+        "${HOST_DOWNLOAD_DIR}:${CONTAINER_DOWNLOAD_DIR}" \
+        "${HOST_INSTALL_DIR}:${CONTAINER_INSTALL_DIR}" \
+        "${HOST_SQLCL_DIR}:${CONTAINER_SQLCL_DIR}" \
+        "${HOST_SQLPLUS_DIR}:${CONTAINER_SQLPLUS_DIR}"
     do
         host_dir="${pair%%:*}"
         container_dir="${pair##*:}"
@@ -278,9 +293,15 @@ if [[ -n "$TARGET_FILE" ]]; then
         log_info  "Searched:"
         log_info  "  ${HOST_ADMIN_DIR}"
         log_info  "  ${HOST_APEX_DIR}"
+        log_info  "  ${HOST_MCP_DIR}"
         log_info  "  ${HOST_CLI_DIR}"
         log_info  "  ${HOST_UTILS_DIR}"
         log_info  "  ${HOST_BUILD_DIR}"
+        log_info  "  ${HOST_SYSADMIN_DIR}"
+        log_info  "  ${HOST_DOWNLOAD_DIR}"
+        log_info  "  ${HOST_INSTALL_DIR}"
+        log_info  "  ${HOST_SQLCL_DIR}"
+        log_info  "  ${HOST_SQLPLUS_DIR}"
         exit 1
     fi
 
@@ -288,12 +309,17 @@ else
     # ── Full sync mode ────────────────────────────────────────────────────────
     log_step "Deploying All Scripts"
 
-    deploy_directory "$HOST_UTILS_DIR"  "$CONTAINER_UTILS_DIR"  "backbone/utils"
-    deploy_directory "$HOST_BUILD_DIR"  "$CONTAINER_BUILD_DIR"  "backbone/build"
-    deploy_directory "$HOST_CLI_DIR"    "$CONTAINER_CLI_DIR"    "cli"
-    deploy_directory "$HOST_ADMIN_DIR"  "$CONTAINER_ADMIN_DIR"  "oracle/admin"
-    deploy_directory "$HOST_MCP_DIR"    "$CONTAINER_MCP_DIR"    "oracle/mcp"
-    deploy_directory "$HOST_APEX_DIR"   "$CONTAINER_APEX_DIR"   "oracle/apex"
+    deploy_directory "$HOST_UTILS_DIR"     "$CONTAINER_UTILS_DIR"     "system/utils"
+    deploy_directory "$HOST_BUILD_DIR"     "$CONTAINER_BUILD_DIR"     "system/build"
+    deploy_directory "$HOST_SYSADMIN_DIR"  "$CONTAINER_SYSADMIN_DIR"  "system/admin"
+    deploy_directory "$HOST_DOWNLOAD_DIR"  "$CONTAINER_DOWNLOAD_DIR"  "system/download"
+    deploy_directory "$HOST_INSTALL_DIR"   "$CONTAINER_INSTALL_DIR"   "system/install"
+    deploy_directory "$HOST_CLI_DIR"       "$CONTAINER_CLI_DIR"       "cli"
+    deploy_directory "$HOST_ADMIN_DIR"     "$CONTAINER_ADMIN_DIR"     "oracle/admin"
+    deploy_directory "$HOST_MCP_DIR"       "$CONTAINER_MCP_DIR"       "oracle/mcp"
+    deploy_directory "$HOST_APEX_DIR"      "$CONTAINER_APEX_DIR"      "oracle/apex"
+    deploy_directory "$HOST_SQLCL_DIR"     "$CONTAINER_SQLCL_DIR"     "oracle/sqlcl"
+    deploy_directory "$HOST_SQLPLUS_DIR"   "$CONTAINER_SQLPLUS_DIR"   "oracle/sqlplus"
 fi
 
 print_summary

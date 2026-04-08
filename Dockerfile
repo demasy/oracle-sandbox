@@ -18,7 +18,17 @@ ENV SRC_ORACLE_ORDS=$SRC_ORACLE_ORDS
 ENV INSTALL_APEX=$INSTALL_APEX
 
 RUN mkdir -p /usr/demasy/app
-RUN mkdir -p /usr/sandbox/app
+RUN mkdir -p /usr/sandbox/app/cli
+RUN mkdir -p /usr/sandbox/app/system/utils
+RUN mkdir -p /usr/sandbox/app/system/build
+RUN mkdir -p /usr/sandbox/app/system/admin
+RUN mkdir -p /usr/sandbox/app/system/download
+RUN mkdir -p /usr/sandbox/app/system/install
+RUN mkdir -p /usr/sandbox/app/oracle/admin
+RUN mkdir -p /usr/sandbox/app/oracle/apex
+RUN mkdir -p /usr/sandbox/app/oracle/mcp
+RUN mkdir -p /usr/sandbox/app/oracle/sqlcl
+RUN mkdir -p /usr/sandbox/app/oracle/sqlplus
 
 COPY package*.json ./
 
@@ -29,32 +39,41 @@ COPY ./app.js ./app.js
 COPY ["LICENSE", "./"]
 
 # Copy scripts to organized structure
-COPY ./src/scripts/backbone/utils/*.sh /usr/demasy/scripts/backbone/utils/
-COPY ./src/scripts/cli/*.sh /usr/demasy/scripts/cli/
-# COPY ./src/scripts/oracle/admin/download.sh /usr/demasy/scripts/oracle/admin/download.sh
-COPY ./src/scripts/oracle/admin/*.sh /usr/demasy/scripts/oracle/admin/
-COPY ./src/scripts/oracle/mcp/*.sh /usr/demasy/scripts/oracle/mcp/
-COPY ./src/scripts/oracle/apex/*.sh /usr/demasy/scripts/oracle/apex/
-COPY ./src/scripts/backbone/build/*.sh /usr/demasy/scripts/build/
+COPY ./src/builder/scripts/cli/*.sh                 /usr/sandbox/app/cli/
+COPY ./src/builder/scripts/system/utils/*.sh        /usr/sandbox/app/system/utils/
+COPY ./src/builder/scripts/system/build/*.sh        /usr/sandbox/app/system/build/
+COPY ./src/builder/scripts/system/admin/*.sh        /usr/sandbox/app/system/admin/
+COPY ./src/builder/scripts/system/download/*.sh     /usr/sandbox/app/system/download/
+COPY ./src/builder/scripts/system/install/*.sh      /usr/sandbox/app/system/install/
+COPY ./src/builder/scripts/oracle/admin/*.sh        /usr/sandbox/app/oracle/admin/
+COPY ./src/builder/scripts/oracle/apex/*.sh         /usr/sandbox/app/oracle/apex/
+COPY ./src/builder/scripts/oracle/mcp/*.sh          /usr/sandbox/app/oracle/mcp/
+COPY ./src/builder/scripts/oracle/sqlcl/*.sh        /usr/sandbox/app/oracle/sqlcl/
+COPY ./src/builder/scripts/oracle/sqlplus/*.sh      /usr/sandbox/app/oracle/sqlplus/
 
 # Set permissions for all scripts
-RUN chmod +x /usr/demasy/scripts/backbone/utils/*.sh && \
-    chmod +x /usr/demasy/scripts/cli/*.sh && \
-    chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
-    chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
-    chmod +x /usr/demasy/scripts/oracle/apex/*.sh && \
-    chmod +x /usr/demasy/scripts/build/*.sh
+RUN chmod +x /usr/sandbox/app/cli/*.sh && \
+    chmod +x /usr/sandbox/app/system/utils/*.sh && \
+    chmod +x /usr/sandbox/app/system/build/*.sh && \
+    chmod +x /usr/sandbox/app/system/admin/*.sh && \
+    chmod +x /usr/sandbox/app/system/download/*.sh && \
+    chmod +x /usr/sandbox/app/system/install/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/admin/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/apex/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/mcp/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/sqlcl/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/sqlplus/*.sh
 
-WORKDIR /usr/demasy/scripts
+WORKDIR /usr/sandbox/app
 RUN mkdir -p /opt/oracle
 
 # Install Oracle components (Instant Client + SQLcl)
 ENV TERM=xterm
-RUN /usr/demasy/scripts/build/builder-startup.sh
+RUN /usr/sandbox/app/system/build/builder-startup.sh
 
 # Download APEX and ORDS using download-apex.sh script (conditional)
 RUN if [ "$INSTALL_APEX" = "true" ]; then \
-      /usr/demasy/scripts/oracle/admin/download-apex.sh; \
+      /usr/sandbox/app/system/download/download-apex.sh; \
     else \
       echo "Skipping APEX/ORDS download (INSTALL_APEX=$INSTALL_APEX)"; \
     fi
@@ -114,16 +133,23 @@ ENV INSTALL_APEX=${INSTALL_APEX}
 
 COPY --from=demasylabs-builder package*.json ./
 COPY --from=demasylabs-builder /usr/demasy /usr/demasy
+COPY --from=demasylabs-builder /usr/sandbox/app /usr/sandbox/app
 COPY --from=demasylabs-builder /opt/oracle /opt/oracle
 
 RUN npm install oracledb --build-from-source --unsafe-perm
 
 # Set permissions for all scripts in runtime stage
-RUN chmod +x /usr/demasy/scripts/backbone/utils/*.sh && \
-    chmod +x /usr/demasy/scripts/cli/*.sh && \
-    chmod +x /usr/demasy/scripts/oracle/admin/*.sh && \
-    chmod +x /usr/demasy/scripts/oracle/mcp/*.sh && \
-    chmod +x /usr/demasy/scripts/oracle/apex/*.sh
+RUN chmod +x /usr/sandbox/app/cli/*.sh && \
+    chmod +x /usr/sandbox/app/system/utils/*.sh && \
+    chmod +x /usr/sandbox/app/system/build/*.sh && \
+    chmod +x /usr/sandbox/app/system/admin/*.sh && \
+    chmod +x /usr/sandbox/app/system/download/*.sh && \
+    chmod +x /usr/sandbox/app/system/install/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/admin/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/apex/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/mcp/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/sqlcl/*.sh && \
+    chmod +x /usr/sandbox/app/oracle/sqlplus/*.sh
 
 # Create a wrapper for SQLcl that detects Java path dynamically for any architecture
 # Updated by demasy on November 11, 2025
@@ -139,36 +165,36 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
 # Symbolic links to Oracle tools and scripts
 
 
-RUN ln -s /usr/demasy/scripts/oracle/admin/download.sh /usr/local/bin/download-oracle-components
+RUN ln -s /usr/sandbox/app/system/download/download.sh /usr/local/bin/download-oracle-components
 
 # -------------------------------------------- [CLI Tools]
-RUN ln -s /usr/demasy/scripts/cli/sandbox.sh /usr/local/bin/sandbox
-RUN ln -s /usr/demasy/scripts/cli/commands.sh /usr/local/bin/commands
-RUN ln -s /usr/demasy/scripts/cli/sqlplus-connect.sh /usr/local/bin/sqlplus
-RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/sqlcl
-RUN ln -s /usr/demasy/scripts/cli/sqlcl-connect.sh /usr/local/bin/oracle
+RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/sandbox
+RUN ln -s /usr/sandbox/app/cli/commands.sh /usr/local/bin/commands
+RUN ln -s /usr/sandbox/app/oracle/sqlplus/sqlplus-connect.sh /usr/local/bin/sqlplus
+RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/sqlcl
+RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/oracle
 
 # -------------------------------------------- [Oracle APEX Tools]
-# RUN ln -s /usr/demasy/scripts/oracle/admin/download-apex.sh /usr/local/bin/download-apex
-# RUN ln -s /usr/demasy/scripts/oracle/apex/install.sh /usr/local/bin/install-apex
-# RUN ln -s /usr/demasy/scripts/oracle/apex/uninstall.sh /usr/local/bin/uninstall-apex
-# RUN ln -s /usr/demasy/scripts/oracle/apex/start.sh /usr/local/bin/start-apex
-# RUN ln -s /usr/demasy/scripts/oracle/apex/stop.sh /usr/local/bin/stop-apex
+# RUN ln -s /usr/sandbox/app/system/download/download-apex.sh /usr/local/bin/download-apex
+# RUN ln -s /usr/sandbox/app/oracle/apex/install.sh /usr/local/bin/install-apex
+# RUN ln -s /usr/sandbox/app/oracle/apex/uninstall.sh /usr/local/bin/uninstall-apex
+# RUN ln -s /usr/sandbox/app/oracle/apex/start.sh /usr/local/bin/start-apex
+# RUN ln -s /usr/sandbox/app/oracle/apex/stop.sh /usr/local/bin/stop-apex
 
 # -------------------------------------------- [Software Install Tools]
-# RUN ln -s /usr/demasy/scripts/oracle/admin/install-all.sh /usr/local/bin/install-all
-# RUN ln -s /usr/demasy/scripts/oracle/admin/install-client.sh /usr/local/bin/install-client
-# RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlplus.sh /usr/local/bin/install-sqlplus
-# RUN ln -s /usr/demasy/scripts/oracle/admin/install-sqlcl.sh /usr/local/bin/install-sqlcl
+# RUN ln -s /usr/sandbox/app/system/install/install-all.sh /usr/local/bin/install-all
+# RUN ln -s /usr/sandbox/app/system/install/install-client.sh /usr/local/bin/install-client
+# RUN ln -s /usr/sandbox/app/system/install/install-sqlplus.sh /usr/local/bin/install-sqlplus
+# RUN ln -s /usr/sandbox/app/system/install/install-sqlcl.sh /usr/local/bin/install-sqlcl
 
 # -------------------------------------------- [Admin & Diagnostics]
-# RUN ln -s /usr/demasy/scripts/oracle/admin/healthcheck.sh /usr/local/bin/healthcheck
-RUN ln -s /usr/demasy/scripts/oracle/admin/create-pdb.sh /usr/local/bin/create-pdb
-RUN ln -s /usr/demasy/scripts/oracle/admin/create-demasy-user.sh /usr/local/bin/create-demasy-user
-RUN ln -s /usr/demasy/scripts/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
+# RUN ln -s /usr/sandbox/app/system/admin/healthcheck.sh /usr/local/bin/healthcheck
+RUN ln -s /usr/sandbox/app/oracle/admin/create-pdb.sh /usr/local/bin/create-pdb
+RUN ln -s /usr/sandbox/app/oracle/admin/create-demasy-user.sh /usr/local/bin/create-demasy-user
+RUN ln -s /usr/sandbox/app/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
 
 # -------------------------------------------- [MCP Tools]
-# RUN ln -s /usr/demasy/scripts/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp
+# RUN ln -s /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp
 
 
 # Verify installation and test SQLcl
@@ -196,5 +222,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 WORKDIR /usr/demasy/app
 
 # Use startup script to handle initialization
-CMD ["/usr/demasy/scripts/build/startup.sh"]
+CMD ["/usr/sandbox/app/system/build/startup.sh"]
 
