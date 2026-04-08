@@ -138,7 +138,7 @@ if [[ "$RESOURCE" == "-h" || "$RESOURCE" == "--help" ]]; then
     exit 0
 fi
 if [[ "$PARAMS" == "-h" || "$PARAMS" == "--help" ]]; then
-    source /usr/sandbox/app/cli/sandbox-help.sh
+    source /usr/sandbox/app/cli/sandbox-resource-help.sh
     exit 0
 fi
 
