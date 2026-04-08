@@ -12,7 +12,7 @@ SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
 
 # Source utilities from the actual script location
-source "$SCRIPT_DIR/../../backbone/utils/banner.sh"
+source "/usr/sandbox/app/system/utils/banner.sh"
 
 # Colors (inline for this script)
 RED='\033[0;31m'
@@ -882,8 +882,8 @@ fi
 # INSTALLATION COMPLETE
 ################################################################################
 
-# Source completion message display from backbone/utils
-COMPLETION_MSG_SCRIPT="$SCRIPT_DIR/../../backbone/utils/apex-completion.sh"
+# Source completion message display from system/utils
+COMPLETION_MSG_SCRIPT="/usr/sandbox/app/system/utils/apex-completion.sh"
 if [ -f "$COMPLETION_MSG_SCRIPT" ]; then
     source "$COMPLETION_MSG_SCRIPT"
     # Display completion message with credentials
