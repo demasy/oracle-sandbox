@@ -316,4 +316,4 @@ echo ""
 display_commands
 
 # Start the Node.js management server
-exec node /usr/demasy/app/app.js
+exec node /usr/sandbox/app/app.js

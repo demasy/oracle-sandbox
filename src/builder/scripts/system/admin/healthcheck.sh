@@ -226,7 +226,7 @@ check_system_resources() {
     fi
     
     # Disk usage for the application directory
-    local disk_usage=$(df -h /usr/demasy 2>/dev/null | awk 'NR==2{print $5}' | sed 's/%//')
+    local disk_usage=$(df -h /usr/sandbox 2>/dev/null | awk 'NR==2{print $5}' | sed 's/%//')
     if [ -n "$disk_usage" ]; then
         if [ "$disk_usage" -lt 85 ]; then
             echo -e " - Disk Usage: ${GREEN}✓ OK${NC} (${disk_usage}%)"
