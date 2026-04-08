@@ -1,24 +1,28 @@
 #!/bin/bash
 #==============================================================================
 # reset-container.sh
-# Full reset: remove containers + volumes, rebuild, and start fresh
+# Full reset: remove containers + volumes, prune Docker disk usage, rebuild,
+# and start fresh.
 #
 # Usage:
 #   ./reset-container.sh [options]
 #
 # Options:
 #   --no-build    Skip docker-compose build (only remove + up)
+#   --no-prune    Skip Docker disk cleanup (images, build cache, containers)
 #   --dry-run     Show what would be done without executing
 #   -h, --help    Show this help message
 #
 # Examples:
 #   ./reset-container.sh
 #   ./reset-container.sh --no-build
+#   ./reset-container.sh --no-prune
 #   ./reset-container.sh --dry-run
 #
 # Purpose:
 #   Tears down all containers and volumes defined in docker-compose.yml,
-#   performs a clean no-cache build, then brings everything back up.
+#   prunes dangling images / build cache / stopped containers to reclaim
+#   disk space, performs a clean no-cache build, then brings everything back up.
 #
 # Author: Demasy <founder@demasy.io>
 #==============================================================================
@@ -55,12 +59,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 SKIP_BUILD=false
+SKIP_PRUNE=false
 DRY_RUN=false
 
 # ─── Argument parsing ─────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --no-build)   SKIP_BUILD=true; shift ;;
+    --no-prune)   SKIP_PRUNE=true; shift ;;
     --dry-run)    DRY_RUN=true;    shift ;;
     -h|--help)
       sed -n '/^# Usage:/,/^#==/p' "$0" | sed 's/^# \?//'
@@ -100,31 +106,58 @@ fi
 
 log_info "Workspace : $WORKSPACE_ROOT"
 log_info "Skip build: $SKIP_BUILD"
+log_info "Skip prune: $SKIP_PRUNE"
 log_info "Dry run   : $DRY_RUN"
 
+# ─── Disk usage snapshot ──────────────────────────────────────────────────────
+if [[ "$DRY_RUN" == false ]]; then
+  DISK_BEFORE=$(docker system df --format 'table {{.Type}}\t{{.Size}}\t{{.Reclaimable}}' 2>/dev/null || true)
+fi
+
 # ─── Step 1: Stop and remove containers + volumes ────────────────────────────
-log_step "Step 1/3 — Removing containers and volumes"
+log_step "Step 1/4 — Removing containers and volumes"
 
 run_cmd "Stopping and removing containers + volumes" \
   docker-compose -f "$WORKSPACE_ROOT/docker-compose.yml" down --volumes --remove-orphans
 
 log_success "Containers and volumes removed"
 
-# ─── Step 2: Build images (no cache) ─────────────────────────────────────────
+# ─── Step 2: Prune Docker disk usage ─────────────────────────────────────────
+if [[ "$SKIP_PRUNE" == false ]]; then
+  log_step "Step 2/4 — Pruning Docker disk usage"
+  if [[ "$DRY_RUN" == true ]]; then
+    log_dry "docker image prune -f"
+    log_dry "docker builder prune -f"
+    log_dry "docker container prune -f"
+  else
+    log_info "Removing dangling images..."
+    docker image prune -f
+    log_info "Removing build cache..."
+    docker builder prune -f
+    log_info "Removing stopped containers..."
+    docker container prune -f
+    log_success "Docker disk usage cleaned"
+  fi
+else
+  log_step "Step 2/4 — Skipping prune (--no-prune)"
+  log_warn "Docker disk usage not cleaned"
+fi
+
+# ─── Step 3: Build images (no cache) ─────────────────────────────────────────
 if [[ "$SKIP_BUILD" == false ]]; then
-  log_step "Step 2/3 — Building images (no cache)"
+  log_step "Step 3/4 — Building images (no cache)"
 
   run_cmd "Building Docker images without cache" \
     docker-compose -f "$WORKSPACE_ROOT/docker-compose.yml" build --no-cache
 
   log_success "Images built successfully"
 else
-  log_step "Step 2/3 — Skipping build (--no-build)"
+  log_step "Step 3/4 — Skipping build (--no-build)"
   log_warn "Using existing images"
 fi
 
-# ─── Step 3: Start containers ────────────────────────────────────────────────
-log_step "Step 3/3 — Starting containers"
+# ─── Step 4: Start containers ────────────────────────────────────────────────
+log_step "Step 4/4 — Starting containers"
 
 run_cmd "Starting all containers in detached mode" \
   docker-compose -f "$WORKSPACE_ROOT/docker-compose.yml" up -d
@@ -136,6 +169,15 @@ echo ""
 echo -e "  ${GREEN}${BOLD}Reset complete.${NC}"
 echo ""
 if [[ "$DRY_RUN" == false ]]; then
+  if [[ -n "${DISK_BEFORE:-}" ]]; then
+    log_step "Docker disk usage"
+    echo -e "  ${YELLOW}Before:${NC}"
+    echo "$DISK_BEFORE" | sed 's/^/    /'
+    echo ""
+    echo -e "  ${GREEN}After:${NC}"
+    docker system df --format 'table {{.Type}}\t{{.Size}}\t{{.Reclaimable}}' | sed 's/^/    /'
+    echo ""
+  fi
   log_info "Running containers:"
   docker-compose -f "$WORKSPACE_ROOT/docker-compose.yml" ps
 fi
