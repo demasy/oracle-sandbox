@@ -166,7 +166,7 @@ log_success "Account unlock check complete"
 ################################################################################
 log_info "Step 4: Installing APEX (this takes 3-5 minutes)..."
 
-# Check if APEX is already installed
+# Check if APEX is already installed in dba_registry
 log_info "Checking for existing APEX installation..."
 APEX_INSTALLED=$(sql -S sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba <<EOF 2>/dev/null | tr -d '[:space:]'
 SET HEADING OFF FEEDBACK OFF
@@ -191,6 +191,39 @@ EOSQL
     SKIP_APEX_INSTALL=true
 else
     SKIP_APEX_INSTALL=false
+
+    # Check for stale APEX schema (partial/failed previous install)
+    # If APEX_240200 schema exists but is not in dba_registry, drop it first
+    log_info "Checking for stale APEX schema from a previous failed install..."
+    STALE_APEX=$(sql -S sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba <<EOF 2>/dev/null | tr -d '[:space:]'
+SET HEADING OFF FEEDBACK OFF
+ALTER SESSION SET CONTAINER=FREEPDB1;
+SELECT COUNT(*) FROM dba_users WHERE username LIKE 'APEX_%';
+EXIT
+EOF
+)
+
+    if [ "${STALE_APEX}" != "0" ]; then
+        log_warn "Stale APEX schema detected — dropping before fresh install..."
+        sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba << 'EOSQL'
+ALTER SESSION SET CONTAINER=FREEPDB1;
+DECLARE
+BEGIN
+    FOR rec IN (SELECT username FROM dba_users WHERE username LIKE 'APEX_%' ORDER BY username DESC) LOOP
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP USER ' || rec.username || ' CASCADE';
+            DBMS_OUTPUT.PUT_LINE('Dropped: ' || rec.username);
+        EXCEPTION
+            WHEN OTHERS THEN
+                DBMS_OUTPUT.PUT_LINE('Could not drop ' || rec.username || ': ' || SQLERRM);
+        END;
+    END LOOP;
+END;
+/
+EXIT
+EOSQL
+        log_success "Stale APEX schema removed"
+    fi
 fi
 
 if [ "$SKIP_APEX_INSTALL" = false ]; then
