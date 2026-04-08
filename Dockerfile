@@ -165,8 +165,8 @@ RUN ln -s /usr/demasy/scripts/oracle/admin/create-pdb.sh /usr/local/bin/create-p
 RUN ln -s /usr/demasy/scripts/oracle/admin/create-demasy-user.sh /usr/local/bin/create-demasy-user
 RUN ln -s /usr/demasy/scripts/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
 
-# # -------------------------------------------- [MCP Tools]
-# RUN ln -s /usr/demasy/scripts/oracle/mcp/start.sh /usr/local/bin/start-mcp
+# -------------------------------------------- [MCP Tools]
+RUN ln -s /usr/demasy/scripts/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp
 
 
 # Verify installation and test SQLcl

@@ -27,7 +27,7 @@ if [ -z "$DEMASYLABS_DB_HOST" ] || [ -z "$DEMASYLABS_DB_PORT" ] || [ -z "$DEMASY
     exit 1
 fi
 
-DB_CONNECTION="${MCP_USER}/${MCP_PASS}@${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_SERVICE}"
+DB_CONNECTION="${MCP_USER}/${MCP_PASS}@//${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_SERVICE}"
 
 echo "Starting SQLcl MCP Server..."
 echo "Connection: ${MCP_USER}@${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_SERVICE}"
@@ -42,4 +42,4 @@ export LD_LIBRARY_PATH=/opt/oracle/instantclient:$LD_LIBRARY_PATH
 export JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::')
 
 # Start MCP server
-./sql -mcp -connect "$DB_CONNECTION"
+./sql -mcp "$DB_CONNECTION"
