@@ -88,7 +88,7 @@ print_usage() {
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
     echo -e "    ${CYAN}download${NC}   apex | ords"
     echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus | apex"
-    echo -e "    ${CYAN}uninstall${NC}  oracle | client | sqlcl | sqlplus"
+    echo -e "    ${CYAN}uninstall${NC}  oracle | client | sqlcl | sqlplus | apex"
     echo -e "    ${CYAN}start${NC}      mcp | system"
     echo -e "    ${CYAN}stop${NC}       mcp | system"
     echo -e "    ${CYAN}run${NC}        oracle | mcp | system"
@@ -222,6 +222,10 @@ case "$ACTION" in
             client)   log_warn "sandbox uninstall client  — not implemented yet" ;;
             sqlcl)    log_warn "sandbox uninstall sqlcl   — not implemented yet" ;;
             sqlplus)  log_warn "sandbox uninstall sqlplus — not implemented yet" ;;
+            apex)
+                log_step "Uninstalling APEX + ORDS..."
+                bash /usr/demasy/scripts/oracle/apex/uninstall.sh
+                ;;
         esac
         ;;
     start)
