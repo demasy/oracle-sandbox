@@ -10,8 +10,11 @@ if ! command -v sql &> /dev/null; then
     exit 1
 fi
 
+# Use provided connection name or fall back to default
+CONNECTION_NAME="${1:-demasylabs-ai-conn}"
+
 echo "Starting SQLcl MCP Server with saved connection..."
-echo "Connection: demasylabs-ai-conn"
+echo "Connection: ${CONNECTION_NAME}"
 
 # Start SQLcl MCP server
 cd /opt/oracle/sqlcl/bin
@@ -22,4 +25,4 @@ export LD_LIBRARY_PATH=/opt/oracle/instantclient:$LD_LIBRARY_PATH
 export JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::')
 
 # Start MCP server with saved connection
-./sql -mcp demasylabs-ai-conn
+./sql -mcp "${CONNECTION_NAME}"

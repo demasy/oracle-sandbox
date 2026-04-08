@@ -23,6 +23,8 @@
 #   sandbox install sqlcl
 #   sandbox start mcp -d
 #   sandbox start mcp --default
+#   sandbox start mcp -conn mcp-saved
+#   sandbox start mcp --connection mcp-saved
 #   sandbox run mcp
 # ============================================
 
@@ -62,6 +64,8 @@ print_usage() {
     echo -e "    sandbox install sqlcl"
     echo -e "    sandbox start mcp -d"
     echo -e "    sandbox start mcp --default"
+    echo -e "    sandbox start mcp -conn mcp-saved"
+    echo -e "    sandbox start mcp --connection mcp-saved"
     echo -e "    sandbox run mcp"
     echo ""
 }
@@ -158,26 +162,57 @@ case "$ACTION" in
     start)
         case "$RESOURCE" in
             mcp)
-                if [[ -z "$PARAMS" ]]; then
+                # Re-parse remaining params for flag + optional value
+                MCP_FLAG="" MCP_CONN_NAME=""
+                set -- $PARAMS
+                while [[ $# -gt 0 ]]; do
+                    case "$1" in
+                        -d|--default)
+                            MCP_FLAG="default"
+                            shift
+                            ;;
+                        -conn|--connection)
+                            if [[ -z "${2:-}" ]]; then
+                                echo ""
+                                log_error "-conn / --connection requires a connection name"
+                                echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox start mcp -conn mcp-saved${NC}"
+                                echo ""
+                                exit 1
+                            fi
+                            MCP_FLAG="conn"
+                            MCP_CONN_NAME="$2"
+                            shift 2
+                            ;;
+                        *)
+                            echo ""
+                            log_error "Unknown parameter '${1}' for sandbox start mcp"
+                            echo -e "  ${YELLOW}Parameters:${NC}"
+                            echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}              Start MCP using the default saved connection"
+                            echo -e "    ${CYAN}-conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
+                            echo ""
+                            exit 1
+                            ;;
+                    esac
+                done
+
+                if [[ -z "$MCP_FLAG" ]]; then
                     echo ""
                     log_error "sandbox start mcp requires a parameter"
                     echo -e "  ${YELLOW}Parameters:${NC}"
-                    echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}   Start MCP using the default saved connection (demasylabs-ai-conn)"
+                    echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}              Start MCP using the default saved connection (demasylabs-ai-conn)"
+                    echo -e "    ${CYAN}-conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
                     echo ""
                     exit 1
                 fi
-                case "$PARAMS" in
-                    -d|--default)
+
+                case "$MCP_FLAG" in
+                    default)
                         log_step "Starting MCP server with default saved connection..."
                         bash /usr/demasy/scripts/oracle/mcp/start-mcp-with-saved-connection.sh
                         ;;
-                    *)
-                        echo ""
-                        log_error "Unknown parameter '${PARAMS}' for sandbox start mcp"
-                        echo -e "  ${YELLOW}Parameters:${NC}"
-                        echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}   Start MCP using the default saved connection (demasylabs-ai-conn)"
-                        echo ""
-                        exit 1
+                    conn)
+                        log_step "Starting MCP server with saved connection: ${MCP_CONN_NAME}..."
+                        bash /usr/demasy/scripts/oracle/mcp/start-mcp-with-saved-connection.sh "$MCP_CONN_NAME"
                         ;;
                 esac
                 ;;
