@@ -69,7 +69,7 @@ print_usage() {
     echo -e "    ${CYAN}download${NC}   apex | ords"
     echo ""
     echo -e "  ${YELLOW}SQLcl parameters:${NC}"
-    echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} sys | system | sandbox | sandbox_ai | demasy | demasy_ai | demasylabs"
+    echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} sys | system | sandbox | sandbox_ai | demasy | demasy_ai"
     echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   (default: Default Password)"
     echo ""
     echo -e "  ${YELLOW}Download parameters:${NC}"
