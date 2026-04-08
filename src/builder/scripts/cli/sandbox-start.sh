@@ -62,9 +62,5 @@ case "$RESOURCE" in
         log_step "Starting APEX (ORDS)..."
         bash /usr/sandbox/app/oracle/apex/start.sh
         ;;
-    healthcheck)
-        log_step "Running healthcheck..."
-        bash /usr/sandbox/app/system/admin/healthcheck.sh
-        ;;
     system)   log_warn "sandbox start system — not implemented yet" ;;
 esac

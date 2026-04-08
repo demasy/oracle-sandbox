@@ -72,7 +72,6 @@ case "$ACTION" in
         echo -e "  ${YELLOW}Resources:${NC}"
         echo -e "    ${CYAN}apex${NC}         Start Oracle APEX (ORDS)"
         echo -e "    ${CYAN}mcp${NC}          Start the MCP server"
-        echo -e "    ${CYAN}healthcheck${NC}  Run the Oracle sandbox healthcheck"
         echo -e "    ${CYAN}system${NC}       Start system services"
         echo ""
         echo -e "  ${YELLOW}Parameters (mcp):${NC}"
@@ -85,7 +84,6 @@ case "$ACTION" in
         echo -e "    sandbox start mcp --default"
         echo -e "    sandbox start mcp -conn mcp-saved"
         echo -e "    sandbox start mcp --connection mcp-saved"
-        echo -e "    sandbox start healthcheck"
         echo ""
         ;;
     stop)
@@ -125,10 +123,11 @@ case "$ACTION" in
         echo -e "  ${WHITE}Usage:${NC}     sandbox run <resource> [parameters]"
         echo ""
         echo -e "  ${YELLOW}Resources:${NC}"
-        echo -e "    ${CYAN}sqlcl${NC}    Open an interactive SQLcl session"
-        echo -e "    ${CYAN}mcp${NC}      Run the MCP server"
-        echo -e "    ${CYAN}oracle${NC}   Run Oracle tools"
-        echo -e "    ${CYAN}system${NC}   Run system utilities"
+        echo -e "    ${CYAN}sqlcl${NC}        Open an interactive SQLcl session"
+        echo -e "    ${CYAN}mcp${NC}          Run the MCP server"
+        echo -e "    ${CYAN}oracle${NC}       Run Oracle tools"
+        echo -e "    ${CYAN}system${NC}       Run system utilities"
+        echo -e "    ${CYAN}healthcheck${NC}  Run the Oracle sandbox healthcheck"
         echo ""
         echo -e "  ${YELLOW}Parameters (sqlcl):${NC}"
         echo -e "    ${CYAN}-user${NC} <user>       Required. Database user to connect as"
@@ -149,6 +148,7 @@ case "$ACTION" in
         echo -e "    sandbox run sqlcl -user sys"
         echo -e "    sandbox run sqlcl -user demasy_ai"
         echo -e "    sandbox run sqlcl -user demasy -pass mypassword"
+        echo -e "    sandbox run healthcheck"
         echo ""
         ;;
 esac
