@@ -21,7 +21,8 @@
 # Examples:
 #   sandbox download oracle
 #   sandbox install sqlcl
-#   sandbox start mcp
+#   sandbox start mcp -d
+#   sandbox start mcp --default
 #   sandbox run mcp
 # ============================================
 
@@ -44,7 +45,7 @@ resources_for() {
 
 print_usage() {
     echo ""
-    echo -e "  ${CYAN}sandbox${NC} — Demasylabs Oracle Sandbox CLI"
+    echo -e "  ${CYAN}sandbox${NC} — Oracle Sandbox CLI"
     echo ""
     echo -e "  ${WHITE}Usage:${NC}   sandbox <action> <resource> [parameters]"
     echo ""
@@ -59,7 +60,8 @@ print_usage() {
     echo -e "  ${YELLOW}Examples:${NC}"
     echo -e "    sandbox download oracle"
     echo -e "    sandbox install sqlcl"
-    echo -e "    sandbox start mcp"
+    echo -e "    sandbox start mcp -d"
+    echo -e "    sandbox start mcp --default"
     echo -e "    sandbox run mcp"
     echo ""
 }
@@ -155,7 +157,30 @@ case "$ACTION" in
         ;;
     start)
         case "$RESOURCE" in
-            mcp)      log_warn "sandbox start mcp    — not implemented yet" ;;
+            mcp)
+                if [[ -z "$PARAMS" ]]; then
+                    echo ""
+                    log_error "sandbox start mcp requires a parameter"
+                    echo -e "  ${YELLOW}Parameters:${NC}"
+                    echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}   Start MCP using the default saved connection (demasylabs-ai-conn)"
+                    echo ""
+                    exit 1
+                fi
+                case "$PARAMS" in
+                    -d|--default)
+                        log_step "Starting MCP server with default saved connection..."
+                        bash /usr/demasy/scripts/oracle/mcp/start-mcp-with-saved-connection.sh
+                        ;;
+                    *)
+                        echo ""
+                        log_error "Unknown parameter '${PARAMS}' for sandbox start mcp"
+                        echo -e "  ${YELLOW}Parameters:${NC}"
+                        echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}   Start MCP using the default saved connection (demasylabs-ai-conn)"
+                        echo ""
+                        exit 1
+                        ;;
+                esac
+                ;;
             system)   log_warn "sandbox start system — not implemented yet" ;;
         esac
         ;;
