@@ -43,7 +43,7 @@ resources_for() {
     case "$1" in
         download)                   echo "apex ords" ;;
         install|uninstall)          echo "oracle client sqlcl sqlplus apex" ;;
-        start|stop)                 echo "mcp system" ;;
+        start|stop|restart)         echo "apex mcp system" ;;
         run)                        echo "oracle mcp system" ;;
         *)                          echo "" ;;
     esac
@@ -89,8 +89,9 @@ print_usage() {
     echo -e "    ${CYAN}download${NC}   apex | ords"
     echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus | apex"
     echo -e "    ${CYAN}uninstall${NC}  oracle | client | sqlcl | sqlplus | apex"
-    echo -e "    ${CYAN}start${NC}      mcp | system"
-    echo -e "    ${CYAN}stop${NC}       mcp | system"
+    echo -e "    ${CYAN}start${NC}      apex | mcp | system"
+    echo -e "    ${CYAN}stop${NC}       apex | mcp | system"
+    echo -e "    ${CYAN}restart${NC}    apex | mcp | system"
     echo -e "    ${CYAN}run${NC}        oracle | mcp | system"
     echo ""
     echo -e "  ${YELLOW}Download parameters:${NC}"
@@ -102,6 +103,9 @@ print_usage() {
     echo -e "    sandbox download apex --all"
     echo -e "    sandbox download ords"
     echo -e "    sandbox install sqlcl"
+    echo -e "    sandbox start apex"
+    echo -e "    sandbox stop apex"
+    echo -e "    sandbox restart apex"
     echo -e "    sandbox start mcp -d"
     echo -e "    sandbox start mcp --default"
     echo -e "    sandbox start mcp -conn mcp-saved"
@@ -112,7 +116,7 @@ print_usage() {
 
 # ─── Validation ──────────────────────────────────────────────────────────────
 
-VALID_ACTIONS="download install uninstall start stop run"
+VALID_ACTIONS="download install uninstall start stop restart run"
 
 validate_action() {
     local action="$1"
@@ -285,13 +289,32 @@ case "$ACTION" in
                         ;;
                 esac
                 ;;
+            apex)
+                log_step "Starting APEX (ORDS)..."
+                bash /usr/demasy/scripts/oracle/apex/start.sh
+                ;;
             system)   log_warn "sandbox start system — not implemented yet" ;;
         esac
         ;;
     stop)
         case "$RESOURCE" in
+            apex)
+                log_step "Stopping APEX (ORDS)..."
+                bash /usr/demasy/scripts/oracle/apex/stop.sh
+                ;;
             mcp)      log_warn "sandbox stop mcp    — not implemented yet" ;;
             system)   log_warn "sandbox stop system — not implemented yet" ;;
+        esac
+        ;;
+    restart)
+        case "$RESOURCE" in
+            apex)
+                log_step "Restarting APEX (ORDS)..."
+                bash /usr/demasy/scripts/oracle/apex/stop.sh
+                bash /usr/demasy/scripts/oracle/apex/start.sh
+                ;;
+            mcp)      log_warn "sandbox restart mcp    — not implemented yet" ;;
+            system)   log_warn "sandbox restart system — not implemented yet" ;;
         esac
         ;;
     run)
