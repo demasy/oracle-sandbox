@@ -27,8 +27,9 @@
 #   sandbox download apex --all
 #   sandbox download ords
 #   sandbox install sqlcl
-#   sandbox run sqlcl -user system
-#   sandbox run healthcheck
+#   sandbox run sqlcl --user system
+#   sandbox run sqlcl -u system
+#   sandbox run sqlcl -s
 # ============================================
 
 source /usr/sandbox/app/system/utils/colors.sh
@@ -68,8 +69,9 @@ print_usage() {
     echo -e "    ${CYAN}run${NC}        oracle | mcp | sqlcl | system | healthcheck"
     echo ""
     echo -e "  ${YELLOW}SQLcl parameters:${NC}"
-    echo -e "    ${CYAN}-user${NC} sys | system | demasy | sandbox | demasylabs | demasy_ai"
-    echo -e "    ${CYAN}-pass${NC} <password>   (default: \$DEMASYLABS_DB_PASSWORD)"
+    echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} sys | system | demasy | sandbox | demasylabs | demasy_ai"
+    echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   (default: \$DEMASYLABS_DB_PASSWORD)"
+    echo -e "    ${CYAN}-s${NC}, ${CYAN}--standalone${NC}        Open SQLcl without connecting"
     echo ""
     echo -e "  ${YELLOW}Download parameters:${NC}"
     echo -e "    ${CYAN}apex -s${NC}, ${CYAN}-standalone${NC}   Download APEX only"
@@ -80,9 +82,11 @@ print_usage() {
     echo -e "    sandbox download apex --all"
     echo -e "    sandbox download ords"
     echo -e "    sandbox install sqlcl"
-    echo -e "    sandbox run sqlcl -user system"
-    echo -e "    sandbox run sqlcl -user demasy"
-    echo -e "    sandbox run sqlcl -user sandbox"
+    echo -e "    sandbox run sqlcl --user system"
+    echo -e "    sandbox run sqlcl --user demasy"
+    echo -e "    sandbox run sqlcl --user sandbox"
+    echo -e "    sandbox run sqlcl -u system"
+    echo -e "    sandbox run sqlcl -s"
     echo -e "    sandbox start apex"
     echo -e "    sandbox stop apex"
     echo -e "    sandbox restart apex"
