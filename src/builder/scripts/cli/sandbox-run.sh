@@ -35,7 +35,7 @@ case "$RESOURCE" in
                     log_error "Unknown parameter '${1}' for sandbox run sqlcl"
                     echo -e "  ${YELLOW}Parameters:${NC}"
                     echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} <user>       Required. One of: ${VALID_SQLCL_USERS}"
-                    echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: \$DEMASYLABS_DB_PASSWORD"
+                    echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: Default Password"
                     echo ""
                     exit 1
                     ;;

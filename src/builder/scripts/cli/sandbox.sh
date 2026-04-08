@@ -70,7 +70,7 @@ print_usage() {
     echo ""
     echo -e "  ${YELLOW}SQLcl parameters:${NC}"
     echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} sys | system | demasy | sandbox | demasylabs | demasy_ai"
-    echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   (default: \$DEMASYLABS_DB_PASSWORD)"
+    echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   (default: Default Password)"
     echo ""
     echo -e "  ${YELLOW}Download parameters:${NC}"
     echo -e "    ${CYAN}apex -s${NC}, ${CYAN}--standalone${NC}   Download APEX only"
