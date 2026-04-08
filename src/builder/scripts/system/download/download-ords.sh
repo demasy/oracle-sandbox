@@ -7,9 +7,9 @@
 # ============================================
 
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
-source "$SCRIPT_DIR/../../backbone/utils/colors.sh"
-source "$SCRIPT_DIR/../../backbone/utils/logging.sh"
-source "$SCRIPT_DIR/../../backbone/utils/banner.sh"
+source "/usr/sandbox/app/system/utils/colors.sh"
+source "/usr/sandbox/app/system/utils/logging.sh"
+source "/usr/sandbox/app/system/utils/banner.sh"
 
 print_demasy_banner "Oracle ORDS Software Installer"
 

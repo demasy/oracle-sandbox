@@ -50,9 +50,9 @@ SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
 
 # Source utilities from the actual script location
-source "$SCRIPT_DIR/../../backbone/utils/banner.sh"
-source "$SCRIPT_DIR/../../backbone/utils/logging.sh"
-source "$SCRIPT_DIR/../../backbone/utils/colors.sh"
+source "/usr/sandbox/app/system/utils/banner.sh"
+source "/usr/sandbox/app/system/utils/logging.sh"
+source "/usr/sandbox/app/system/utils/colors.sh"
 
 ################################################################################
 # PARSE PARAMETERS
