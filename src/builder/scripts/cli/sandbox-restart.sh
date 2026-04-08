@@ -9,6 +9,5 @@ case "$RESOURCE" in
         bash /usr/sandbox/app/oracle/apex/stop.sh
         bash /usr/sandbox/app/oracle/apex/start.sh
         ;;
-    mcp)      log_warn "sandbox restart mcp    — not implemented yet" ;;
-    system)   log_warn "sandbox restart system — not implemented yet" ;;
+    mcp)      log_warn "sandbox restart mcp — not implemented yet" ;;
 esac

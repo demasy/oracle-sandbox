@@ -8,6 +8,5 @@ case "$RESOURCE" in
         log_step "Stopping APEX (ORDS)..."
         bash /usr/sandbox/app/oracle/apex/stop.sh
         ;;
-    mcp)      log_warn "sandbox stop mcp    — not implemented yet" ;;
-    system)   log_warn "sandbox stop system — not implemented yet" ;;
+    mcp)      log_warn "sandbox stop mcp — not implemented yet" ;;
 esac
