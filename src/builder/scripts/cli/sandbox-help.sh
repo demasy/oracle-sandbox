@@ -125,7 +125,6 @@ case "$ACTION" in
         echo -e "  ${YELLOW}Parameters (sqlcl):${NC}"
         echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} <user>       Required. Database user to connect as"
         echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: \$DEMASYLABS_DB_PASSWORD"
-        echo -e "    ${CYAN}-s${NC}, ${CYAN}--standalone${NC}        Open SQLcl without connecting"
         echo ""
         echo -e "  ${YELLOW}Valid users:${NC}"
         echo -e "    ${CYAN}sys${NC}          SYS (sysdba) — CDB root"
@@ -143,8 +142,6 @@ case "$ACTION" in
         echo -e "    sandbox run sqlcl --user demasy_ai"
         echo -e "    sandbox run sqlcl --user demasy --pass mypassword"
         echo -e "    sandbox run sqlcl -u system"
-        echo -e "    sandbox run sqlcl -s"
-        echo -e "    sandbox run sqlcl --standalone"
         echo -e "    sandbox run healthcheck"
         echo ""
         ;;

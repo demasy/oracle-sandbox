@@ -7,7 +7,7 @@ VALID_SQLCL_USERS="sys system demasy sandbox demasylabs demasy_ai"
 
 case "$RESOURCE" in
     sqlcl)
-        SQLCL_USER="" SQLCL_PASS="" SQLCL_STANDALONE=false
+        SQLCL_USER="" SQLCL_PASS=""
         set -- $PARAMS
         while [[ $# -gt 0 ]]; do
             case "$1" in
@@ -30,27 +30,17 @@ case "$RESOURCE" in
                     fi
                     SQLCL_PASS="$2"; shift 2
                     ;;
-                -s|--standalone)
-                    SQLCL_STANDALONE=true
-                    shift
-                    ;;
                 *)
                     echo ""
                     log_error "Unknown parameter '${1}' for sandbox run sqlcl"
                     echo -e "  ${YELLOW}Parameters:${NC}"
                     echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} <user>       Required. One of: ${VALID_SQLCL_USERS}"
                     echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: \$DEMASYLABS_DB_PASSWORD"
-                    echo -e "    ${CYAN}-s${NC}, ${CYAN}--standalone${NC}        Open SQLcl without connecting"
                     echo ""
                     exit 1
                     ;;
             esac
         done
-
-        if $SQLCL_STANDALONE; then
-            log_step "Opening SQLcl (standalone)..."
-            sql /nolog
-        else
 
         if [[ -z "$SQLCL_USER" ]]; then
             echo ""
@@ -103,7 +93,6 @@ case "$RESOURCE" in
                 sql "${DEMASYLABS_DB_MCP_USER}/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
                 ;;
         esac
-        fi
         ;;
     oracle)   log_warn "sandbox run oracle — not implemented yet" ;;
     mcp)      log_warn "sandbox run mcp    — not implemented yet" ;;
