@@ -4,6 +4,9 @@
 # ============================================
 # Main entrypoint for the Demasylabs Oracle Sandbox
 # Usage: sandbox <action> <resource> [parameters]
+#        sandbox -h | --help
+#        sandbox <action> -h | --help
+#        sandbox <action> <resource> -h | --help
 #
 # Actions:
 #   run        Run / connect to a service
@@ -54,6 +57,7 @@ print_usage() {
     echo -e "  ${WHITE}Usage:${NC}   sandbox <action> <resource> [parameters]"
     echo -e "           sandbox -h | --help"
     echo -e "           sandbox <action> -h | --help"
+    echo -e "           sandbox <action> <resource> -h | --help"
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
     echo -e "    ${CYAN}run${NC}        oracle | mcp | sqlcl | healthcheck"
@@ -130,6 +134,10 @@ if [[ "$ACTION" == "-h" || "$ACTION" == "--help" ]]; then
     exit 0
 fi
 if [[ "$RESOURCE" == "-h" || "$RESOURCE" == "--help" ]]; then
+    source /usr/sandbox/app/cli/sandbox-help.sh
+    exit 0
+fi
+if [[ "$PARAMS" == "-h" || "$PARAMS" == "--help" ]]; then
     source /usr/sandbox/app/cli/sandbox-help.sh
     exit 0
 fi
