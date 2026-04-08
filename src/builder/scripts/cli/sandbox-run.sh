@@ -3,7 +3,7 @@
 # Variables inherited: ACTION, RESOURCE, PARAMS, logging/color functions
 # ─────────────────────────────────────────────────────────────────────────────
 
-VALID_SQLCL_USERS="sys system demasy sandbox demasylabs demasy_ai"
+VALID_SQLCL_USERS="sys system sandbox sandbox_ai demasy demasy_ai demasylabs"
 
 case "$RESOURCE" in
     sqlcl)
@@ -76,21 +76,25 @@ case "$RESOURCE" in
                 log_step "Connecting as SYSTEM @ ${DEMASYLABS_DB_SERVICE}..."
                 sql "system/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${DEMASYLABS_DB_SERVICE}"
                 ;;
-            demasy)
-                log_step "Connecting as DEMASY @ DEMASYLABS_PDB..."
-                sql "demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
-                ;;
             sandbox)
                 log_step "Connecting as SANDBOX @ DEMASYLABS_PDB..."
                 sql "sandbox/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
                 ;;
-            demasylabs)
-                log_step "Connecting as C##DEMASY (common user) @ DEMASYLABS_PDB..."
-                sql "c##demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+            sandbox_ai)
+                log_step "Connecting as SANDBOX_AI (AI/MCP user) @ DEMASYLABS_PDB..."
+                sql "sandbox_ai/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                ;;
+            demasy)
+                log_step "Connecting as DEMASY @ DEMASYLABS_PDB..."
+                sql "demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
                 ;;
             demasy_ai)
                 log_step "Connecting as ${DEMASYLABS_DB_MCP_USER} (AI/MCP user) @ DEMASYLABS_PDB..."
                 sql "${DEMASYLABS_DB_MCP_USER}/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                ;;
+            demasylabs)
+                log_step "Connecting as C##DEMASY (common user) @ DEMASYLABS_PDB..."
+                sql "c##demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
                 ;;
         esac
         ;;
