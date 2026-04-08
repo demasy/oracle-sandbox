@@ -198,10 +198,18 @@ case "$ACTION" in
         ;;
     install)
         case "$RESOURCE" in
-            oracle)   log_warn "sandbox install oracle  — not implemented yet" ;;
-            client)   log_warn "sandbox install client  — not implemented yet" ;;
-            sqlcl)    log_warn "sandbox install sqlcl   — not implemented yet" ;;
-            sqlplus)  log_warn "sandbox install sqlplus — not implemented yet" ;;
+            oracle|client)
+                log_step "Installing Oracle Instant Client..."
+                bash /usr/demasy/scripts/oracle/admin/install-client.sh
+                ;;
+            sqlcl)
+                log_step "Installing SQLcl..."
+                bash /usr/demasy/scripts/oracle/admin/install-sqlcl.sh
+                ;;
+            sqlplus)
+                log_step "Installing SQL*Plus..."
+                bash /usr/demasy/scripts/oracle/admin/install-sqlplus.sh
+                ;;
         esac
         ;;
     uninstall)
