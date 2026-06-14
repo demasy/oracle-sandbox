@@ -173,6 +173,7 @@ RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/sqlcl
 RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/oracle
 
 # -------------------------------------------- [Oracle APEX Tools]
+# Use 'sandbox' CLI instead: sandbox download apex, sandbox install apex, sandbox start apex, etc.
 # RUN ln -s /usr/sandbox/app/system/download/download-apex.sh /usr/local/bin/download-apex
 # RUN ln -s /usr/sandbox/app/oracle/apex/install.sh /usr/local/bin/install-apex
 # RUN ln -s /usr/sandbox/app/oracle/apex/uninstall.sh /usr/local/bin/uninstall-apex
@@ -180,13 +181,14 @@ RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/oracle
 # RUN ln -s /usr/sandbox/app/oracle/apex/stop.sh /usr/local/bin/stop-apex
 
 # -------------------------------------------- [Software Install Tools]
+# Use 'sandbox' CLI instead: sandbox install client, sandbox install sqlcl, sandbox install apex, etc.
 # RUN ln -s /usr/sandbox/app/system/install/install-all.sh /usr/local/bin/install-all
 # RUN ln -s /usr/sandbox/app/system/install/install-client.sh /usr/local/bin/install-client
 # RUN ln -s /usr/sandbox/app/system/install/install-sqlplus.sh /usr/local/bin/install-sqlplus
 # RUN ln -s /usr/sandbox/app/system/install/install-sqlcl.sh /usr/local/bin/install-sqlcl
 
 # -------------------------------------------- [Admin & Diagnostics]
-# RUN ln -s /usr/sandbox/app/system/admin/healthcheck.sh /usr/local/bin/healthcheck
+RUN ln -s /usr/sandbox/app/system/admin/healthcheck.sh /usr/local/bin/healthcheck
 RUN ln -s /usr/sandbox/app/oracle/admin/create-pdb.sh /usr/local/bin/create-pdb
 RUN ln -s /usr/sandbox/app/oracle/admin/create-demasy-user.sh /usr/local/bin/create-demasy-user
 RUN ln -s /usr/sandbox/app/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
