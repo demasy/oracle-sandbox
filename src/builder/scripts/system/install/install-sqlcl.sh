@@ -38,14 +38,22 @@ if [ -d "/opt/oracle/sqlcl" ] && [ -f "/opt/oracle/sqlcl/bin/sql" ]; then
     exit 0
 fi
 
-log_info "Downloading SQLcl from oracle.com"
-log_warn "By downloading, you accept Oracle's license terms"
-echo ""
+OFFLINE_SQLCL="${SRC_OFFLINE_PATH:-/usr/sandbox/libs/oracle}/${SRC_OFFLINE_SQLCL:-SQLcl/sqlcl-latest.zip}"
 
-log_step "Downloading SQLcl..."
-log_info "Downloading from: oracle.com"
+if [ "${SRC_OFFLINE_MODE:-false}" = "true" ] && [ -f "${OFFLINE_SQLCL}" ]; then
+    log_info "Offline mode: using local SQLcl zip"
+    log_info "Source: ${OFFLINE_SQLCL}"
+    cp "${OFFLINE_SQLCL}" /tmp/sqlcl.zip
+else
+    log_info "Downloading SQLcl from oracle.com"
+    log_warn "By downloading, you accept Oracle's license terms"
+    echo ""
 
-curl -L -o /tmp/sqlcl.zip "https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip"
+    SQLCL_URL="${SRC_ORACLE_SQLCL:-https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip}"
+    log_step "Downloading SQLcl..."
+    log_info "Downloading from: ${SQLCL_URL}"
+    curl -L -o /tmp/sqlcl.zip "${SQLCL_URL}"
+fi
 
 if [ $? -eq 0 ]; then
     log_step "Extracting SQLcl..."
