@@ -7,7 +7,7 @@ VALID_SQLCL_USERS="sys system sandbox sandbox_ai demasy demasy_ai"
 
 case "$RESOURCE" in
     sqlcl)
-        SQLCL_USER="" SQLCL_PASS=""
+        SQLCL_USER="" SQLCL_PASS="" SQLCL_PDB=""
         set -- $PARAMS
         while [[ $# -gt 0 ]]; do
             case "$1" in
@@ -30,12 +30,22 @@ case "$RESOURCE" in
                     fi
                     SQLCL_PASS="$2"; shift 2
                     ;;
+                --pdb|-pdb)
+                    if [[ -z "${2:-}" ]]; then
+                        echo ""
+                        log_error "--pdb requires a PDB name"
+                        echo ""
+                        exit 1
+                    fi
+                    SQLCL_PDB="$2"; shift 2
+                    ;;
                 *)
                     echo ""
                     log_error "Unknown parameter '${1}' for sandbox run sqlcl"
                     echo -e "  ${YELLOW}Parameters:${NC}"
                     echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} <user>       Required. One of: ${VALID_SQLCL_USERS}"
                     echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: Default Password"
+                    echo -e "    ${CYAN}--pdb${NC} <PDB name>          Optional. Override the default PDB"
                     echo ""
                     exit 1
                     ;;
@@ -69,28 +79,34 @@ case "$RESOURCE" in
 
         case "$SQLCL_USER" in
             sys)
-                log_step "Connecting as SYS (sysdba) @ ${DEMASYLABS_DB_SERVICE}..."
-                sql "sys/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${DEMASYLABS_DB_SERVICE}" as sysdba
+                CONN_PDB="${SQLCL_PDB:-${DEMASYLABS_DB_SERVICE}}"
+                log_step "Connecting as SYS (sysdba) @ ${CONN_PDB}..."
+                sql "sys/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}" as sysdba
                 ;;
             system)
-                log_step "Connecting as SYSTEM @ ${DEMASYLABS_DB_SERVICE}..."
-                sql "system/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${DEMASYLABS_DB_SERVICE}"
+                CONN_PDB="${SQLCL_PDB:-${DEMASYLABS_DB_SERVICE}}"
+                log_step "Connecting as SYSTEM @ ${CONN_PDB}..."
+                sql "system/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
             sandbox)
-                log_step "Connecting as SANDBOX @ SANDBOX_PDB..."
-                sql "sandbox/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/SANDBOX_PDB"
+                CONN_PDB="${SQLCL_PDB:-SANDBOX_PDB}"
+                log_step "Connecting as SANDBOX @ ${CONN_PDB}..."
+                sql "sandbox/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
             sandbox_ai)
-                log_step "Connecting as SANDBOX_AI (AI/MCP user) @ SANDBOX_PDB..."
-                sql "sandbox_ai/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/SANDBOX_PDB"
+                CONN_PDB="${SQLCL_PDB:-SANDBOX_PDB}"
+                log_step "Connecting as SANDBOX_AI (AI/MCP user) @ ${CONN_PDB}..."
+                sql "sandbox_ai/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
             demasy)
-                log_step "Connecting as DEMASY @ DEMASYLABS_PDB..."
-                sql "demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                CONN_PDB="${SQLCL_PDB:-DEMASYLABS_PDB}"
+                log_step "Connecting as DEMASY @ ${CONN_PDB}..."
+                sql "demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
             demasy_ai)
-                log_step "Connecting as ${DEMASYLABS_DB_MCP_USER} (AI/MCP user) @ DEMASYLABS_PDB..."
-                sql "${DEMASYLABS_DB_MCP_USER}/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                CONN_PDB="${SQLCL_PDB:-DEMASYLABS_PDB}"
+                log_step "Connecting as ${DEMASYLABS_DB_MCP_USER} (AI/MCP user) @ ${CONN_PDB}..."
+                sql "${DEMASYLABS_DB_MCP_USER}/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
         esac
         ;;

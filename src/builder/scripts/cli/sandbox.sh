@@ -75,6 +75,7 @@ print_usage() {
     echo -e "  ${YELLOW}SQLcl parameters:${NC}"
     echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} sys | system | sandbox | sandbox_ai | demasy | demasy_ai"
     echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   (default: Default Password)"
+    echo -e "    ${CYAN}--pdb${NC} <PDB name>      (override default PDB for user)"
     echo ""
     echo -e "  ${YELLOW}Download parameters:${NC}"
     echo -e "    ${CYAN}apex -s${NC}, ${CYAN}--standalone${NC}   Download APEX only"
