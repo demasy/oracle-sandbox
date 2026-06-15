@@ -296,7 +296,7 @@ EOF
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox user setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh sandbox minimal SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh sandbox all SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox privileges granted" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox privilege grant failed" >> "$AUTO_USER_LOG"
@@ -316,7 +316,7 @@ EOF
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy user setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh demasy minimal DEMASYLABS_PDB \
+        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh demasy all DEMASYLABS_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy privileges granted" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy privilege grant failed" >> "$AUTO_USER_LOG"
