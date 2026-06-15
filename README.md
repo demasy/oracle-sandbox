@@ -290,10 +290,10 @@ Start only specific services:
 
 ```bash
 # Database only
-docker-compose up -d demasylabs-oracle-database
+docker-compose up -d sandbox-oracle-database
 
 # Management server only
-docker-compose up -d demasylabs-oracle-server
+docker-compose up -d sandbox-oracle-server
 ```
 
 <br>
@@ -303,14 +303,14 @@ docker-compose up -d demasylabs-oracle-server
 ##### 1. Check Container Status
 
 ```bash
-docker ps --filter "name=demasylabs-oracle-database" --filter "name=demasylabs-oracle-server"
+docker ps --filter "name=sandbox-oracle-database" --filter "name=sandbox-oracle-server"
 ```
 
 **Expected output:**
 ```
 CONTAINER ID   IMAGE                                               STATUS                    PORTS                                              NAMES
-abc123def456   container-registry.oracle.com/database/free:latest  Up 2 minutes (healthy)    0.0.0.0:1521->1521/tcp, 0.0.0.0:5500->5500/tcp   demasylabs-oracle-database
-def456ghi789   demasylabs-oracle-sandbox:latest                    Up 2 minutes (healthy)    0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp   demasylabs-oracle-server
+abc123def456   container-registry.oracle.com/database/free:latest  Up 2 minutes (healthy)    0.0.0.0:1521->1521/tcp, 0.0.0.0:5500->5500/tcp   sandbox-oracle-database
+def456ghi789   demasylabs-oracle-sandbox:latest                    Up 2 minutes (healthy)    0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp   sandbox-oracle-server
 ```
 
 ##### 2. Wait for Database Initialization
@@ -318,7 +318,7 @@ def456ghi789   demasylabs-oracle-sandbox:latest                    Up 2 minutes 
 Monitor database startup (takes 5-10 minutes on first run):
 
 ```bash
-docker logs -f demasylabs-oracle-database
+docker logs -f sandbox-oracle-database
 ```
 
 **Look for:** `DATABASE IS READY TO USE!`
@@ -344,7 +344,7 @@ curl http://localhost:3000/health
 Access the management container:
 
 ```bash
-docker exec -it demasylabs-oracle-server bash
+docker exec -it sandbox-oracle-server bash
 ```
 
 Connect to the database:
@@ -379,11 +379,11 @@ docker-compose up -d
 
 # 3. Verify
 docker ps
-docker logs -f demasylabs-oracle-database  # Wait for "READY TO USE"
+docker logs -f sandbox-oracle-database  # Wait for "READY TO USE"
 curl http://localhost:3000/health
 
 # 4. (Optional) Run the APEX & ORDS installer inside the database container
-docker exec -it demasylabs-oracle-server bash
+docker exec -it sandbox-oracle-server bash
 /usr/demasy/scripts/apex/install-apex.sh
 exit
 
@@ -391,7 +391,7 @@ exit
 
 
 # 5. Connect
-docker exec -it demasylabs-oracle-server sqlcl
+docker exec -it sandbox-oracle-server sqlcl
 ```
 
 <br>
@@ -417,9 +417,9 @@ flowchart LR
 
         direction LR
         
-        mgmt["<b>demasylabs-oracle-server</b><br/>(Management Server)<br/><br/>Components:<br/>+ Node.js<br/>+ Oracle Client<br/><br/>Services:<br/>- sqlcl<br/>- sqlplus<br/>- healthcheck<br/><br/>Ports: <br/>- 3000<br/><br/><b>192.168.1.120</b>"]
+        mgmt["<b>sandbox-oracle-server</b><br/>(Management Server)<br/><br/>Components:<br/>+ Node.js<br/>+ Oracle Client<br/><br/>Services:<br/>- sqlcl<br/>- sqlplus<br/>- healthcheck<br/><br/>Ports: <br/>- 3000<br/><br/><b>192.168.1.120</b>"]
         
-        db["<b>demasylabs-oracle-database</b><br/>(Database Server)<br/><br/>Components:<br/>+ Oracle AI Database 26ai<br/>+ APEX 24.2<br/>+ ORDS 25.3<br/><br/>Ports:<br/>- 1521, 5500, 8080<br/><br/><b>192.168.1.110</b>"]
+        db["<b>sandbox-oracle-database</b><br/>(Database Server)<br/><br/>Components:<br/>+ Oracle AI Database 26ai<br/>+ APEX 24.2<br/>+ ORDS 25.3<br/><br/>Ports:<br/>- 1521, 5500, 8080<br/><br/><b>192.168.1.110</b>"]
         
          mgmt e1@---> |connects to| db
          e1@{ animation: fast }
@@ -438,12 +438,12 @@ flowchart LR
 
 <br>
 
-#### Database Service (`demasylabs-oracle-database`)
+#### Database Service (`sandbox-oracle-database`)
 
 | Component | Details |
 |-----------|---------|
 | Base Image | Oracle AI Database 26ai Free Edition |
-| Container Name | `demasylabs-oracle-database` |
+| Container Name | `sandbox-oracle-database` |
 | Database Name | DEMASY |
 | Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
 | Network | 192.168.1.110 |
@@ -452,12 +452,12 @@ flowchart LR
 
 <br>
 
-#### Management Server (`demasylabs-oracle-server`)
+#### Management Server (`sandbox-oracle-server`)
 
 | Component | Details |
 |-----------|---------|
 | Base Image | Node.js 20.19.4 |
-| Container Name | `demasylabs-oracle-server` |
+| Container Name | `sandbox-oracle-server` |
 | Exposed Port | 3000 (API & Health Check) |
 | Network | 192.168.1.120 |
 | Resources | • CPU: 1 core<br>• Memory: 512MB |
