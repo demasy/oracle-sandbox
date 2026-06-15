@@ -22,7 +22,7 @@
 #   run:                            oracle | mcp | sqlcl | healthcheck
 #   status:                         apex | mcp | oracle
 #   start / stop / restart:         apex | mcp
-#   install:                        oracle | client | sqlcl | sqlplus | apex
+#   install:                        apex
 #   uninstall:                      apex
 #   download:                       apex | ords
 #
@@ -41,7 +41,7 @@ source /usr/sandbox/app/system/utils/banner.sh
 resources_for() {
     case "$1" in
         download)                   echo "apex ords" ;;
-        install)                    echo "oracle client sqlcl sqlplus apex" ;;
+        install)                    echo "apex" ;;
         uninstall)                  echo "apex" ;;
         start)                      echo "apex mcp" ;;
         stop|restart)               echo "apex mcp" ;;
@@ -68,7 +68,7 @@ print_usage() {
     echo -e "    ${CYAN}start${NC}      apex | mcp"
     echo -e "    ${CYAN}stop${NC}       apex | mcp"
     echo -e "    ${CYAN}restart${NC}    apex | mcp"
-    echo -e "    ${CYAN}install${NC}    oracle | client | sqlcl | sqlplus | apex"
+    echo -e "    ${CYAN}install${NC}    apex"
     echo -e "    ${CYAN}uninstall${NC}  apex"
     echo -e "    ${CYAN}download${NC}   apex | ords"
     echo ""
