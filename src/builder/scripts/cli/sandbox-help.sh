@@ -120,14 +120,14 @@ case "$ACTION" in
         echo ""
         echo -e "  ${YELLOW}Parameters (mcp):${NC}"
         echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Use the default saved connection"
-        echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC}, ${CYAN}--connection${NC} <name>  Use the specified saved connection"
+        echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC} <name>  Use the specified saved connection"
         echo ""
         echo -e "  ${YELLOW}Examples:${NC}"
         echo -e "    sandbox start apex"
         echo -e "    sandbox start mcp -d"
         echo -e "    sandbox start mcp -c sandbox-mcp-conn"
         echo -e "    sandbox start mcp --conn sandbox-mcp-conn"
-        echo -e "    sandbox start mcp --connection demasy-mcp-conn"
+        echo -e "    sandbox start mcp --conn demasy-mcp-conn"
         echo ""
         ;;
     stop)

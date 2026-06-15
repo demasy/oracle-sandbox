@@ -3,15 +3,13 @@
 # Variables inherited: ACTION, RESOURCE, PARAMS, logging/color functions
 # ─────────────────────────────────────────────────────────────────────────────
 
-VALID_SQLCL_USERS="sys system sandbox sandbox_ai demasy demasy_ai"
-
 case "$RESOURCE" in
     sqlcl)
         SQLCL_USER="" SQLCL_PASS="" SQLCL_PDB=""
         set -- $PARAMS
         while [[ $# -gt 0 ]]; do
             case "$1" in
-                -u|-user|--user)
+                -u|--user)
                     if [[ -z "${2:-}" ]]; then
                         echo ""
                         log_error "--user requires a value"
@@ -21,7 +19,7 @@ case "$RESOURCE" in
                     fi
                     SQLCL_USER="$2"; shift 2
                     ;;
-                -p|-pass|--pass)
+                -p|--pass)
                     if [[ -z "${2:-}" ]]; then
                         echo ""
                         log_error "--pass requires a value"
@@ -30,7 +28,7 @@ case "$RESOURCE" in
                     fi
                     SQLCL_PASS="$2"; shift 2
                     ;;
-                --pdb|-pdb)
+                --pdb)
                     if [[ -z "${2:-}" ]]; then
                         echo ""
                         log_error "--pdb requires a PDB name"

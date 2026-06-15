@@ -37,6 +37,7 @@
 source /usr/sandbox/app/system/utils/colors.sh
 source /usr/sandbox/app/system/utils/logging.sh
 source /usr/sandbox/app/system/utils/banner.sh
+source /usr/sandbox/app/cli/sandbox-config.sh
 
 # ─── Resource sets per action ─────────────────────────────────────────────────
 
@@ -95,7 +96,7 @@ print_usage() {
     echo -e "  ${YELLOW}Examples:${NC}"
     echo -e "    sandbox run healthcheck"
     echo -e "    sandbox run sqlcl -u system"
-    echo -e "    sandbox start mcp --conn sandbox-mcp-conn"
+    echo -e "    sandbox start mcp -c sandbox-mcp-conn"
     echo -e "    sandbox install apex --dry-run"
     echo -e "    sandbox conn add --name my-conn --user demasy --pdb DEMASYLABS_PDB --quiet"
     echo ""
@@ -197,11 +198,17 @@ for _arg in "$@"; do
         *)          _filtered_args+=("$_arg") ;;
     esac
 done
+_first_real_arg="${_filtered_args[0]:-}"
 set -- "${_filtered_args[@]}"
 unset _filtered_args _arg
 
 clear
-[[ "${SANDBOX_QUIET:-0}" != "1" ]] && print_demasy_banner "Sandbox CLI"
+_suppress_banner=0
+[[ "${SANDBOX_QUIET:-0}" == "1" ]] && _suppress_banner=1
+[[ "$_first_real_arg" == "-h" || "$_first_real_arg" == "--help" ]] && _suppress_banner=1
+[[ "$_first_real_arg" == "status" || "$_first_real_arg" == "logs" ]] && _suppress_banner=1
+[[ "$_suppress_banner" == "0" ]] && print_demasy_banner "Sandbox CLI"
+unset _first_real_arg _suppress_banner
 
 if [[ $# -lt 1 ]]; then
     print_usage

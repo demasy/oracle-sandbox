@@ -13,7 +13,7 @@ case "$RESOURCE" in
                     MCP_FLAG="default"
                     shift
                     ;;
-                -c|-conn|--conn|--connection)
+                -c|--conn)
                     if [[ -z "${2:-}" ]]; then
                         echo ""
                         log_error "--conn requires a connection name"
@@ -30,7 +30,7 @@ case "$RESOURCE" in
                     log_error "Unknown parameter '${1}' for sandbox start mcp"
                     echo -e "  ${YELLOW}Parameters:${NC}"
                     echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Start MCP using the default saved connection"
-                    echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
+                    echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC} <name>  Start MCP using the specified saved connection"
                     echo ""
                     exit ${EXIT_USAGE:-1}
                     ;;
@@ -42,7 +42,7 @@ case "$RESOURCE" in
             log_error "sandbox start mcp requires a parameter"
             echo -e "  ${YELLOW}Parameters:${NC}"
             echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Start MCP using the default saved connection (demasylabs-ai-conn)"
-            echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
+            echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC} <name>  Start MCP using the specified saved connection"
             echo ""
             exit ${EXIT_USAGE:-1}
         fi

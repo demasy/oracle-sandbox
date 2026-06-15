@@ -50,7 +50,7 @@ _conn_do_add() {
     set -- $PARAMS
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --name|-name|-n)
+            --name|-n)
                 [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_NAME="$2"; shift 2 ;;
             --user|-u)
@@ -126,7 +126,7 @@ _conn_do_delete() {
     set -- $PARAMS
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --name|-name|-n)
+            --name|-n)
                 [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_NAME="$2"; shift 2 ;;
             *)
@@ -164,7 +164,7 @@ _conn_do_test() {
     set -- $PARAMS
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --name|-name|-n)
+            --name|-n)
                 [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_NAME="$2"; shift 2 ;;
             *)
