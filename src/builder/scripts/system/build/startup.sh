@@ -274,8 +274,26 @@ EOF
             exit 1
         fi
 
+        # Create PDBs — idempotent (skips if already exists)
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating PDBs..." >> "$AUTO_USER_LOG"
+
+        bash /usr/sandbox/app/oracle/admin/create-pdb.sh SANDBOX_PDB \
+            >> "$AUTO_USER_LOG" 2>&1 \
+            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] SANDBOX_PDB ready" >> "$AUTO_USER_LOG" \
+            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] SANDBOX_PDB creation failed" >> "$AUTO_USER_LOG"
+
+        bash /usr/sandbox/app/oracle/admin/create-pdb.sh DEMASYLABS_PDB \
+            >> "$AUTO_USER_LOG" 2>&1 \
+            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] DEMASYLABS_PDB ready" >> "$AUTO_USER_LOG" \
+            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] DEMASYLABS_PDB creation failed" >> "$AUTO_USER_LOG"
+
         # Create default users — idempotent (skips if already exists)
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating default database users..." >> "$AUTO_USER_LOG"
+
+        bash /usr/sandbox/app/oracle/admin/create-user.sh sandbox Demasy1986 SANDBOX_PDB \
+            >> "$AUTO_USER_LOG" 2>&1 \
+            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox user ready" >> "$AUTO_USER_LOG" \
+            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox user setup failed" >> "$AUTO_USER_LOG"
 
         bash /usr/sandbox/app/oracle/admin/create-user.sh demasy Demasy1986 DEMASYLABS_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
