@@ -115,6 +115,7 @@ RUN apt-get update && \
   telnet \
   tcpdump \
   net-tools \
+  procps \
   htop \
   jq \
   openssl \
