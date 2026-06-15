@@ -34,5 +34,6 @@ EOSQL
 if find /root/.dbtools/connections -name "dbtools.properties" 2>/dev/null | xargs grep -l "demasylabs-ai-conn" 2>/dev/null | grep -q .; then
     echo "Saved connection 'demasylabs-ai-conn' created successfully"
 else
-    echo "Warning: saved connection 'demasylabs-ai-conn' not found in ~/.dbtools/connections — setup may have failed"
+    echo "Error: saved connection 'demasylabs-ai-conn' not found in ~/.dbtools/connections — setup failed"
+    exit 1
 fi

@@ -7,7 +7,7 @@
 # ============================================
 
 # Set TERM environment variable if not set
-export TERM=${TERM:-xterm}
+export TERM=xterm
 
 # Source utility scripts using absolute paths
 source /usr/sandbox/app/system/utils/colors.sh
@@ -245,7 +245,7 @@ if [[ -n "$DEMASYLABS_DB_HOST" && -n "$DEMASYLABS_DB_PORT" && -n "$DEMASYLABS_DB
     AUTO_USER_LOG="/tmp/auto-user-setup.log"
 
     (
-        export TERM=${TERM:-xterm}
+        export TERM=xterm
         WAIT_TIMEOUT=${DEMASYLABS_STARTUP_DB_WAIT_TIMEOUT:-600}
         WAIT_INTERVAL=${DEMASYLABS_STARTUP_DB_WAIT_INTERVAL:-10}
         WAIT_ELAPSED=0
