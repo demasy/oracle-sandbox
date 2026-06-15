@@ -290,17 +290,17 @@ EOF
         # Create default users — idempotent (skips if already exists)
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating default database users..." >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/create-user.sh sandbox Demasy1986 SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/create-user.sh sandbox ${DEMASYLABS_DB_PASSWORD} SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox user setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/create-user.sh demasy Demasy1986 DEMASYLABS_PDB \
+        bash /usr/sandbox/app/oracle/admin/create-user.sh demasy ${DEMASYLABS_DB_PASSWORD} DEMASYLABS_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy user setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/create-user.sh demasylabs Demasy1986 DEMASYLABS_PDB \
+        bash /usr/sandbox/app/oracle/admin/create-user.sh demasylabs ${DEMASYLABS_DB_PASSWORD} DEMASYLABS_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasylabs user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasylabs user setup failed" >> "$AUTO_USER_LOG"
