@@ -67,8 +67,14 @@ WORKDIR /usr/sandbox/app
 RUN mkdir -p /opt/oracle
 
 # Install Oracle components (Instant Client + SQLcl)
-ENV TERM=xterm
+ENV TERM=xterm-256color
 RUN /usr/sandbox/app/system/build/builder-startup.sh
+
+# Fix terminal for interactive docker exec sessions (suppresses "(arg: N)" noise
+# caused by macOS terminal sending bracketed-paste sequences on attach)
+RUN echo '' >> /root/.bashrc \
+ && echo '[ -z "$TERM" ] || [ "$TERM" = "dumb" ] && export TERM=xterm-256color' >> /root/.bashrc \
+ && echo 'bind "set enable-bracketed-paste off" 2>/dev/null || true' >> /root/.bashrc
 
 # Download APEX and ORDS using download-apex.sh script (conditional)
 RUN if [ "$INSTALL_APEX" = "true" ]; then \
@@ -162,7 +168,6 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
 
 # Symbolic links to Oracle tools and scripts
 
-
 RUN ln -s /usr/sandbox/app/system/download/download.sh /usr/local/bin/download-oracle-components
 
 # -------------------------------------------- [CLI Tools]
@@ -172,7 +177,6 @@ RUN ln -s /usr/sandbox/app/oracle/sqlplus/sqlplus-connect.sh /usr/local/bin/sqlp
 RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/sqlcl
 # RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/oracle
 
-
 # -------------------------------------------- [Admin & Diagnostics]
 RUN ln -s /usr/sandbox/app/system/admin/healthcheck.sh /usr/local/bin/healthcheck
 RUN ln -s /usr/sandbox/app/oracle/admin/create-pdb.sh /usr/local/bin/create-pdb
@@ -181,7 +185,6 @@ RUN ln -s /usr/sandbox/app/oracle/admin/rollback-demasy-user.sh /usr/local/bin/r
 
 # -------------------------------------------- [MCP Tools]
 # RUN ln -s /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp
-
 
 # Verify installation and test SQLcl
 # Updated by demasy on November 11, 2025
@@ -209,4 +212,3 @@ WORKDIR /usr/sandbox/app
 
 # Use startup script to handle initialization
 CMD ["/usr/sandbox/app/system/build/startup.sh"]
-
