@@ -295,15 +295,30 @@ EOF
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox user setup failed" >> "$AUTO_USER_LOG"
 
+        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh sandbox minimal SANDBOX_PDB \
+            >> "$AUTO_USER_LOG" 2>&1 \
+            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox privileges granted" >> "$AUTO_USER_LOG" \
+            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox privilege grant failed" >> "$AUTO_USER_LOG"
+
         bash /usr/sandbox/app/oracle/admin/create-user.sh demasy ${DEMASYLABS_DB_PASSWORD} DEMASYLABS_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy user setup failed" >> "$AUTO_USER_LOG"
 
+        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh demasy minimal DEMASYLABS_PDB \
+            >> "$AUTO_USER_LOG" 2>&1 \
+            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy privileges granted" >> "$AUTO_USER_LOG" \
+            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy privilege grant failed" >> "$AUTO_USER_LOG"
+
         bash /usr/sandbox/app/oracle/admin/create-user.sh demasylabs ${DEMASYLABS_DB_PASSWORD} DEMASYLABS_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasylabs user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasylabs user setup failed" >> "$AUTO_USER_LOG"
+
+        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh demasylabs minimal DEMASYLABS_PDB \
+            >> "$AUTO_USER_LOG" 2>&1 \
+            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasylabs privileges granted" >> "$AUTO_USER_LOG" \
+            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasylabs privilege grant failed" >> "$AUTO_USER_LOG"
 
         # Set up MCP saved connection (stored in ~/.dbtools inside container)
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setting up MCP saved connection..." >> "$AUTO_USER_LOG"
