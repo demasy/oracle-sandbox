@@ -52,11 +52,27 @@ case "$RESOURCE" in
 
         if [[ -z "$SQLCL_USER" ]]; then
             echo ""
-            log_error "sandbox run sqlcl requires --user <user>"
-            echo -e "  ${YELLOW}Valid users:${NC} ${CYAN}${VALID_SQLCL_USERS}${NC}"
-            echo -e "  ${YELLOW}Example:${NC}    ${CYAN}sandbox run sqlcl --user system${NC}"
+            echo -e "  ${YELLOW}Select a user:${NC}"
             echo ""
-            exit ${EXIT_USAGE:-1}
+            _idx=1
+            for _u in $VALID_SQLCL_USERS; do
+                echo -e "    ${CYAN}${_idx})${NC} ${_u}"
+                _idx=$(( _idx + 1 ))
+            done
+            echo ""
+            printf "  Enter number: "
+            read -r _choice
+            echo ""
+            _idx=1
+            for _u in $VALID_SQLCL_USERS; do
+                [[ "$_idx" == "$_choice" ]] && SQLCL_USER="$_u" && break
+                _idx=$(( _idx + 1 ))
+            done
+            unset _idx _u _choice
+            if [[ -z "$SQLCL_USER" ]]; then
+                log_error "Invalid selection"
+                exit ${EXIT_USAGE:-1}
+            fi
         fi
 
         VALID_USER=false

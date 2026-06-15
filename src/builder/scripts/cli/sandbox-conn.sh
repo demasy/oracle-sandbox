@@ -202,6 +202,51 @@ _conn_do_test() {
     fi
 }
 
+# ── rename ────────────────────────────────────────────────────────────────────
+
+_conn_do_rename() {
+    local CONN_FROM="" CONN_TO=""
+    set -- $PARAMS
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --from|-f)
+                [[ -z "${2:-}" ]] && { log_error "--from requires a value"; exit ${EXIT_USAGE:-1}; }
+                CONN_FROM="$2"; shift 2 ;;
+            --to|-t)
+                [[ -z "${2:-}" ]] && { log_error "--to requires a value"; exit ${EXIT_USAGE:-1}; }
+                CONN_TO="$2"; shift 2 ;;
+            *)
+                log_error "Unknown parameter '${1}' for sandbox conn rename"
+                echo -e "  ${YELLOW}Parameters:${NC}"
+                echo -e "    ${CYAN}--from${NC}  <name>   Required. Current connection name"
+                echo -e "    ${CYAN}--to${NC}    <name>   Required. New connection name"
+                echo ""
+                exit ${EXIT_USAGE:-1} ;;
+        esac
+    done
+
+    [[ -z "$CONN_FROM" ]] && { log_error "sandbox conn rename requires --from <name>"; exit ${EXIT_USAGE:-1}; }
+    [[ -z "$CONN_TO" ]]   && { log_error "sandbox conn rename requires --to <name>"; exit ${EXIT_USAGE:-1}; }
+
+    local conn_dir
+    conn_dir=$(_conn_find_dir "$CONN_FROM")
+    if [[ -z "$conn_dir" ]]; then
+        log_error "Connection '${CONN_FROM}' not found."
+        echo -e "  ${YELLOW}Tip:${NC} Run ${CYAN}sandbox conn list${NC} to see available connections."
+        echo ""
+        exit ${EXIT_USAGE:-1}
+    fi
+
+    if [[ -n "$(_conn_find_dir "$CONN_TO")" ]]; then
+        log_error "A connection named '${CONN_TO}' already exists. Delete it first."
+        exit ${EXIT_USAGE:-1}
+    fi
+
+    local props="${conn_dir}/dbtools.properties"
+    sed -i "s/^name=${CONN_FROM}$/name=${CONN_TO}/" "$props"
+    log_success "Connection renamed: '${CONN_FROM}' → '${CONN_TO}'"
+}
+
 # ── Dispatch ──────────────────────────────────────────────────────────────────
 
 case "$RESOURCE" in
@@ -209,4 +254,5 @@ case "$RESOURCE" in
     add)     _conn_do_add ;;
     delete)  _conn_do_delete ;;
     test)    _conn_do_test ;;
+    rename)  _conn_do_rename ;;
 esac

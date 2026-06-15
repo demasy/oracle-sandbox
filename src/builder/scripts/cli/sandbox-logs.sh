@@ -102,9 +102,25 @@ _logs_do_mcp() {
 _logs_do_all() {
     log_step "All sandbox logs"
     echo ""
-    for f in "${LOGS_STARTUP[@]}" "${LOGS_APEX[@]}" "${LOGS_ORDS[@]}"; do
-        _logs_print_file "$f" "$LOGS_LINES" "$LOGS_FOLLOW"
-    done
+    if [[ "$LOGS_FOLLOW" == "true" ]]; then
+        # Multiplex all log files into one stream with file labels
+        local _all_files=()
+        for f in "${LOGS_STARTUP[@]}" "${LOGS_APEX[@]}" "${LOGS_ORDS[@]}"; do
+            [[ -f "$f" ]] && _all_files+=("$f")
+        done
+        if [[ ${#_all_files[@]} -eq 0 ]]; then
+            log_info "No log files found."
+            return
+        fi
+        tail -f "${_all_files[@]}" | awk '
+            /^==> .+ <==$/ { sub(/^==> /,""); sub(/ <==$/, ""); file=$0; next }
+            { print "  \033[36m[" file "]\033[0m " $0 }
+        '
+    else
+        for f in "${LOGS_STARTUP[@]}" "${LOGS_APEX[@]}" "${LOGS_ORDS[@]}"; do
+            _logs_print_file "$f" "$LOGS_LINES" "false"
+        done
+    fi
 }
 
 # ── Dispatch ──────────────────────────────────────────────────────────────────

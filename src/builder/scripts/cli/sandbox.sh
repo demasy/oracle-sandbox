@@ -50,7 +50,7 @@ resources_for() {
         stop|restart)               echo "apex mcp" ;;
         run)                        echo "sqlcl mcp healthcheck" ;;
         status)                     echo "database apex mcp" ;;
-        conn)                       echo "list add delete test" ;;
+        conn)                       echo "list add delete test rename" ;;
         logs)                       echo "apex install ords startup mcp all" ;;
         *)                          echo "" ;;
     esac
@@ -70,7 +70,7 @@ print_usage() {
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
     echo -e "    ${CYAN}run${NC}        sqlcl | mcp | healthcheck"
     echo -e "    ${CYAN}status${NC}     database | apex | mcp"
-    echo -e "    ${CYAN}conn${NC}       list | add | delete | test"
+    echo -e "    ${CYAN}conn${NC}       list | add | delete | rename | test"
     echo -e "    ${CYAN}logs${NC}       apex | install | ords | startup | mcp | all"
     echo -e "    ${CYAN}start${NC}      apex | mcp"
     echo -e "    ${CYAN}stop${NC}       apex | mcp"
@@ -223,16 +223,27 @@ fi
 
 validate_action "$ACTION"
 
-if [[ -z "$RESOURCE" ]]; then
-    echo ""
-    log_error "Missing resource for action '${ACTION}'"
-    valid=$(resources_for "$ACTION")
-    echo -e "  ${YELLOW}Available resources:${NC} ${CYAN}${valid}${NC}"
-    echo ""
-    exit 1
-fi
+# Actions that allow omitting the resource (run all resources as dashboard)
+_optional_resource_actions="status"
 
-validate_resource "$ACTION" "$RESOURCE"
+if [[ -z "$RESOURCE" ]]; then
+    _is_optional=false
+    for _a in $_optional_resource_actions; do
+        [[ "$_a" == "$ACTION" ]] && _is_optional=true && break
+    done
+    if [[ "$_is_optional" == false ]]; then
+        echo ""
+        log_error "Missing resource for action '${ACTION}'"
+        valid=$(resources_for "$ACTION")
+        echo -e "  ${YELLOW}Available resources:${NC} ${CYAN}${valid}${NC}"
+        echo ""
+        exit $EXIT_USAGE
+    fi
+    unset _is_optional _a _optional_resource_actions
+else
+    unset _optional_resource_actions
+    validate_resource "$ACTION" "$RESOURCE"
+fi
 
 # ─── Dispatch ───────────────────────────────────────────────────────────
 

@@ -52,6 +52,21 @@ case "${ACTION}/${RESOURCE}" in
         echo ""
         ;;
 
+    conn/rename)
+        echo ""
+        echo -e "  ${CYAN}sandbox conn rename${NC} — Rename a saved MCP connection"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox conn rename --from <name> --to <name>"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--from${NC}  <name>   Required. Current connection name"
+        echo -e "    ${CYAN}--to${NC}    <name>   Required. New connection name"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox conn rename --from sandbox-mcp --to demasy-mcp"
+        echo ""
+        ;;
+
     conn/test)
         echo ""
         echo -e "  ${CYAN}sandbox conn test${NC} — Test a saved MCP connection"
