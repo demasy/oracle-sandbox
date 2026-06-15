@@ -13,7 +13,7 @@ services:
       - ORACLE_PWD=${ENV_DB_PASSWORD}
       - ORACLE_CHARACTERSET=${ENV_DB_CHARACTERSET}
     volumes:
-      - demasylabs_oracle_vol:/opt/oracle/oradata
+      - sandbox_oracle_vol:/opt/oracle/oradata
     logging:
       driver: "json-file"
       options:
@@ -88,8 +88,8 @@ services:
       - DEMASYLABS_STARTUP_DB_WAIT_TIMEOUT=${ENV_STARTUP_DB_WAIT_TIMEOUT}
       - DEMASYLABS_STARTUP_DB_WAIT_INTERVAL=${ENV_STARTUP_DB_WAIT_INTERVAL}
     volumes:  
-      - demasylabs_logs_vol:/home/oracle/logs
-      - demasylabs_dbtools_vol:/root/.dbtools
+      - sandbox_logs_vol:/home/oracle/logs
+      - sandbox_dbtools_vol:/root/.dbtools
     logging:
       driver: "json-file"
       options:
@@ -131,12 +131,12 @@ networks:
           gateway: ${ENV_NETWORK_GATEWAY}
 
 volumes:
-  demasylabs_oracle_vol:
+  sandbox_oracle_vol:
     driver: local
-    name: demasylabs_oracle_vol
-  demasylabs_logs_vol:
+    name: sandbox_oracle_vol
+  sandbox_logs_vol:
     driver: local
-    name: demasylabs_logs_vol
-  demasylabs_dbtools_vol:
+    name: sandbox_logs_vol
+  sandbox_dbtools_vol:
     driver: local
-    name: demasylabs_dbtools_vol
+    name: sandbox_dbtools_vol
