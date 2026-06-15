@@ -5,6 +5,160 @@
 
 case "${ACTION}/${RESOURCE}" in
 
+    # ── conn ─────────────────────────────────────────────────────────────────
+
+    conn/list)
+        echo ""
+        echo -e "  ${CYAN}sandbox conn list${NC} — List all saved MCP connections"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox conn list"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox conn list"
+        echo ""
+        ;;
+
+    conn/add)
+        echo ""
+        echo -e "  ${CYAN}sandbox conn add${NC} — Add a new saved MCP connection"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox conn add [parameters]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--name${NC}  <name>       Required. Connection name"
+        echo -e "    ${CYAN}--user${NC}  <user>       Required. Database user"
+        echo -e "    ${CYAN}--pass${NC}  <password>   Optional. Default: env password"
+        echo -e "    ${CYAN}--host${NC}  <host>       Optional. Default: env host"
+        echo -e "    ${CYAN}--port${NC}  <port>       Optional. Default: env port"
+        echo -e "    ${CYAN}--pdb${NC}   <PDB name>   Optional. Default: env service"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox conn add --name sandbox-mcp --user demasy_ai --pdb DEMASYLABS_PDB"
+        echo -e "    sandbox conn add --name sandbox-mcp --user sandbox_ai --pdb SANDBOX_PDB"
+        echo ""
+        ;;
+
+    conn/delete)
+        echo ""
+        echo -e "  ${CYAN}sandbox conn delete${NC} — Delete a saved MCP connection"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox conn delete --name <name>"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--name${NC}  <name>   Required. Connection name to delete"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox conn delete --name sandbox-mcp"
+        echo ""
+        ;;
+
+    conn/test)
+        echo ""
+        echo -e "  ${CYAN}sandbox conn test${NC} — Test a saved MCP connection"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox conn test --name <name>"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--name${NC}  <name>   Required. Connection name to test"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox conn test --name sandbox-mcp"
+        echo ""
+        ;;
+
+    # ── logs ─────────────────────────────────────────────────────────────────
+
+    logs/apex)
+        echo ""
+        echo -e "  ${CYAN}sandbox logs apex${NC} — View APEX installation logs"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox logs apex [parameters]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
+        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox logs apex"
+        echo -e "    sandbox logs apex --follow"
+        echo ""
+        ;;
+
+    logs/install)
+        echo ""
+        echo -e "  ${CYAN}sandbox logs install${NC} — View all installation logs (APEX + ORDS)"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox logs install [parameters]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
+        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox logs install"
+        echo -e "    sandbox logs install --lines 100"
+        echo ""
+        ;;
+
+    logs/ords)
+        echo ""
+        echo -e "  ${CYAN}sandbox logs ords${NC} — View ORDS runtime log"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox logs ords [parameters]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
+        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox logs ords"
+        echo -e "    sandbox logs ords --follow"
+        echo ""
+        ;;
+
+    logs/startup)
+        echo ""
+        echo -e "  ${CYAN}sandbox logs startup${NC} — View container startup / user-setup log"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox logs startup [parameters]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
+        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox logs startup"
+        echo -e "    sandbox logs startup --follow"
+        echo ""
+        ;;
+
+    logs/mcp)
+        echo ""
+        echo -e "  ${CYAN}sandbox logs mcp${NC} — View MCP server log"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox logs mcp"
+        echo ""
+        echo -e "  ${WHITE}Note:${NC}      MCP server does not write a log file."
+        echo -e "             Use ${CYAN}sandbox run mcp${NC} to see output in the foreground."
+        echo ""
+        ;;
+
+    logs/all)
+        echo ""
+        echo -e "  ${CYAN}sandbox logs all${NC} — View all sandbox log files"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox logs all [parameters]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
+        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox logs all"
+        echo -e "    sandbox logs all --lines 20"
+        echo ""
+        ;;
+
     # ── run ──────────────────────────────────────────────────────────────────
 
     run/sqlcl)

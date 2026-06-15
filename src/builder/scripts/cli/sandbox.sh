@@ -21,6 +21,8 @@
 # Resources:
 #   run:                            sqlcl | mcp | healthcheck
 #   status:                         database | apex | mcp
+#   conn:                           list | add | delete | test
+#   logs:                           apex | install | ords | startup | mcp | all
 #   start / stop / restart:         apex | mcp
 #   install:                        apex
 #   uninstall:                      apex
@@ -47,6 +49,8 @@ resources_for() {
         stop|restart)               echo "apex mcp" ;;
         run)                        echo "sqlcl mcp healthcheck" ;;
         status)                     echo "database apex mcp" ;;
+        conn)                       echo "list add delete test" ;;
+        logs)                       echo "apex install ords startup mcp all" ;;
         *)                          echo "" ;;
     esac
 }
@@ -65,6 +69,8 @@ print_usage() {
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
     echo -e "    ${CYAN}run${NC}        sqlcl | mcp | healthcheck"
     echo -e "    ${CYAN}status${NC}     database | apex | mcp"
+    echo -e "    ${CYAN}conn${NC}       list | add | delete | test"
+    echo -e "    ${CYAN}logs${NC}       apex | install | ords | startup | mcp | all"
     echo -e "    ${CYAN}start${NC}      apex | mcp"
     echo -e "    ${CYAN}stop${NC}       apex | mcp"
     echo -e "    ${CYAN}restart${NC}    apex | mcp"
@@ -90,7 +96,7 @@ print_usage() {
 
 # ─── Validation ──────────────────────────────────────────────────────────────
 
-VALID_ACTIONS="download install uninstall start stop restart run status"
+VALID_ACTIONS="download install uninstall start stop restart run status conn logs"
 
 validate_action() {
     local action="$1"
