@@ -84,7 +84,7 @@ echo ""
 
 # Build image
 print_info "Building Docker image..."
-if docker-compose build demasylabs-oracle-server; then
+if docker-compose build sandbox-oracle-server; then
     print_success "Image built successfully"
 else
     print_error "Failed to build image"

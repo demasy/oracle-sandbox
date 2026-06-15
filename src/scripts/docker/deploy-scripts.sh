@@ -7,7 +7,7 @@
 #   ./deploy-scripts.sh [options]
 #
 # Options:
-#   --container <name>    Target container (default: demasylabs-oracle-server)
+#   --container <name>    Target container (default: sandbox-oracle-server)
 #   --scripts <dir>       Host scripts directory to sync (default: all admin scripts)
 #   --file <name>         Deploy a single script file only (e.g. create_user.sh)
 #   --symlink             Create symlink for deployed scripts in /usr/local/bin
@@ -60,7 +60,7 @@ log_dry()     { echo -e "  ${YELLOW}[DRY-RUN]${NC} $1"; }
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
-CONTAINER_NAME="demasylabs-oracle-server"
+CONTAINER_NAME="sandbox-oracle-server"
 HOST_ADMIN_DIR="$WORKSPACE_ROOT/src/builder/scripts/oracle/admin"
 HOST_APEX_DIR="$WORKSPACE_ROOT/src/builder/scripts/oracle/apex"
 HOST_MCP_DIR="$WORKSPACE_ROOT/src/builder/scripts/oracle/mcp"
