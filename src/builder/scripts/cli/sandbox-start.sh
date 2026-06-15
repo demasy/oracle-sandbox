@@ -19,7 +19,7 @@ case "$RESOURCE" in
                         log_error "--conn requires a connection name"
                         echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox start mcp --conn sandbox-mcp-conn${NC}"
                         echo ""
-                        exit 1
+                        exit ${EXIT_USAGE:-1}
                     fi
                     MCP_FLAG="conn"
                     MCP_CONN_NAME="$2"
@@ -32,7 +32,7 @@ case "$RESOURCE" in
                     echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Start MCP using the default saved connection"
                     echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
                     echo ""
-                    exit 1
+                    exit ${EXIT_USAGE:-1}
                     ;;
             esac
         done
@@ -44,7 +44,7 @@ case "$RESOURCE" in
             echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Start MCP using the default saved connection (demasylabs-ai-conn)"
             echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC}, ${CYAN}--connection${NC} <name>  Start MCP using the specified saved connection"
             echo ""
-            exit 1
+            exit ${EXIT_USAGE:-1}
         fi
 
         case "$MCP_FLAG" in

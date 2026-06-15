@@ -246,15 +246,28 @@ log_info "Monitor progress in another terminal: docker exec demasylabs-oracle-se
 (cd /opt/oracle/apex && sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba @/opt/oracle/apex/install_apex.sql) > /tmp/apex_install.log 2>&1 &
 APEX_PID=$!
 
-# Show progress dots while installation runs
-echo -n "Installing APEX"
+# Show progress dots with elapsed time while installation runs
+APEX_INSTALL_START=$(date +%s)
 while kill -0 $APEX_PID 2>/dev/null; do
-    echo -n "."
+    _now=$(date +%s)
+    _elapsed=$(( _now - APEX_INSTALL_START ))
+    _mins=$(( _elapsed / 60 ))
+    _secs=$(( _elapsed % 60 ))
+    if (( _mins > 0 )); then
+        _elapsed_str=$(printf "%dm %02ds" "$_mins" "$_secs")
+    else
+        _elapsed_str=$(printf "%ds" "$_secs")
+    fi
+    printf "\r  Installing APEX... [%s]" "$_elapsed_str"
     sleep 10
 done
 wait $APEX_PID
 APEX_EXIT_CODE=$?
-echo ""
+_now=$(date +%s)
+_total=$(( _now - APEX_INSTALL_START ))
+_mins=$(( _total / 60 ))
+_secs=$(( _total % 60 ))
+printf "\r  Installing APEX... done in %dm %02ds\n" "$_mins" "$_secs"
 
 if [ $APEX_EXIT_CODE -ne 0 ]; then
         log_error "APEX installation failed with exit code $APEX_EXIT_CODE"

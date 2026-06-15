@@ -17,7 +17,7 @@ case "$RESOURCE" in
                         log_error "--user requires a value"
                         echo -e "  ${YELLOW}Valid users:${NC} ${CYAN}${VALID_SQLCL_USERS}${NC}"
                         echo ""
-                        exit 1
+                        exit ${EXIT_USAGE:-1}
                     fi
                     SQLCL_USER="$2"; shift 2
                     ;;
@@ -26,7 +26,7 @@ case "$RESOURCE" in
                         echo ""
                         log_error "--pass requires a value"
                         echo ""
-                        exit 1
+                        exit ${EXIT_USAGE:-1}
                     fi
                     SQLCL_PASS="$2"; shift 2
                     ;;
@@ -35,7 +35,7 @@ case "$RESOURCE" in
                         echo ""
                         log_error "--pdb requires a PDB name"
                         echo ""
-                        exit 1
+                        exit ${EXIT_USAGE:-1}
                     fi
                     SQLCL_PDB="$2"; shift 2
                     ;;
@@ -47,7 +47,7 @@ case "$RESOURCE" in
                     echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: Default Password"
                     echo -e "    ${CYAN}--pdb${NC} <PDB name>          Optional. Override the default PDB"
                     echo ""
-                    exit 1
+                    exit ${EXIT_USAGE:-1}
                     ;;
             esac
         done
@@ -58,7 +58,7 @@ case "$RESOURCE" in
             echo -e "  ${YELLOW}Valid users:${NC} ${CYAN}${VALID_SQLCL_USERS}${NC}"
             echo -e "  ${YELLOW}Example:${NC}    ${CYAN}sandbox run sqlcl --user system${NC}"
             echo ""
-            exit 1
+            exit ${EXIT_USAGE:-1}
         fi
 
         VALID_USER=false
@@ -70,7 +70,7 @@ case "$RESOURCE" in
             log_error "Unknown user '${SQLCL_USER}' for sandbox run sqlcl"
             echo -e "  ${YELLOW}Valid users:${NC} ${CYAN}${VALID_SQLCL_USERS}${NC}"
             echo ""
-            exit 1
+            exit ${EXIT_USAGE:-1}
         fi
 
         CONN_PASS="${SQLCL_PASS:-${DEMASYLABS_DB_PASSWORD}}"

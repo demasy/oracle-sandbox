@@ -51,22 +51,22 @@ _conn_do_add() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --name|-name|-n)
-                [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit 1; }
+                [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_NAME="$2"; shift 2 ;;
             --user|-u)
-                [[ -z "${2:-}" ]] && { log_error "--user requires a value"; exit 1; }
+                [[ -z "${2:-}" ]] && { log_error "--user requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_USER="$2"; shift 2 ;;
             --pass|-p)
-                [[ -z "${2:-}" ]] && { log_error "--pass requires a value"; exit 1; }
+                [[ -z "${2:-}" ]] && { log_error "--pass requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_PASS="$2"; shift 2 ;;
             --host)
-                [[ -z "${2:-}" ]] && { log_error "--host requires a value"; exit 1; }
+                [[ -z "${2:-}" ]] && { log_error "--host requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_HOST="$2"; shift 2 ;;
             --port)
-                [[ -z "${2:-}" ]] && { log_error "--port requires a value"; exit 1; }
+                [[ -z "${2:-}" ]] && { log_error "--port requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_PORT="$2"; shift 2 ;;
             --pdb)
-                [[ -z "${2:-}" ]] && { log_error "--pdb requires a value"; exit 1; }
+                [[ -z "${2:-}" ]] && { log_error "--pdb requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_PDB="$2"; shift 2 ;;
             *)
                 log_error "Unknown parameter '${1}' for sandbox conn add"
@@ -78,17 +78,22 @@ _conn_do_add() {
                 echo -e "    ${CYAN}--port${NC}  <port>       Optional. Default: ${DEMASYLABS_DB_PORT}"
                 echo -e "    ${CYAN}--pdb${NC}   <PDB name>   Optional. Default: ${DEMASYLABS_DB_SERVICE}"
                 echo ""
-                exit 1 ;;
+                exit ${EXIT_USAGE:-1} ;;
         esac
     done
 
-    [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn add requires --name <name>"; exit 1; }
-    [[ -z "$CONN_USER" ]] && { log_error "sandbox conn add requires --user <user>"; exit 1; }
+    [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn add requires --name <name>"; exit ${EXIT_USAGE:-1}; }
+    [[ -z "$CONN_USER" ]] && { log_error "sandbox conn add requires --user <user>"; exit ${EXIT_USAGE:-1}; }
 
     CONN_PASS="${CONN_PASS:-${DEMASYLABS_DB_PASSWORD}}"
     CONN_HOST="${CONN_HOST:-${DEMASYLABS_DB_HOST}}"
     CONN_PORT="${CONN_PORT:-${DEMASYLABS_DB_PORT}}"
     CONN_PDB="${CONN_PDB:-${DEMASYLABS_DB_SERVICE}}"
+
+    if [[ "${SANDBOX_DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] Would save connection: ${CONN_NAME} → ${CONN_USER}@${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
+        return
+    fi
 
     # Remove existing connection with the same name so SQLcl won't refuse
     _existing=$(_conn_find_dir "$CONN_NAME")
@@ -110,7 +115,7 @@ EOSQL
         log_success "Connection '${CONN_NAME}' saved successfully."
     else
         log_error "Connection '${CONN_NAME}' was not saved — SQLcl may have reported an error above."
-        exit 1
+        exit ${EXIT_DB:-2}
     fi
 }
 
@@ -122,17 +127,17 @@ _conn_do_delete() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --name|-name|-n)
-                [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit 1; }
+                [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_NAME="$2"; shift 2 ;;
             *)
                 log_error "Unknown parameter '${1}' for sandbox conn delete"
                 echo -e "  ${YELLOW}Parameters:${NC}  ${CYAN}--name${NC} <name>   Required. Connection name to delete"
                 echo ""
-                exit 1 ;;
+                exit ${EXIT_USAGE:-1} ;;
         esac
     done
 
-    [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn delete requires --name <name>"; exit 1; }
+    [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn delete requires --name <name>"; exit ${EXIT_USAGE:-1}; }
 
     local conn_dir
     conn_dir=$(_conn_find_dir "$CONN_NAME")
@@ -140,7 +145,12 @@ _conn_do_delete() {
         log_error "Connection '${CONN_NAME}' not found."
         echo -e "  ${YELLOW}Tip:${NC} Run ${CYAN}sandbox conn list${NC} to see available connections."
         echo ""
-        exit 1
+        exit ${EXIT_USAGE:-1}
+    fi
+
+    if [[ "${SANDBOX_DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] Would delete connection: ${CONN_NAME} (${conn_dir})"
+        return
     fi
 
     rm -rf "$conn_dir"
@@ -155,17 +165,17 @@ _conn_do_test() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --name|-name|-n)
-                [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit 1; }
+                [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit ${EXIT_USAGE:-1}; }
                 CONN_NAME="$2"; shift 2 ;;
             *)
                 log_error "Unknown parameter '${1}' for sandbox conn test"
                 echo -e "  ${YELLOW}Parameters:${NC}  ${CYAN}--name${NC} <name>   Required. Connection name to test"
                 echo ""
-                exit 1 ;;
+                exit ${EXIT_USAGE:-1} ;;
         esac
     done
 
-    [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn test requires --name <name>"; exit 1; }
+    [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn test requires --name <name>"; exit ${EXIT_USAGE:-1}; }
 
     local conn_dir
     conn_dir=$(_conn_find_dir "$CONN_NAME")
@@ -173,7 +183,7 @@ _conn_do_test() {
         log_error "Connection '${CONN_NAME}' not found."
         echo -e "  ${YELLOW}Tip:${NC} Run ${CYAN}sandbox conn list${NC} to see available connections."
         echo ""
-        exit 1
+        exit ${EXIT_USAGE:-1}
     fi
 
     log_step "Testing connection '${CONN_NAME}'..."
@@ -188,7 +198,7 @@ _conn_do_test() {
         log_error "Connection '${CONN_NAME}' failed."
         echo "$result" | tail -10
         echo ""
-        exit 1
+        exit ${EXIT_DB:-2}
     fi
 }
 
