@@ -77,12 +77,12 @@ case "$RESOURCE" in
                 sql "system/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${DEMASYLABS_DB_SERVICE}"
                 ;;
             sandbox)
-                log_step "Connecting as SANDBOX @ DEMASYLABS_PDB..."
-                sql "sandbox/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                log_step "Connecting as SANDBOX @ SANDBOX_PDB..."
+                sql "sandbox/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/SANDBOX_PDB"
                 ;;
             sandbox_ai)
-                log_step "Connecting as SANDBOX_AI (AI/MCP user) @ DEMASYLABS_PDB..."
-                sql "sandbox_ai/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/DEMASYLABS_PDB"
+                log_step "Connecting as SANDBOX_AI (AI/MCP user) @ SANDBOX_PDB..."
+                sql "sandbox_ai/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/SANDBOX_PDB"
                 ;;
             demasy)
                 log_step "Connecting as DEMASY @ DEMASYLABS_PDB..."
