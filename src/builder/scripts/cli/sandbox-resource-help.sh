@@ -54,15 +54,6 @@ case "${ACTION}/${RESOURCE}" in
         echo ""
         ;;
 
-    run/database)
-        echo ""
-        echo -e "  ${CYAN}sandbox run database${NC} — Connect to the Oracle database"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox run database"
-        echo ""
-        echo -e "  ${WHITE}Note:${NC}      Not yet implemented."
-        echo ""
-        ;;
 
     # ── start ─────────────────────────────────────────────────────────────────
 
