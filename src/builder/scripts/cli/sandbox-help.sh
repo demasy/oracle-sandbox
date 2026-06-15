@@ -30,7 +30,7 @@ case "$ACTION" in
         echo -e "  ${YELLOW}Resources:${NC}"
         echo -e "    ${CYAN}sqlcl${NC}        Open an interactive SQLcl session"
         echo -e "    ${CYAN}mcp${NC}          Run the MCP server"
-        echo -e "    ${CYAN}oracle${NC}       Run Oracle tools"
+        echo -e "    ${CYAN}database${NC}     Connect to the Oracle database"
         echo -e "    ${CYAN}healthcheck${NC}  Run the Oracle sandbox healthcheck"
         echo ""
         echo -e "  ${YELLOW}Parameters (sqlcl):${NC}"

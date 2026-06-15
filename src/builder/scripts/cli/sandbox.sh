@@ -19,7 +19,7 @@
 #   download   Download Oracle components
 #
 # Resources:
-#   run:                            oracle | mcp | sqlcl | healthcheck
+#   run:                            database | mcp | sqlcl | healthcheck
 #   status:                         apex | mcp | oracle
 #   start / stop / restart:         apex | mcp
 #   install:                        apex
@@ -45,7 +45,7 @@ resources_for() {
         uninstall)                  echo "apex" ;;
         start)                      echo "apex mcp" ;;
         stop|restart)               echo "apex mcp" ;;
-        run)                        echo "oracle mcp sqlcl healthcheck" ;;
+        run)                        echo "database mcp sqlcl healthcheck" ;;
         status)                     echo "apex mcp oracle" ;;
         *)                          echo "" ;;
     esac
@@ -63,7 +63,7 @@ print_usage() {
     echo -e "           sandbox <action> <resource> -h | --help"
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
-    echo -e "    ${CYAN}run${NC}        oracle | mcp | sqlcl | healthcheck"
+    echo -e "    ${CYAN}run${NC}        database | mcp | sqlcl | healthcheck"
     echo -e "    ${CYAN}status${NC}     apex | mcp | oracle"
     echo -e "    ${CYAN}start${NC}      apex | mcp"
     echo -e "    ${CYAN}stop${NC}       apex | mcp"
