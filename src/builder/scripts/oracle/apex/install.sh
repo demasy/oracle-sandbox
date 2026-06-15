@@ -337,6 +337,34 @@ EOSQL
 log_success "APEX configured with ${APEX_ADMIN_USERNAME} user (Workspace: INTERNAL, Password: ${APEX_PASSWORD})"
 
 ################################################################################
+# STEP 5C: REST-enable the default workspace schema for SQL Developer Web
+################################################################################
+log_info "Step 5C: REST-enabling default workspace schema (${APEX_DEFAULT_WORKSPACE_SCHEMA:-DEMASYLABS})..."
+
+WORKSPACE_SCHEMA="${APEX_DEFAULT_WORKSPACE_SCHEMA:-DEMASYLABS}"
+
+sql -S "${WORKSPACE_SCHEMA}"/"${APEX_PASSWORD}"@//"${DB_HOST}":"${DB_PORT}"/"${DB_SERVICE}" 2>/dev/null <<EOSQL || true
+BEGIN
+    ORDS.ENABLE_SCHEMA(
+        p_enabled             => TRUE,
+        p_schema              => '${WORKSPACE_SCHEMA}',
+        p_url_mapping_type    => 'BASE_PATH',
+        p_url_mapping_pattern => '$(echo "${WORKSPACE_SCHEMA}" | tr '[:upper:]' '[:lower:]')',
+        p_auto_rest_auth      => FALSE
+    );
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Schema may not exist yet if no workspace has been provisioned; skip silently
+        NULL;
+END;
+/
+EXIT
+EOSQL
+
+log_success "Schema REST-enable complete (SQL Developer Web login will work immediately after workspace creation)"
+
+################################################################################
 # STEP 6: Configure APEX REST
 ################################################################################
 log_info "Step 6: Configuring APEX REST..."

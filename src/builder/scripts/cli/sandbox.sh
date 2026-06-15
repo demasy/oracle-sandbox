@@ -10,6 +10,7 @@
 #
 # Actions:
 #   run        Run / connect to a service
+#   status     Show running status of a service
 #   start      Start a service
 #   stop       Stop a service
 #   restart    Restart a service
@@ -19,6 +20,7 @@
 #
 # Resources:
 #   run:                            oracle | mcp | sqlcl | healthcheck
+#   status:                         apex | mcp | oracle
 #   start / stop / restart:         apex | mcp
 #   install:                        oracle | client | sqlcl | sqlplus | apex
 #   uninstall:                      apex
@@ -44,6 +46,7 @@ resources_for() {
         start)                      echo "apex mcp" ;;
         stop|restart)               echo "apex mcp" ;;
         run)                        echo "oracle mcp sqlcl healthcheck" ;;
+        status)                     echo "apex mcp oracle" ;;
         *)                          echo "" ;;
     esac
 }
@@ -61,6 +64,7 @@ print_usage() {
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
     echo -e "    ${CYAN}run${NC}        oracle | mcp | sqlcl | healthcheck"
+    echo -e "    ${CYAN}status${NC}     apex | mcp | oracle"
     echo -e "    ${CYAN}start${NC}      apex | mcp"
     echo -e "    ${CYAN}stop${NC}       apex | mcp"
     echo -e "    ${CYAN}restart${NC}    apex | mcp"
@@ -85,7 +89,7 @@ print_usage() {
 
 # ─── Validation ──────────────────────────────────────────────────────────────
 
-VALID_ACTIONS="download install uninstall start stop restart run"
+VALID_ACTIONS="download install uninstall start stop restart run status"
 
 validate_action() {
     local action="$1"

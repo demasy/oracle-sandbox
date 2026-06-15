@@ -95,7 +95,10 @@ case "$RESOURCE" in
         esac
         ;;
     oracle)   log_warn "sandbox run oracle — not implemented yet" ;;
-    mcp)      log_warn "sandbox run mcp    — not implemented yet" ;;
+    mcp)
+        log_step "Starting MCP server (foreground)..."
+        bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh
+        ;;
     healthcheck)
         log_step "Running healthcheck..."
         bash /usr/sandbox/app/system/admin/healthcheck.sh
