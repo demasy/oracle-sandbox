@@ -33,6 +33,8 @@ case "${ACTION}/${RESOURCE}" in
         echo -e "    sandbox run sqlcl --user demasy --pass mypassword"
         echo -e "    sandbox run sqlcl --user demasy --pdb SANDBOX_PDB"
         echo -e "    sandbox run sqlcl -u sandbox --pdb DEMASYLABS_PDB"
+        echo -e "    sandbox run sqlcl --user demasy --pdb DEMASYLABS_PDB"
+        echo -e "    sandbox run sqlcl -u sandbox --pdb SANDBOX_PDB"
         echo ""
         ;;
 
