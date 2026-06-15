@@ -11,14 +11,14 @@ case "$ACTION" in
         echo -e "  ${WHITE}Usage:${NC}     sandbox status <resource>"
         echo ""
         echo -e "  ${YELLOW}Resources:${NC}"
-        echo -e "    ${CYAN}apex${NC}     APEX/ORDS — process, port, HTTP endpoints"
-        echo -e "    ${CYAN}mcp${NC}      MCP server — process check"
-        echo -e "    ${CYAN}oracle${NC}   Oracle database — port and SQL connectivity"
+        echo -e "    ${CYAN}database${NC}  Oracle database — port and SQL connectivity"
+        echo -e "    ${CYAN}apex${NC}      APEX/ORDS — process, port, HTTP endpoints"
+        echo -e "    ${CYAN}mcp${NC}       MCP server — process check"
         echo ""
         echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox status database"
         echo -e "    sandbox status apex"
         echo -e "    sandbox status mcp"
-        echo -e "    sandbox status oracle"
         echo ""
         ;;
     run)

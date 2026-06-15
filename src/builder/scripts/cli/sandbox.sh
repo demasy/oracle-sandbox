@@ -20,7 +20,7 @@
 #
 # Resources:
 #   run:                            database | mcp | sqlcl | healthcheck
-#   status:                         apex | mcp | oracle
+#   status:                         database | apex | mcp
 #   start / stop / restart:         apex | mcp
 #   install:                        apex
 #   uninstall:                      apex
@@ -46,7 +46,7 @@ resources_for() {
         start)                      echo "apex mcp" ;;
         stop|restart)               echo "apex mcp" ;;
         run)                        echo "database mcp sqlcl healthcheck" ;;
-        status)                     echo "apex mcp oracle" ;;
+        status)                     echo "database apex mcp" ;;
         *)                          echo "" ;;
     esac
 }
@@ -64,7 +64,7 @@ print_usage() {
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
     echo -e "    ${CYAN}run${NC}        database | mcp | sqlcl | healthcheck"
-    echo -e "    ${CYAN}status${NC}     apex | mcp | oracle"
+    echo -e "    ${CYAN}status${NC}     database | apex | mcp"
     echo -e "    ${CYAN}start${NC}      apex | mcp"
     echo -e "    ${CYAN}stop${NC}       apex | mcp"
     echo -e "    ${CYAN}restart${NC}    apex | mcp"
