@@ -7,13 +7,10 @@ CONN_DIR="/root/.dbtools/connections"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-_conn_list_names() {
-    find "$CONN_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort | xargs -I{} basename {}
-}
-
-_conn_props_file() {
-    # SQLcl 26.x: ~/.dbtools/connections/<name>/dbtools.properties
-    echo "${CONN_DIR}/${1}/dbtools.properties"
+# SQLcl stores connections in hashed subdirs — find by name= property
+_conn_find_dir() {
+    local name="$1"
+    grep -rl "^name=${name}$" "${CONN_DIR}" 2>/dev/null | head -1 | xargs -I{} dirname {}
 }
 
 _conn_get_prop() {
@@ -24,10 +21,10 @@ _conn_get_prop() {
 # ── list ──────────────────────────────────────────────────────────────────────
 
 _conn_do_list() {
-    local names
-    names=$(_conn_list_names)
+    local props_files
+    props_files=$(find "$CONN_DIR" -name "dbtools.properties" 2>/dev/null | sort)
 
-    if [[ -z "$names" ]]; then
+    if [[ -z "$props_files" ]]; then
         log_info "No saved connections found."
         echo -e "  ${YELLOW}Tip:${NC} Use ${CYAN}sandbox conn add --name <name> --user <user> --pdb <PDB>${NC} to create one."
         echo ""
@@ -36,17 +33,13 @@ _conn_do_list() {
 
     echo -e "  ${YELLOW}Saved connections:${NC}"
     echo ""
-    while IFS= read -r name; do
-        local props
-        props=$(_conn_props_file "$name")
-        if [[ -f "$props" ]]; then
-            local url
-            url=$(_conn_get_prop "$props" "db_url")
-            echo -e "    ${CYAN}${name}${NC}  ${url}"
-        else
-            echo -e "    ${CYAN}${name}${NC}  ${YELLOW}(no properties file)${NC}"
-        fi
-    done <<< "$names"
+    while IFS= read -r props; do
+        local name user conn_str
+        name=$(_conn_get_prop "$props" "name")
+        user=$(_conn_get_prop "$props" "userName")
+        conn_str=$(_conn_get_prop "$props" "connectionString")
+        echo -e "    ${CYAN}${name}${NC}   ${user}@${conn_str}"
+    done <<< "$props_files"
     echo ""
 }
 
@@ -97,6 +90,13 @@ _conn_do_add() {
     CONN_PORT="${CONN_PORT:-${DEMASYLABS_DB_PORT}}"
     CONN_PDB="${CONN_PDB:-${DEMASYLABS_DB_SERVICE}}"
 
+    # Remove existing connection with the same name so SQLcl won't refuse
+    _existing=$(_conn_find_dir "$CONN_NAME")
+    if [[ -n "$_existing" ]]; then
+        log_info "Replacing existing connection '${CONN_NAME}'..."
+        rm -rf "$_existing"
+    fi
+
     log_step "Adding saved connection '${CONN_NAME}'..."
     echo -e "  ${YELLOW}User:${NC} ${CONN_USER}@${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
     echo ""
@@ -106,9 +106,7 @@ CONN -save "${CONN_NAME}" -savepwd ${CONN_USER}/${CONN_PASS}@//${CONN_HOST}:${CO
 EXIT
 EOSQL
 
-    local props
-    props=$(_conn_props_file "$CONN_NAME")
-    if [[ -f "$props" ]]; then
+    if [[ -n "$(_conn_find_dir "$CONN_NAME")" ]]; then
         log_success "Connection '${CONN_NAME}' saved successfully."
     else
         log_error "Connection '${CONN_NAME}' was not saved — SQLcl may have reported an error above."
@@ -136,8 +134,9 @@ _conn_do_delete() {
 
     [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn delete requires --name <name>"; exit 1; }
 
-    local conn_dir="${CONN_DIR}/${CONN_NAME}"
-    if [[ ! -d "$conn_dir" ]]; then
+    local conn_dir
+    conn_dir=$(_conn_find_dir "$CONN_NAME")
+    if [[ -z "$conn_dir" ]]; then
         log_error "Connection '${CONN_NAME}' not found."
         echo -e "  ${YELLOW}Tip:${NC} Run ${CYAN}sandbox conn list${NC} to see available connections."
         echo ""
@@ -168,9 +167,9 @@ _conn_do_test() {
 
     [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn test requires --name <name>"; exit 1; }
 
-    local props
-    props=$(_conn_props_file "$CONN_NAME")
-    if [[ ! -f "$props" ]]; then
+    local conn_dir
+    conn_dir=$(_conn_find_dir "$CONN_NAME")
+    if [[ -z "$conn_dir" ]]; then
         log_error "Connection '${CONN_NAME}' not found."
         echo -e "  ${YELLOW}Tip:${NC} Run ${CYAN}sandbox conn list${NC} to see available connections."
         echo ""
