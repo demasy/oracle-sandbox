@@ -18,7 +18,7 @@ fi
 print_demasy_banner() {
     local title="${1:-Banner}"
     
-    clear
+    clear 2>/dev/null || true
     echo ""
     echo -e "\e[0;33m ____  _____ __  __    _    ______   __\e[0m"
     echo -e "\e[0;33m|  _ \| ____|  \/  |  / \  / ___\ \ / /\e[0m"
