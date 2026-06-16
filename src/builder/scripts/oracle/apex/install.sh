@@ -148,7 +148,7 @@ ALTER SESSION SET CONTAINER=FREEPDB1;
 DECLARE
     v_count NUMBER;
 BEGIN
-    FOR rec IN (SELECT username FROM dba_users WHERE username IN ('APEX_PUBLIC_USER','APEX_PUBLIC_ROUTER','APEX_240200','ORDS_PUBLIC_USER','ORDS_METADATA')) LOOP
+    FOR rec IN (SELECT username FROM dba_users WHERE username IN ('APEX_PUBLIC_USER','APEX_PUBLIC_ROUTER','ORDS_PUBLIC_USER','ORDS_METADATA') OR username LIKE 'APEX\_%' ESCAPE '\') LOOP
         EXECUTE IMMEDIATE 'ALTER USER ' || rec.username || ' ACCOUNT UNLOCK';
         DBMS_OUTPUT.PUT_LINE('Unlocked: ' || rec.username);
     END LOOP;
@@ -240,7 +240,7 @@ echo -e "\e[1m☕ Grab a cup of coffee and relax...\e[0m"
 echo -e "\e[1m   Demasy will take care of installing Oracle APEX for you! 🚀\e[0m"
 echo ""
 log_info "Running APEX installation (this takes 3-5 minutes)..."
-log_info "Monitor progress in another terminal: docker exec demasylabs-oracle-server tail -f /tmp/apex_install.log"
+log_info "Monitor progress in another terminal: docker exec sandbox-oracle-server tail -f /tmp/apex_install.log"
 
 # Run installation from APEX directory (CRITICAL: cd is required)
 (cd /opt/oracle/apex && sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba @/opt/oracle/apex/install_apex.sql) > /tmp/apex_install.log 2>&1 &
@@ -333,10 +333,9 @@ END;
 /
 
 -- Unlock all APEX/ORDS user accounts with standard password
-ALTER USER APEX_PUBLIC_USER ACCOUNT UNLOCK;
 ALTER USER APEX_PUBLIC_USER IDENTIFIED BY ${APEX_PASSWORD};
+ALTER USER APEX_PUBLIC_USER ACCOUNT UNLOCK;
 ALTER USER APEX_PUBLIC_ROUTER ACCOUNT UNLOCK;
-ALTER USER APEX_240200 ACCOUNT UNLOCK;
 GRANT CREATE SESSION TO APEX_PUBLIC_USER;
 
 -- Verify ADMIN user was created correctly
@@ -350,32 +349,104 @@ EOSQL
 log_success "APEX configured with ${APEX_ADMIN_USERNAME} user (Workspace: INTERNAL, Password: ${APEX_PASSWORD})"
 
 ################################################################################
-# STEP 5C: REST-enable the default workspace schema for SQL Developer Web
+# STEP 5C: Create default APEX workspace and workspace admin user
 ################################################################################
-log_info "Step 5C: REST-enabling default workspace schema (${APEX_DEFAULT_WORKSPACE_SCHEMA:-DEMASYLABS})..."
+log_info "Step 5C: Creating default APEX workspace (${APEX_WORKSPACE:-DEMASYLABS})..."
 
-WORKSPACE_SCHEMA="${APEX_DEFAULT_WORKSPACE_SCHEMA:-DEMASYLABS}"
+WORKSPACE_NAME="${APEX_WORKSPACE:-DEMASYLABS}"
+WORKSPACE_SCHEMA="${APEX_DEFAULT_WORKSPACE_SCHEMA:-${WORKSPACE_NAME}}"
+WORKSPACE_SCHEMA_LOWER="$(echo "${WORKSPACE_SCHEMA}" | tr '[:upper:]' '[:lower:]')"
+WORKSPACE_ADMIN="${APEX_ADMIN_USERNAME:-demasylabs}"
 
-sql -S "${WORKSPACE_SCHEMA}"/"${APEX_PASSWORD}"@//"${DB_HOST}":"${DB_PORT}"/"${DB_SERVICE}" 2>/dev/null <<EOSQL || true
+sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba <<EOSQL
+ALTER SESSION SET CONTAINER=FREEPDB1;
+SET SERVEROUTPUT ON
+
+DECLARE
+    v_ws_count     NUMBER := 0;
+    v_user_count   NUMBER := 0;
 BEGIN
-    ORDS.ENABLE_SCHEMA(
-        p_enabled             => TRUE,
-        p_schema              => '${WORKSPACE_SCHEMA}',
-        p_url_mapping_type    => 'BASE_PATH',
-        p_url_mapping_pattern => '$(echo "${WORKSPACE_SCHEMA}" | tr '[:upper:]' '[:lower:]')',
-        p_auto_rest_auth      => FALSE
+    -- Remove existing workspace if present (idempotent)
+    BEGIN
+        SELECT COUNT(*) INTO v_ws_count
+        FROM apex_workspaces
+        WHERE workspace = UPPER('${WORKSPACE_NAME}');
+
+        IF v_ws_count > 0 THEN
+            APEX_INSTANCE_ADMIN.REMOVE_WORKSPACE(
+                p_workspace        => '${WORKSPACE_NAME}',
+                p_drop_users       => 'N',
+                p_drop_tablespaces => 'N'
+            );
+            DBMS_OUTPUT.PUT_LINE('Removed existing workspace ${WORKSPACE_NAME}');
+        END IF;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+
+    -- Create the primary schema if it doesn't already exist as a DB user
+    SELECT COUNT(*) INTO v_user_count
+    FROM dba_users
+    WHERE username = UPPER('${WORKSPACE_SCHEMA}');
+
+    IF v_user_count = 0 THEN
+        EXECUTE IMMEDIATE 'CREATE USER ' || UPPER('${WORKSPACE_SCHEMA}') ||
+            ' IDENTIFIED BY "${APEX_PASSWORD}" DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS';
+        EXECUTE IMMEDIATE 'GRANT CONNECT, RESOURCE, CREATE SESSION, CREATE VIEW TO ' || UPPER('${WORKSPACE_SCHEMA}');
+        DBMS_OUTPUT.PUT_LINE('Created schema ${WORKSPACE_SCHEMA} for workspace ${WORKSPACE_NAME}');
+    END IF;
+
+    -- Create workspace with schema
+    APEX_INSTANCE_ADMIN.ADD_WORKSPACE(
+        p_workspace    => '${WORKSPACE_NAME}',
+        p_primary_schema => '${WORKSPACE_SCHEMA}'
     );
+    DBMS_OUTPUT.PUT_LINE('Workspace ${WORKSPACE_NAME} created with schema ${WORKSPACE_SCHEMA}');
+
+    -- Create workspace admin user
+    -- SET_WORKSPACE alone leaves stale security-group context from the prior
+    -- REMOVE_WORKSPACE/ADD_WORKSPACE calls; explicitly re-deriving and setting
+    -- the security_group_id (as the INTERNAL admin block above already does)
+    -- ensures CREATE_USER hashes the password against the right workspace.
+    APEX_UTIL.SET_WORKSPACE('${WORKSPACE_NAME}');
+    APEX_UTIL.SET_SECURITY_GROUP_ID(APEX_UTIL.FIND_SECURITY_GROUP_ID(p_workspace => '${WORKSPACE_NAME}'));
+    BEGIN
+        APEX_UTIL.REMOVE_USER(p_user_name => '${WORKSPACE_ADMIN}');
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    APEX_UTIL.CREATE_USER(
+        p_user_name                    => '${WORKSPACE_ADMIN}',
+        p_email_address                => '${APEX_EMAIL}',
+        p_web_password                 => '${APEX_PASSWORD}',
+        p_developer_privs              => 'ADMIN:CREATE:DATA_LOADER:EDIT:HELP:MONITOR:SQL',
+        p_change_password_on_first_use => 'N'
+    );
+
+    -- CREATE_USER's p_change_password_on_first_use is not honored at creation time
+    -- (instance policy overrides it), which blocks the very first login. Re-apply
+    -- it via EDIT_USER, and push out account_expiry past its midnight-of-today default.
+    -- EDIT_USER overwrites the full row, not just the given params, so the developer
+    -- role / default schema / schema access set by CREATE_USER must be re-passed here
+    -- or they get silently wiped to NULL (which then also blocks login).
+    APEX_UTIL.EDIT_USER(
+        p_user_id                      => APEX_UTIL.GET_USER_ID(p_username => '${WORKSPACE_ADMIN}'),
+        p_user_name                    => '${WORKSPACE_ADMIN}',
+        p_developer_roles              => 'ADMIN:CREATE:DATA_LOADER:EDIT:HELP:MONITOR:SQL',
+        p_default_schema               => '${WORKSPACE_SCHEMA}',
+        p_allow_access_to_schemas      => '${WORKSPACE_SCHEMA}',
+        p_account_expiry               => SYSDATE + 365,
+        p_change_password_on_first_use => 'N',
+        p_first_password_use_occurred  => 'Y'
+    );
+
+    DBMS_OUTPUT.PUT_LINE('Workspace admin ${WORKSPACE_ADMIN} created in ${WORKSPACE_NAME}');
+
     COMMIT;
-EXCEPTION
-    WHEN OTHERS THEN
-        -- Schema may not exist yet if no workspace has been provisioned; skip silently
-        NULL;
 END;
 /
 EXIT
 EOSQL
 
-log_success "Schema REST-enable complete (SQL Developer Web login will work immediately after workspace creation)"
+log_success "Workspace ${WORKSPACE_NAME:-DEMASYLABS} created with admin ${WORKSPACE_ADMIN:-demasylabs}"
 
 ################################################################################
 # STEP 6: Configure APEX REST
@@ -384,12 +455,11 @@ log_info "Step 6: Configuring APEX REST..."
 
 if [ -f "/opt/oracle/apex/apex_rest_config.sql" ]; then
     log_info "Running APEX REST configuration..."
-    (cd /opt/oracle/apex && sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba << 'EOSQL' 2>&1 | tee /tmp/apex_rest_config.log
+    sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba << 'EOSQL' 2>&1 | tee /tmp/apex_rest_config.log
 ALTER SESSION SET CONTAINER=FREEPDB1;
-@apex_rest_config.sql
+@/opt/oracle/apex/apex_rest_config.sql
 EXIT
 EOSQL
-)
     if grep -qi "error\|failed" /tmp/apex_rest_config.log 2>/dev/null; then
         log_warn "APEX REST config reported warnings (may be already configured)"
     else
@@ -531,6 +601,43 @@ EXIT
 EOSQL
 
 log_success "ORDS configuration verified - SQL Developer Web is enabled"
+
+################################################################################
+# STEP 8C: REST-enable workspace schema (ORDS_METADATA now exists)
+################################################################################
+_WS_SCHEMA="${WORKSPACE_SCHEMA:-DEMASYLABS}"
+_WS_PATTERN="$(echo "${_WS_SCHEMA}" | tr '[:upper:]' '[:lower:]')"
+log_info "Step 8C: REST-enabling workspace schema ${_WS_SCHEMA} for SQL Developer Web..."
+
+sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba <<EOSQL
+ALTER SESSION SET CONTAINER=FREEPDB1;
+SET SERVEROUTPUT ON
+
+DECLARE
+    v_schema  VARCHAR2(128) := '${_WS_SCHEMA}';
+    v_pattern VARCHAR2(128) := '${_WS_PATTERN}';
+BEGIN
+    EXECUTE IMMEDIATE 'GRANT INHERIT PRIVILEGES ON USER ' || v_schema || ' TO ORDS_METADATA';
+
+    ORDS_ADMIN.ENABLE_SCHEMA(
+        p_enabled             => TRUE,
+        p_schema              => v_schema,
+        p_url_mapping_type    => 'BASE_PATH',
+        p_url_mapping_pattern => v_pattern,
+        p_auto_rest_auth      => FALSE
+    );
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('REST-enabled: ' || v_schema || ' -> /ords/' || v_pattern || '/_sdw/');
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('REST-enable warning: ' || SQLERRM);
+END;
+/
+EXIT
+EOSQL
+
+log_success "SQL Developer Web ready: http://localhost:8080/ords/${_WS_PATTERN}/_sdw/"
+unset _WS_SCHEMA _WS_PATTERN
 
 ################################################################################
 # STEP 9: Configure ORDS Pool
@@ -733,28 +840,30 @@ log_info "Step 11: Starting ORDS..."
 log_info "Final account unlock and password verification (resetting to default password)..."
 # Reset and unlock a standard list of users to the configured APEX_PASSWORD.
 sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba <<EOSQL
+SET DEFINE OFF
 ALTER SESSION SET CONTAINER=FREEPDB1;
 BEGIN
     FOR r IN (
         SELECT username FROM dba_users
-        WHERE username IN ('APEX_PUBLIC_USER','APEX_PUBLIC_ROUTER','APEX_240200','ORDS_PUBLIC_USER','ORDS_METADATA')
+        WHERE username IN ('APEX_PUBLIC_USER','APEX_PUBLIC_ROUTER','ORDS_PUBLIC_USER','ORDS_METADATA')
+           OR username LIKE 'APEX\_%' ESCAPE '\'
     ) LOOP
         BEGIN
             EXECUTE IMMEDIATE 'ALTER USER ' || r.username || ' IDENTIFIED BY ${APEX_PASSWORD}';
             EXECUTE IMMEDIATE 'ALTER USER ' || r.username || ' ACCOUNT UNLOCK';
-            DBMS_OUTPUT.PUT_LINE('✓ Reset & unlocked: ' || r.username);
+            DBMS_OUTPUT.PUT_LINE('Unlocked: ' || r.username);
         EXCEPTION
             WHEN OTHERS THEN
-                DBMS_OUTPUT.PUT_LINE('  Could not reset/unlock ' || r.username || ': ' || SQLERRM);
+                DBMS_OUTPUT.PUT_LINE('Could not unlock ' || r.username || ': ' || SQLERRM);
         END;
     END LOOP;
 END;
 /
 
--- Verify account status
-SELECT 'Account Status: ' || username || ' - ' || account_status 
-FROM dba_users 
-WHERE username IN ('APEX_PUBLIC_USER','APEX_PUBLIC_ROUTER','APEX_240200','ORDS_PUBLIC_USER','ORDS_METADATA')
+SELECT 'Account Status: ' || username || ' - ' || account_status
+FROM dba_users
+WHERE username IN ('APEX_PUBLIC_USER','APEX_PUBLIC_ROUTER','ORDS_PUBLIC_USER','ORDS_METADATA')
+   OR username LIKE 'APEX\_%' ESCAPE '\'
 ORDER BY username;
 
 EXIT
@@ -836,24 +945,24 @@ echo "=================================================================="
 echo " Database Status:"
 echo "=================================================================="
 
-sql -S sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba << 'EOSQL'
+sql -S sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba << 'EOSQL' | sed 's/^  /  \xe2\x9c\x93 /'
 SET HEADING OFF FEEDBACK OFF
 ALTER SESSION SET CONTAINER=FREEPDB1;
 
 -- APEX Version
-SELECT '  ✓ APEX Version: ' || version || ' (Status: ' || status || ')' 
+SELECT '  APEX Version: ' || version || ' (Status: ' || status || ')'
 FROM dba_registry WHERE comp_id='APEX';
 
 -- APEX Schemas
-SELECT '  ✓ APEX Schema: ' || username 
-FROM dba_users 
-WHERE username LIKE 'APEX%' 
+SELECT '  APEX Schema: ' || username
+FROM dba_users
+WHERE username LIKE 'APEX%'
 ORDER BY username;
 
 -- ORDS Schemas
-SELECT '  ✓ ORDS Schema: ' || username 
-FROM dba_users 
-WHERE username LIKE 'ORDS%' 
+SELECT '  ORDS Schema: ' || username
+FROM dba_users
+WHERE username LIKE 'ORDS%'
 ORDER BY username;
 
 EXIT
@@ -961,7 +1070,7 @@ COMPLETION_MSG_SCRIPT="/usr/sandbox/app/system/utils/apex-completion.sh"
 if [ -f "$COMPLETION_MSG_SCRIPT" ]; then
     source "$COMPLETION_MSG_SCRIPT"
     # Display completion message with credentials
-    display_completion_message "${APEX_ADMIN_USERNAME}" "${APEX_PASSWORD}" "${APEX_EMAIL}" "8080"
+    display_completion_message "${APEX_ADMIN_USERNAME}" "${APEX_PASSWORD}" "${APEX_EMAIL}" "8080" "${WORKSPACE_NAME:-DEMASYLABS}"
 else
     echo "Warning: apex-completion.sh not found at $COMPLETION_MSG_SCRIPT"
     echo "Installation completed successfully!"
