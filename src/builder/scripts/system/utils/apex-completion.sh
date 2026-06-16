@@ -26,36 +26,56 @@ display_completion_message() {
     local APEX_PASSWORD="${2}"
     local APEX_EMAIL="${3}"
     local ORDS_PORT="${4:-8080}"
-    
+    local WORKSPACE_NAME="${5:-DEMASYLABS}"
+    local WORKSPACE_SCHEMA_LOWER="$(echo "${WORKSPACE_NAME}" | tr '[:upper:]' '[:lower:]')"
+
     # Clear terminal and show Demasy Labs banner
     print_demasy_banner "APEX Installation Complete ✅"
     echo ""
     echo ""
-    
+
     # APEX Details Section
     echo -e "${BOLD}${BLUE}🚀 APEX Details:${NC}"
     echo -e "${DIM}  ─────────────────────────────────────────────────────────────${NC}"
     echo -e "  ${GREEN}Application Builder:${NC}  http://localhost:${ORDS_PORT}/ords/f?p=4550:1"
-    echo -e "  ${GREEN}SQL Developer Web:${NC}    http://localhost:${ORDS_PORT}/ords/sql-developer"
+    echo -e "  ${GREEN}SQL Developer Web:${NC}    http://localhost:${ORDS_PORT}/ords/${WORKSPACE_SCHEMA_LOWER}/_sdw/"
     echo -e "  ${GREEN}APEX Admin:${NC}           http://localhost:${ORDS_PORT}/ords/apex_admin"
     echo ""
-    
-    # Login Credentials Section
-    echo -e "${BOLD}${BLUE}🔐 Login Credentials:${NC}"
+
+    # Login Credentials — INTERNAL (global admin)
+    echo -e "${BOLD}${BLUE}🔐 APEX Admin (INTERNAL workspace):${NC}"
     echo -e "${DIM}  ─────────────────────────────────────────────────────────────${NC}"
     echo -e "  ${GREEN}Workspace:${NC} ${BOLD}INTERNAL${NC}"
     echo -e "  ${GREEN}Username:${NC}  ${BOLD}${APEX_ADMIN_USERNAME}${NC}"
     echo -e "  ${GREEN}Password:${NC}  ${BOLD}${APEX_PASSWORD}${NC}"
-    echo -e "  ${GREEN}Email:${NC}     ${BOLD}${APEX_EMAIL}${NC}"
+    echo -e "  ${GREEN}URL:${NC}       http://localhost:${ORDS_PORT}/ords/apex_admin"
     echo ""
-    
+
+    # Login Credentials — SQL Developer Web (authenticates as the DB schema, not the APEX workspace user)
+    echo -e "${BOLD}${BLUE}🔐 SQL Developer Web (schema: ${WORKSPACE_NAME}):${NC}"
+    echo -e "${DIM}  ─────────────────────────────────────────────────────────────${NC}"
+    echo -e "  ${GREEN}Username:${NC}  ${BOLD}${WORKSPACE_NAME}${NC}  ${DIM}(database schema, not the APEX admin user)${NC}"
+    echo -e "  ${GREEN}Password:${NC}  ${BOLD}${APEX_PASSWORD}${NC}"
+    echo -e "  ${GREEN}URL:${NC}       http://localhost:${ORDS_PORT}/ords/${WORKSPACE_SCHEMA_LOWER}/_sdw/"
+    echo ""
+
+    # Login Credentials — APEX workspace developer (used inside Application Builder, not SQL Developer Web)
+    echo -e "${BOLD}${BLUE}🔐 APEX Workspace Developer (workspace: ${WORKSPACE_NAME}):${NC}"
+    echo -e "${DIM}  ─────────────────────────────────────────────────────────────${NC}"
+    echo -e "  ${GREEN}Workspace:${NC} ${BOLD}${WORKSPACE_NAME}${NC}"
+    echo -e "  ${GREEN}Username:${NC}  ${BOLD}${APEX_ADMIN_USERNAME}${NC}"
+    echo -e "  ${GREEN}Password:${NC}  ${BOLD}${APEX_PASSWORD}${NC}"
+    echo -e "  ${GREEN}Email:${NC}     ${BOLD}${APEX_EMAIL}${NC}"
+    echo -e "  ${GREEN}URL:${NC}       http://localhost:${ORDS_PORT}/ords/f?p=4550:1"
+    echo ""
+
     # Management Commands Section
     echo -e "${BOLD}${BLUE}📋 Management Commands:${NC}"
     echo -e "${DIM}  ─────────────────────────────────────────────────────────────${NC}"
-    echo -e "  ${GREEN}Start ORDS:${NC}  ${BOLD}start-apex${NC}"
-    echo -e "  ${GREEN}Stop ORDS:${NC}   ${BOLD}stop-apex${NC}"
-    echo -e "  ${GREEN}View Logs:${NC}   ${BOLD}tail -f /tmp/ords.log${NC}"
-    echo -e "  ${GREEN}APEX Logs:${NC}   ${BOLD}tail -f /tmp/apex_install.log${NC}"
+    echo -e "  ${GREEN}Start ORDS:${NC}  ${BOLD}sandbox start apex${NC}"
+    echo -e "  ${GREEN}Stop ORDS:${NC}   ${BOLD}sandbox stop apex${NC}"
+    echo -e "  ${GREEN}View Logs:${NC}   ${BOLD}sandbox logs ords${NC}"
+    echo -e "  ${GREEN}APEX Logs:${NC}   ${BOLD}sandbox logs apex${NC}"
     echo ""
     
     # Installed Components Section
@@ -75,15 +95,12 @@ display_completion_message() {
     echo -e "${BOLD}${BLUE}🔧 Troubleshooting:${NC}"
     echo -e "${DIM}  ─────────────────────────────────────────────────────────────${NC}"
     echo -e "  ${BOLD}If APEX images not loading:${NC}"
-    echo -e "    ${CYAN}1.${NC} Verify: ${DIM}ls -la /tmp/i | wc -l${NC} [should show ~855 files]"
-    echo -e "    ${CYAN}2.${NC} Restart: ${BOLD}stop-apex && start-apex${NC}"
-    echo -e "    ${CYAN}3.${NC} Check logs: ${DIM}tail -f /tmp/ords.log${NC}"
+    echo -e "    ${CYAN}1.${NC} Restart: ${BOLD}sandbox restart apex${NC}"
+    echo -e "    ${CYAN}2.${NC} Check logs: ${BOLD}sandbox logs ords${NC}"
     echo ""
     echo -e "  ${BOLD}If connection errors:${NC}"
-    echo -e "    ${CYAN}1.${NC} Check accounts:"
-    echo -e "       ${DIM}SELECT username, account_status FROM dba_users${NC}"
-    echo -e "       ${DIM}WHERE username LIKE 'APEX%' OR username LIKE 'ORDS%';${NC}"
-    echo -e "    ${CYAN}2.${NC} Unlock: ${DIM}ALTER USER ORDS_PUBLIC_USER ACCOUNT UNLOCK;${NC}"
+    echo -e "    ${CYAN}1.${NC} Check accounts: ${DIM}SELECT username, account_status FROM dba_users WHERE username LIKE 'APEX%' OR username LIKE 'ORDS%';${NC}"
+    echo -e "    ${CYAN}2.${NC} Reinstall: ${BOLD}sandbox install apex${NC}"
     echo ""
     echo -e "${GREEN}═══════════════════════════════════════════════════════════════${NC}"
     echo ""
