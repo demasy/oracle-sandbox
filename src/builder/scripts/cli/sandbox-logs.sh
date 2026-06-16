@@ -10,8 +10,12 @@ LOGS_APEX=(
     "/tmp/apex_rest_config.log"
 )
 LOGS_ORDS=(
-    "/tmp/ords_install.log"
     "/tmp/ords.log"
+)
+LOGS_INSTALL=(
+    "/tmp/apex_install.log"
+    "/tmp/apex_rest_config.log"
+    "/tmp/ords_install.log"
 )
 LOGS_STARTUP=(
     "/tmp/auto-user-setup.log"
@@ -60,17 +64,17 @@ _logs_parse_params() {
 # ── Resources ─────────────────────────────────────────────────────────────────
 
 _logs_do_apex() {
-    log_step "APEX installation logs"
+    log_step "APEX logs"
     echo ""
-    for f in "${LOGS_APEX[@]}" "${LOGS_ORDS[@]}"; do
+    for f in "${LOGS_APEX[@]}"; do
         _logs_print_file "$f" "$LOGS_LINES" "$LOGS_FOLLOW"
     done
 }
 
 _logs_do_install() {
-    log_step "Install logs"
+    log_step "Install logs (APEX + ORDS)"
     echo ""
-    for f in "${LOGS_APEX[@]}" "${LOGS_ORDS[@]}"; do
+    for f in "${LOGS_INSTALL[@]}"; do
         _logs_print_file "$f" "$LOGS_LINES" "$LOGS_FOLLOW"
     done
 }
@@ -105,7 +109,7 @@ _logs_do_all() {
     if [[ "$LOGS_FOLLOW" == "true" ]]; then
         # Multiplex all log files into one stream with file labels
         local _all_files=()
-        for f in "${LOGS_STARTUP[@]}" "${LOGS_APEX[@]}" "${LOGS_ORDS[@]}"; do
+        for f in "${LOGS_STARTUP[@]}" "${LOGS_INSTALL[@]}" "${LOGS_ORDS[@]}"; do
             [[ -f "$f" ]] && _all_files+=("$f")
         done
         if [[ ${#_all_files[@]} -eq 0 ]]; then
@@ -117,7 +121,7 @@ _logs_do_all() {
             { print "  \033[36m[" file "]\033[0m " $0 }
         '
     else
-        for f in "${LOGS_STARTUP[@]}" "${LOGS_APEX[@]}" "${LOGS_ORDS[@]}"; do
+        for f in "${LOGS_STARTUP[@]}" "${LOGS_INSTALL[@]}" "${LOGS_ORDS[@]}"; do
             _logs_print_file "$f" "$LOGS_LINES" "false"
         done
     fi
