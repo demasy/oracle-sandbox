@@ -119,7 +119,6 @@ RUN apt-get update && \
   htop \
   jq \
   openssl \
-  git \
   && npm install -g nodemon \
   && rm -rf /var/lib/apt/lists/*
 
