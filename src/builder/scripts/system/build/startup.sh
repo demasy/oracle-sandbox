@@ -198,7 +198,7 @@ EOF
         #             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         #         else
         #             log_info "Running installation in background (logs saved to /tmp/apex-startup-install.log)"
-        #             log_info "Monitor progress: docker exec -it demasylabs-oracle-server tail -f /tmp/apex-startup-install.log"
+        #             log_info "Monitor progress: docker exec -it sandbox-oracle-server tail -f /tmp/apex-startup-install.log"
         #             echo ""
                     
         #             # Run installation in background
