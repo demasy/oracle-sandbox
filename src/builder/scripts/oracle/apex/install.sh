@@ -423,13 +423,17 @@ BEGIN
 
     -- CREATE_USER's p_change_password_on_first_use is not honored at creation time
     -- (instance policy overrides it), which blocks the very first login. Re-apply
-    -- it via EDIT_USER, and push out account_expiry past its midnight-of-today default.
-    -- EDIT_USER overwrites the full row, not just the given params, so the developer
-    -- role / default schema / schema access set by CREATE_USER must be re-passed here
-    -- or they get silently wiped to NULL (which then also blocks login).
+    -- it via EDIT_USER. EDIT_USER overwrites the full row, not just the given
+    -- params, so the developer role / default schema / schema access set by
+    -- CREATE_USER must be re-passed here or they get silently wiped to NULL
+    -- (which then also blocks login). Critically, p_web_password/p_new_password
+    -- must ALSO be re-passed (identical, non-null) or EDIT_USER clears the
+    -- password hash entirely, breaking login with "Invalid Login Credentials".
     APEX_UTIL.EDIT_USER(
         p_user_id                      => APEX_UTIL.GET_USER_ID(p_username => '${WORKSPACE_ADMIN}'),
         p_user_name                    => '${WORKSPACE_ADMIN}',
+        p_web_password                 => '${APEX_PASSWORD}',
+        p_new_password                 => '${APEX_PASSWORD}',
         p_developer_roles              => 'ADMIN:CREATE:DATA_LOADER:EDIT:HELP:MONITOR:SQL',
         p_default_schema               => '${WORKSPACE_SCHEMA}',
         p_allow_access_to_schemas      => '${WORKSPACE_SCHEMA}',
