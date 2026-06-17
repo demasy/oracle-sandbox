@@ -4,7 +4,8 @@
   "description": "<br>",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "validate": "docker compose config >/dev/null && find src/builder/scripts src/scripts -name '*.sh' -print0 | xargs -0 -n1 bash -n && node -c app.js",
+    "test": "npm run validate"
   },
   "repository": {
     "type": "git",
