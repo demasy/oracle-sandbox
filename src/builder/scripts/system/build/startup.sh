@@ -311,6 +311,16 @@ EOF
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox_ai privileges granted" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox_ai privilege grant failed" >> "$AUTO_USER_LOG"
 
+        # Set up MCP saved connection immediately after sandbox_ai is ready
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setting up MCP saved connection..." >> "$AUTO_USER_LOG"
+        DEMASYLABS_DB_MCP_USER="${DEMASYLABS_DB_MCP_USER:-${DEMASYLABS_DB_USER}}" \
+        DEMASYLABS_DB_MCP_SERVICE="${DEMASYLABS_DB_MCP_SERVICE}" \
+        DEMASYLABS_DB_PASSWORD="${DEMASYLABS_DB_PASSWORD:-${DEMASYLABS_DB_PASS}}" \
+        bash /usr/sandbox/app/oracle/mcp/setup-saved-connection.sh \
+            >> "$AUTO_USER_LOG" 2>&1 \
+            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] MCP saved connection ready" >> "$AUTO_USER_LOG" \
+            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] MCP saved connection setup failed" >> "$AUTO_USER_LOG"
+
         bash /usr/sandbox/app/oracle/admin/create-user.sh demasy ${DEMASYLABS_DB_PASSWORD} DEMASYLABS_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy user ready" >> "$AUTO_USER_LOG" \
@@ -330,15 +340,6 @@ EOF
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasylabs privileges granted" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasylabs privilege grant failed" >> "$AUTO_USER_LOG"
-
-        # Set up MCP saved connection (stored in ~/.dbtools inside container)
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setting up MCP saved connection..." >> "$AUTO_USER_LOG"
-        DEMASYLABS_DB_MCP_USER="${DEMASYLABS_DB_MCP_USER:-${DEMASYLABS_DB_USER}}" \
-        DEMASYLABS_DB_PASSWORD="${DEMASYLABS_DB_PASSWORD:-${DEMASYLABS_DB_PASS}}" \
-        bash /usr/sandbox/app/oracle/mcp/setup-saved-connection.sh \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] MCP saved connection ready" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] MCP saved connection setup failed" >> "$AUTO_USER_LOG"
 
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Auto-user setup complete" >> "$AUTO_USER_LOG"
     ) &

@@ -1,12 +1,12 @@
 #!/bin/bash
 ################################################################################
 # Setup Saved SQLcl Connection for MCP
-# Creates the demasylabs-ai-conn saved connection with credentials
+# Creates the sandbox-ai-conn saved connection with credentials
 ################################################################################
 
 # Resolve credentials — MCP user falls back to default DB user
 DEMASYLABS_DB_MCP_USER="${DEMASYLABS_DB_MCP_USER:-${DEMASYLABS_DB_USER}}"
-DEMASYLABS_DB_MCP_SERVICE="${DEMASYLABS_DB_MCP_SERVICE:-SANDBOX_PDB}"
+DEMASYLABS_DB_MCP_SERVICE="${DEMASYLABS_DB_MCP_SERVICE}"
 DEMASYLABS_DB_PASSWORD="${DEMASYLABS_DB_PASSWORD:-${DEMASYLABS_DB_PASS}}"
 
 # Check required environment variables
@@ -27,14 +27,14 @@ echo "User: ${DEMASYLABS_DB_MCP_USER}@${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT
 
 # Create (or overwrite) the saved connection — stores credentials in ~/.dbtools
 /opt/oracle/sqlcl/bin/sql /nolog <<EOSQL
-CONN -save demasylabs-ai-conn -savepwd ${DEMASYLABS_DB_MCP_USER}/${DEMASYLABS_DB_PASSWORD}@//${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_MCP_SERVICE}
+CONN -save sandbox-ai-conn -savepwd ${DEMASYLABS_DB_MCP_USER}/${DEMASYLABS_DB_PASSWORD}@//${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_MCP_SERVICE}
 EXIT
 EOSQL
 
 # SQLcl 26.x stores each connection in its own subdirectory under ~/.dbtools/connections/
-if find /root/.dbtools/connections -name "dbtools.properties" 2>/dev/null | xargs grep -l "demasylabs-ai-conn" 2>/dev/null | grep -q .; then
-    echo "Saved connection 'demasylabs-ai-conn' created successfully"
+if find /root/.dbtools/connections -name "dbtools.properties" 2>/dev/null | xargs grep -l "sandbox-ai-conn" 2>/dev/null | grep -q .; then
+    echo "Saved connection 'sandbox-ai-conn' created successfully"
 else
-    echo "Error: saved connection 'demasylabs-ai-conn' not found in ~/.dbtools/connections — setup failed"
+    echo "Error: saved connection 'sandbox-ai-conn' not found in ~/.dbtools/connections — setup failed"
     exit 1
 fi

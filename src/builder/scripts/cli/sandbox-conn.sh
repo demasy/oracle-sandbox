@@ -25,8 +25,14 @@ _conn_do_list() {
     props_files=$(find "$CONN_DIR" -name "dbtools.properties" 2>/dev/null | sort)
 
     if [[ -z "$props_files" ]]; then
-        log_info "No saved connections found."
-        echo -e "  ${YELLOW}Tip:${NC} Use ${CYAN}sandbox conn add --name <name> --user <user> --pdb <PDB>${NC} to create one."
+        local setup_log="/tmp/auto-user-setup.log"
+        if [[ -f "$setup_log" ]] && ! grep -q "Auto-user setup complete" "$setup_log" 2>/dev/null; then
+            log_info "Setup still in progress — connections will be available shortly."
+            echo -e "  ${YELLOW}Tip:${NC} Monitor progress with: ${CYAN}tail -f ${setup_log}${NC}"
+        else
+            log_info "No saved connections found."
+            echo -e "  ${YELLOW}Tip:${NC} Use ${CYAN}sandbox conn add --name <name> --user <user> --pdb <PDB>${NC} to create one."
+        fi
         echo ""
         return
     fi
