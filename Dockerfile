@@ -131,6 +131,7 @@ RUN JAVA_HOME_CANDIDATE=$(find /usr/lib/jvm -name "java-17-openjdk*" -type d | h
 # Set JAVA_HOME dynamically based on architecture
 ENV JAVA_HOME_DYNAMIC=/usr/lib/jvm/java-17-openjdk-arm64
 ENV CLASSPATH="/opt/oracle/sqlcl/lib/*"
+ENV HOST=0.0.0.0
 
 # Pass build argument to runtime environment
 ARG INSTALL_APEX

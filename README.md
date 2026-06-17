@@ -41,7 +41,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - [Getting Started](#getting-started)
 - [Architecture](#architecture)
 - [Built-in Tools & Scripts](#built-in-tools--scripts)
-- [Documentation](https://github.com/demasy/oracle-database/tree/main/src/docs)
+- [Documentation](https://github.com/demasy/oracle-sandbox/tree/main/docs)
 - [Change Log / Release History](#change-log--release-history)
 - [Contributors](#contributors)
 - [License](#overview)
@@ -127,7 +127,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 > [!NOTE]
 > - Oracle Database, SQLcl, and SQL*Plus are pre-installed in the container - no separate installation required.
-> - Oracle APEX and ORDS must be installed manually using the provided script inside the container.  ```bash /usr/demasy/scripts/apex/install-apex.sh ```
+> - Oracle APEX and ORDS can be installed manually using the `install-apex` command inside the management container.
 
 <br>
 
@@ -145,7 +145,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 > 4. **Restrict network access**: Bind services to `localhost` only for local development
 > 5. **Keep software updated**: Regularly pull the latest Oracle images and update components.
 > 
-> **Default credentials are publicly visible in `.env.example` - you MUST change them!**
+> **Template credentials in `.env.example` are placeholders - you MUST change them!**
 
 <br>
 
@@ -190,8 +190,8 @@ git status  # Should NOT show .env file
 #### Step 1: Clone Repository
 
 ```bash
-git clone https://github.com/demasy/oracle-database.git
-cd oracle-database
+git clone https://github.com/demasy/oracle-sandbox.git
+cd oracle-sandbox
 ```
 
 <br>
@@ -309,8 +309,8 @@ docker ps --filter "name=sandbox-oracle-database" --filter "name=sandbox-oracle-
 **Expected output:**
 ```
 CONTAINER ID   IMAGE                                               STATUS                    PORTS                                              NAMES
-abc123def456   container-registry.oracle.com/database/free:latest  Up 2 minutes (healthy)    0.0.0.0:1521->1521/tcp, 0.0.0.0:5500->5500/tcp   sandbox-oracle-database
-def456ghi789   demasylabs-oracle-sandbox:latest                    Up 2 minutes (healthy)    0.0.0.0:3000->3000/tcp, 0.0.0.0:8080->8080/tcp   sandbox-oracle-server
+abc123def456   container-registry.oracle.com/database/free:latest  Up 2 minutes (healthy)    127.0.0.1:1521->1521/tcp, 127.0.0.1:5500->5500/tcp   sandbox-oracle-database
+def456ghi789   demasylabs-oracle-sandbox:latest                    Up 2 minutes (healthy)    127.0.0.1:3000->3000/tcp, 127.0.0.1:8080->8080/tcp   sandbox-oracle-server
 ```
 
 ##### 2. Wait for Database Initialization
@@ -335,7 +335,14 @@ curl http://localhost:3000/health
 ```json
 {
   "status": "healthy",
-  "timestamp": "2025-11-25T12:00:00.000Z"
+  "service": "oracle-sandbox-management",
+  "uptimeSeconds": 42,
+  "checks": {
+    "configuration": {
+      "status": "pass",
+      "missingEnv": []
+    }
+  }
 }
 ```
 
@@ -368,8 +375,8 @@ SQL>
 
 ```bash
 # 1. Clone and setup
-git clone https://github.com/demasy/oracle-database.git
-cd oracle-database
+git clone https://github.com/demasy/oracle-sandbox.git
+cd oracle-sandbox
 cp .env.example .env
 # Edit .env with your configuration
 
@@ -384,7 +391,7 @@ curl http://localhost:3000/health
 
 # 4. (Optional) Run the APEX & ORDS installer inside the database container
 docker exec -it sandbox-oracle-server bash
-/usr/demasy/scripts/apex/install-apex.sh
+install-apex
 exit
 
 # APEX / ORDS Web UI: open http://localhost:8080 (or your configured port) in a browser
@@ -505,20 +512,29 @@ All scripts are organized in a structured directory layout for better maintainab
 
 **Container Path Structure:**
 ```
-/usr/demasy/scripts/
+/usr/sandbox/app/
 ├── cli/                    # User-facing CLI tools
-│   ├── sqlcl-connect.sh    # SQLcl database connection
-│   └── sqlplus-connect.sh  # SQL*Plus connection
+│   └── sandbox.sh          # Main sandbox CLI
+│
+├── system/
+│   ├── admin/              # Health and diagnostics
+│   ├── download/           # Oracle component download helpers
+│   ├── install/            # Oracle client install helpers
+│   └── utils/              # Shared shell utilities
 │
 ├── oracle/
 │   ├── admin/              # Administrative tools
-│   │   └── healthcheck.sh  # System health monitoring
+│   │   ├── create-pdb.sh
+│   │   └── create-user.sh
 │   │
 │   ├── apex/               # APEX management
 │   │   ├── install.sh      # APEX + ORDS installation
 │   │   ├── uninstall.sh    # APEX removal
 │   │   ├── start.sh        # Start ORDS
 │   │   └── stop.sh         # Stop ORDS
+│   │
+│   ├── sqlcl/              # SQLcl connection helper
+│   └── sqlplus/            # SQL*Plus connection helper
 
 ```
 
@@ -528,14 +544,12 @@ All scripts are organized in a structured directory layout for better maintainab
 
 | Command Alias | Target Script | Purpose |
 |-------|--------------|----------|
-| `sqlcl` | `/usr/demasy/scripts/cli/sqlcl-connect.sh` | Connect via SQLcl |
-| `sqlplus` | `/usr/demasy/scripts/cli/sqlplus-connect.sh` | Connect via SQL*Plus |
-| `oracle` | `/usr/demasy/scripts/cli/sqlcl-connect.sh` | Alias for SQLcl |
-| `healthcheck` | `/usr/demasy/scripts/oracle/admin/healthcheck.sh` | Run health check |
-| `install-apex` | `/usr/demasy/scripts/oracle/apex/install.sh` | Install APEX |
-| `uninstall-apex` | `/usr/demasy/scripts/oracle/apex/uninstall.sh` | Remove APEX |
-| `start-apex` | `/usr/demasy/scripts/oracle/apex/start.sh` | Start ORDS |
-| `stop-apex` | `/usr/demasy/scripts/oracle/apex/stop.sh` | Stop ORDS |
+| `sqlcl` | `/usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh` | Connect via SQLcl |
+| `sqlplus` | `/usr/sandbox/app/oracle/sqlplus/sqlplus-connect.sh` | Connect via SQL*Plus |
+| `healthcheck` | `/usr/sandbox/app/system/admin/healthcheck.sh` | Run health check |
+| `install-apex` | `/usr/sandbox/app/oracle/apex/install.sh` | Install APEX |
+| `start-ords` | `/usr/local/bin/start-ords` | Start ORDS after APEX installation |
+| `stop-ords` | `/usr/local/bin/stop-ords` | Stop ORDS after APEX installation |
 
 <br>
 
@@ -600,7 +614,7 @@ We welcome you to join and contribute to the "🚀 **Oracle Sandbox – Develope
 <br>
 
 ###### Suggestions & Issues
-> If you find any issues or have a great idea in mind, please create an issue on <a href="https://github.com/demasy/oracle-database/issues">GitHub</a>.
+> If you find any issues or have a great idea in mind, please create an issue on <a href="https://github.com/demasy/oracle-sandbox/issues">GitHub</a>.
 
 <br>
 

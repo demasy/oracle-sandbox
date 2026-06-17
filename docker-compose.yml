@@ -3,9 +3,9 @@ services:
     image: container-registry.oracle.com/database/free:latest
     container_name: sandbox-oracle-database
     ports:
-      - "${ENV_DB_PORT_LISTENER}:1521"
-      - "${ENV_DB_PORT_EM}:5500"
-      - "9090:9090"  # APEX EPG
+      - "127.0.0.1:${ENV_DB_PORT_LISTENER}:1521"
+      - "127.0.0.1:${ENV_DB_PORT_EM}:5500"
+      - "127.0.0.1:9090:9090"  # APEX EPG
     environment:
       - TZ=${ENV_TIME_ZONE}
       - ORACLE_SID=${ENV_DB_SID}
@@ -55,15 +55,16 @@ services:
         INSTALL_APEX: ${ENV_INSTALL_APEX}
     container_name: sandbox-oracle-server
     ports:
-      - "${ENV_SERVER_PORT}:3000"
-      - "${ENV_APEX_PORT:-8080}:8080" # for Apex
-      - "${ENV_MCP_PORT:-3001}:3001"  # for MCP
+      - "127.0.0.1:${ENV_SERVER_PORT}:3000"
+      - "127.0.0.1:${ENV_APEX_PORT:-8080}:8080" # for Apex
+      - "127.0.0.1:${ENV_MCP_PORT:-3001}:3001"  # for MCP
     depends_on:
       sandbox-oracle-database:
         condition: service_healthy
     environment:
       - TZ=${ENV_TIME_ZONE}
       - NODE_ENV=${ENV_NODE_ENV:-demasylabs}
+      - HOST=0.0.0.0
       - DEMASYLABS_DB_CLIENT=${ENV_DB_CLIENT}
       - DEMASYLABS_DB_CONNECT_STRING=${ENV_IP_DB_SERVER}:${ENV_DB_PORT_LISTENER}/${ENV_DB_SERVICE}
       - DEMASYLABS_DB_HOST=${ENV_IP_DB_SERVER}
@@ -138,8 +139,8 @@ networks:
       com.docker.network.bridge.enable_icc: "true"
       com.docker.network.bridge.enable_ip_masquerade: "true"
       com.docker.network.driver.mtu: "1500"
-      # Enable external access to container IPs
-      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+      # Bind published ports to localhost by default for local development.
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
     ipam:
       driver: default
       config:
