@@ -39,6 +39,24 @@ APEX_PASSWORD="${DEMASYLABS_APEX_ADMIN_PASSWORD}"
 APEX_EMAIL="${DEMASYLABS_APEX_EMAIL}"
 APEX_WORKSPACE="${DEMASYLABS_APEX_DEFAULT_WORKSPACE}"
 
+# Configuration - Use environment variables (with sensible fallbacks)
+APEX_HOME="${DEMASYLABS_APEX_HOME:-/opt/oracle/apex}"
+APEX_IMAGES_DIR="${DEMASYLABS_APEX_IMAGES_DIR:-/tmp/i}"
+APEX_INSTALL_LOG="${DEMASYLABS_APEX_INSTALL_LOG:-/tmp/apex_install.log}"
+APEX_TABLE_SPACE="${DEMASYLABS_APEX_TABLE_SPACE:-APEX}"
+APEX_TABLE_SPACE_FILES="${DEMASYLABS_APEX_TABLE_SPACE_FILES:-APEX_FILES}"
+APEX_SECURITY_GROUP_ID="${DEMASYLABS_APEX_SECURITY_GROUP_ID:-10}"
+APEX_TABLESPACE_SIZE="${DEMASYLABS_APEX_TABLESPACE_SIZE:-500M}"
+APEX_TABLESPACE_AUTOEXTEND="${DEMASYLABS_APEX_TABLESPACE_AUTOEXTEND:-100M}"
+ORDS_HOME="${DEMASYLABS_ORDS_HOME:-/opt/oracle/ords}"
+ORDS_CONFIG="${DEMASYLABS_ORDS_CONFIG:-/opt/oracle/ords/config}"
+ORDS_LOG="${DEMASYLABS_ORDS_LOG:-/tmp/ords.log}"
+ORDS_PORT="${DEMASYLABS_ORDS_PORT:-8080}"
+ORDS_JDBC_MIN_LIMIT="${DEMASYLABS_ORDS_JDBC_MIN_LIMIT:-3}"
+ORDS_JDBC_MAX_LIMIT="${DEMASYLABS_ORDS_JDBC_MAX_LIMIT:-20}"
+ORDS_JDBC_INITIAL_LIMIT="${DEMASYLABS_ORDS_JDBC_INITIAL_LIMIT:-3}"
+ORDS_STATEMENT_TIMEOUT="${DEMASYLABS_ORDS_STATEMENT_TIMEOUT:-900}"
+
 # Display Demasy Labs banner
 print_demasy_banner "Oracle APEX Complete Installation"
 
@@ -49,10 +67,10 @@ log_info "Starting APEX installation from inside container..."
 ################################################################################
 log_info "Step 1: Verifying APEX and ORDS installation files..."
 
-# APEX is already in /opt/oracle/apex from Docker build
-if [ ! -d "/opt/oracle/apex" ]; then
+# APEX is already in $APEX_HOME from Docker build
+if [ ! -d "${APEX_HOME}" ]; then
     echo ""
-    log_error "APEX directory not found at /opt/oracle/apex"
+    log_error "APEX directory not found at ${APEX_HOME}"
     echo ""
     log_info "APEX software is not installed. Please download it first:"
     echo -e "  • Download APEX software: download-apex"
@@ -61,13 +79,13 @@ if [ ! -d "/opt/oracle/apex" ]; then
     exit 1
 fi
 
-APEX_SIZE=$(du -sh /opt/oracle/apex | cut -f1)
+APEX_SIZE=$(du -sh "${APEX_HOME}" | cut -f1)
 log_success "APEX found (${APEX_SIZE})"
 
-# ORDS is already in /opt/oracle/ords from Docker build
-if [ ! -d "/opt/oracle/ords" ]; then
+# ORDS is already in $ORDS_HOME from Docker build
+if [ ! -d "${ORDS_HOME}" ]; then
     echo ""
-    log_error "ORDS directory not found at /opt/oracle/ords"
+    log_error "ORDS directory not found at ${ORDS_HOME}"
     echo ""
     log_info "ORDS software is not installed. Please download it first:"
     echo -e "  • Download ORDS software: ${CYAN}download-ords${RESET}"
@@ -77,7 +95,7 @@ if [ ! -d "/opt/oracle/ords" ]; then
     exit 1
 fi
 
-ORDS_SIZE=$(du -sh /opt/oracle/ords | cut -f1)
+ORDS_SIZE=$(du -sh "${ORDS_HOME}" | cut -f1)
 log_success "ORDS found (${ORDS_SIZE})"
 
 # Create working directory for ORDS config
@@ -104,7 +122,7 @@ log_success "Database connection successful"
 ################################################################################
 log_info "Step 3: Creating tablespaces..."
 
-sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba << 'EOSQL'
+sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba << EOSQL
 ALTER SESSION SET CONTAINER=FREEPDB1;
 
 -- Check if tablespaces already exist
@@ -112,21 +130,21 @@ DECLARE
     v_count NUMBER;
 BEGIN
     -- Create APEX tablespace if it doesn't exist
-    SELECT COUNT(*) INTO v_count FROM dba_tablespaces WHERE tablespace_name = 'APEX';
+    SELECT COUNT(*) INTO v_count FROM dba_tablespaces WHERE tablespace_name = '${APEX_TABLE_SPACE}';
     IF v_count = 0 THEN
-        EXECUTE IMMEDIATE q'[CREATE TABLESPACE APEX DATAFILE '/opt/oracle/oradata/FREE/FREEPDB1/apex01.dbf' SIZE 500M AUTOEXTEND ON NEXT 100M MAXSIZE UNLIMITED]';
-        DBMS_OUTPUT.PUT_LINE('APEX tablespace created');
+        EXECUTE IMMEDIATE q'[CREATE TABLESPACE ${APEX_TABLE_SPACE} DATAFILE '/opt/oracle/oradata/FREE/FREEPDB1/apex01.dbf' SIZE ${APEX_TABLESPACE_SIZE} AUTOEXTEND ON NEXT ${APEX_TABLESPACE_AUTOEXTEND} MAXSIZE UNLIMITED]';
+        DBMS_OUTPUT.PUT_LINE('${APEX_TABLE_SPACE} tablespace created');
     ELSE
-        DBMS_OUTPUT.PUT_LINE('APEX tablespace already exists');
+        DBMS_OUTPUT.PUT_LINE('${APEX_TABLE_SPACE} tablespace already exists');
     END IF;
-    
+
     -- Create APEX_FILES tablespace if it doesn't exist
-    SELECT COUNT(*) INTO v_count FROM dba_tablespaces WHERE tablespace_name = 'APEX_FILES';
+    SELECT COUNT(*) INTO v_count FROM dba_tablespaces WHERE tablespace_name = '${APEX_TABLE_SPACE_FILES}';
     IF v_count = 0 THEN
-        EXECUTE IMMEDIATE q'[CREATE TABLESPACE APEX_FILES DATAFILE '/opt/oracle/oradata/FREE/FREEPDB1/apex_files01.dbf' SIZE 500M AUTOEXTEND ON NEXT 100M MAXSIZE UNLIMITED]';
-        DBMS_OUTPUT.PUT_LINE('APEX_FILES tablespace created');
+        EXECUTE IMMEDIATE q'[CREATE TABLESPACE ${APEX_TABLE_SPACE_FILES} DATAFILE '/opt/oracle/oradata/FREE/FREEPDB1/apex_files01.dbf' SIZE ${APEX_TABLESPACE_SIZE} AUTOEXTEND ON NEXT ${APEX_TABLESPACE_AUTOEXTEND} MAXSIZE UNLIMITED]';
+        DBMS_OUTPUT.PUT_LINE('${APEX_TABLE_SPACE_FILES} tablespace created');
     ELSE
-        DBMS_OUTPUT.PUT_LINE('APEX_FILES tablespace already exists');
+        DBMS_OUTPUT.PUT_LINE('${APEX_TABLE_SPACE_FILES} tablespace already exists');
     END IF;
 END;
 /
@@ -229,9 +247,9 @@ fi
 if [ "$SKIP_APEX_INSTALL" = false ]; then
     # FIX: Create SQL file with absolute path and run from APEX directory
     log_info "Creating APEX installation SQL script..."
-cat > /opt/oracle/apex/install_apex.sql << 'SQL_EOF'
+cat > "${APEX_HOME}/install_apex.sql" << SQL_EOF
 ALTER SESSION SET CONTAINER=FREEPDB1;
-@/opt/oracle/apex/apexins.sql APEX APEX_FILES TEMP /i/
+@${APEX_HOME}/apexins.sql ${APEX_TABLE_SPACE} ${APEX_TABLE_SPACE_FILES} TEMP /i/
 EXIT
 SQL_EOF
 
@@ -240,10 +258,10 @@ echo -e "\e[1m☕ Grab a cup of coffee and relax...\e[0m"
 echo -e "\e[1m   Demasy will take care of installing Oracle APEX for you! 🚀\e[0m"
 echo ""
 log_info "Running APEX installation (this takes 3-5 minutes)..."
-log_info "Monitor progress in another terminal: docker exec sandbox-oracle-server tail -f /tmp/apex_install.log"
+log_info "Monitor progress in another terminal: docker exec sandbox-oracle-server tail -f ${APEX_INSTALL_LOG}"
 
 # Run installation from APEX directory (CRITICAL: cd is required)
-(cd /opt/oracle/apex && sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba @/opt/oracle/apex/install_apex.sql) > /tmp/apex_install.log 2>&1 &
+(cd "${APEX_HOME}" && sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba @"${APEX_HOME}/install_apex.sql") > "${APEX_INSTALL_LOG}" 2>&1 &
 APEX_PID=$!
 
 # Show progress dots with elapsed time while installation runs
@@ -271,12 +289,12 @@ printf "\r  Installing APEX... done in %dm %02ds\n" "$_mins" "$_secs"
 
 if [ $APEX_EXIT_CODE -ne 0 ]; then
         log_error "APEX installation failed with exit code $APEX_EXIT_CODE"
-        tail -50 /tmp/apex_install.log
+        tail -50 "${APEX_INSTALL_LOG}"
         exit 1
     fi
-    
+
     # Check installation result
-    if grep -q "PL/SQL procedure successfully completed" /tmp/apex_install.log || grep -q "completed" /tmp/apex_install.log; then
+    if grep -q "PL/SQL procedure successfully completed" "${APEX_INSTALL_LOG}" || grep -q "completed" "${APEX_INSTALL_LOG}"; then
         log_success "APEX installed successfully"
         
         # Verify APEX is in dba_registry
@@ -289,8 +307,8 @@ FROM dba_registry WHERE comp_id='APEX';
 EXIT
 EOSQL
     else
-        log_error "APEX installation may have issues. Check /tmp/apex_install.log"
-        tail -50 /tmp/apex_install.log
+        log_error "APEX installation may have issues. Check ${APEX_INSTALL_LOG}"
+        tail -50 "${APEX_INSTALL_LOG}"
         exit 1
     fi
 fi
@@ -307,7 +325,7 @@ ALTER SESSION SET CONTAINER=FREEPDB1;
 BEGIN
     -- Set workspace context to INTERNAL (always exists)
     APEX_UTIL.SET_WORKSPACE('INTERNAL');
-    APEX_UTIL.SET_SECURITY_GROUP_ID(10);
+    APEX_UTIL.SET_SECURITY_GROUP_ID(${APEX_SECURITY_GROUP_ID});
     
     -- Remove existing ADMIN user if exists
     BEGIN
@@ -457,7 +475,7 @@ log_success "Workspace ${WORKSPACE_NAME:-DEMASYLABS} created with admin ${WORKSP
 ################################################################################
 log_info "Step 6: Configuring APEX REST..."
 
-if [ -f "/opt/oracle/apex/apex_rest_config.sql" ]; then
+if [ -f "${APEX_HOME}/apex_rest_config.sql" ]; then
     log_info "Running APEX REST configuration..."
     sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba << 'EOSQL' 2>&1 | tee /tmp/apex_rest_config.log
 ALTER SESSION SET CONTAINER=FREEPDB1;
@@ -479,23 +497,20 @@ fi
 log_info "Step 7: Copying APEX images..."
 
 # Always copy images to ensure they're fresh and available
-if [ -d "/tmp/i" ] && [ "$(ls -A /tmp/i 2>/dev/null)" ]; then
-    log_info "Images directory exists with $(ls /tmp/i | wc -l) files, refreshing..."
-    rm -rf /tmp/i
+if [ -d "${APEX_IMAGES_DIR}" ] && [ "$(ls -A "${APEX_IMAGES_DIR}" 2>/dev/null)" ]; then
+    log_info "Images directory exists with $(ls "${APEX_IMAGES_DIR}" | wc -l) files, refreshing..."
+    rm -rf "${APEX_IMAGES_DIR}"
 fi
 
-cp -r /opt/oracle/apex/images /tmp/i
-IMAGES_SIZE=$(du -sh /tmp/i | cut -f1)
-IMAGES_COUNT=$(find /tmp/i -type f | wc -l)
+cp -r "${APEX_HOME}/images" "${APEX_IMAGES_DIR}"
+IMAGES_SIZE=$(du -sh "${APEX_IMAGES_DIR}" | cut -f1)
+IMAGES_COUNT=$(find "${APEX_IMAGES_DIR}" -type f | wc -l)
 log_success "APEX images copied: ${IMAGES_SIZE} (${IMAGES_COUNT} files)"
 
 ################################################################################
 # STEP 8: Install ORDS (FIX: Proper configuration with proxy user)
 ################################################################################
 log_info "Step 8: Installing ORDS (this takes 1-2 minutes)..."
-
-# Use the ORDS config directory that was already created during build
-ORDS_CONFIG="/opt/oracle/ords/config"
 
 # Verify config exists, if not create it
 if [ ! -d "${ORDS_CONFIG}" ]; then
@@ -529,7 +544,7 @@ fi
 
 if [ "${ORDS_INSTALLED}" = "0" ]; then
     log_info "Running ORDS installation (installing ORDS_PUBLIC_USER and ORDS_METADATA schemas)..."
-    /opt/oracle/ords/bin/ords --config ${ORDS_CONFIG} install \
+    "${ORDS_HOME}/bin/ords" --config ${ORDS_CONFIG} install \
 --admin-user SYS \
 --db-hostname ${DB_HOST} \
 --db-port ${DB_PORT} \
@@ -542,7 +557,7 @@ ${SYS_PASSWORD}
 ${APEX_PASSWORD}
 ${APEX_PASSWORD}
 EOINPUT
-    
+
     # Check if installation succeeded
     if grep -qi "error\|failed" /tmp/ords_install.log && ! grep -q "completed" /tmp/ords_install.log; then
         log_error "ORDS installation encountered errors"
@@ -640,7 +655,7 @@ END;
 EXIT
 EOSQL
 
-log_success "SQL Developer Web ready: http://localhost:8080/ords/${_WS_PATTERN}/_sdw/"
+log_success "SQL Developer Web ready: http://localhost:${ORDS_PORT}/ords/${_WS_PATTERN}/_sdw/"
 unset _WS_SCHEMA _WS_PATTERN
 
 ################################################################################
@@ -662,10 +677,10 @@ else
 <entry key="db.servicename">${DB_SERVICE}</entry>
 <entry key="db.username">ORDS_PUBLIC_USER</entry>
 <entry key="db.password">${APEX_PASSWORD}</entry>
-<entry key="jdbc.MinLimit">3</entry>
-<entry key="jdbc.MaxLimit">20</entry>
-<entry key="jdbc.InitialLimit">3</entry>
-<entry key="jdbc.statementTimeout">900</entry>
+<entry key="jdbc.MinLimit">${ORDS_JDBC_MIN_LIMIT}</entry>
+<entry key="jdbc.MaxLimit">${ORDS_JDBC_MAX_LIMIT}</entry>
+<entry key="jdbc.InitialLimit">${ORDS_JDBC_INITIAL_LIMIT}</entry>
+<entry key="jdbc.statementTimeout">${ORDS_STATEMENT_TIMEOUT}</entry>
 <entry key="plsql.gateway.mode">proxied</entry>
 </properties>
 POOLEOF
@@ -680,7 +695,7 @@ POOLEOF
 <entry key="database.api.enabled">true</entry>
 <entry key="feature.sdw">true</entry>
 <entry key="restEnabledSql.active">true</entry>
-<entry key="jdbc.statementTimeout">900</entry>
+<entry key="jdbc.statementTimeout">${ORDS_STATEMENT_TIMEOUT}</entry>
 </properties>
 SETTINGSEOF
     
@@ -691,7 +706,7 @@ fi
 if [ -f "${ORDS_CONFIG}/global/settings.xml" ]; then
     if ! grep -q "standalone.doc.root" "${ORDS_CONFIG}/global/settings.xml"; then
         log_warn "Updating ORDS settings to include image serving..."
-        sed -i.bak 's|</properties>|<entry key="standalone.doc.root">/tmp/i</entry>\n<entry key="standalone.static.context.path">/i</entry>\n</properties>|' "${ORDS_CONFIG}/global/settings.xml" 2>/dev/null || true
+        sed -i.bak "s|</properties>|<entry key=\"standalone.doc.root\">${APEX_IMAGES_DIR}</entry>\\n<entry key=\"standalone.static.context.path\">/i</entry>\\n</properties>|" "${ORDS_CONFIG}/global/settings.xml" 2>/dev/null || true
     fi
 fi
 
@@ -702,16 +717,17 @@ log_success "ORDS configured"
 ################################################################################
 log_info "Step 10: Creating ORDS management scripts..."
 
-cat > /usr/local/bin/start-ords << 'EOFSCRIPT'
+cat > /usr/local/bin/start-ords << EOFSCRIPT
 #!/bin/bash
-ORDS_BIN="/opt/oracle/ords/bin/ords"
-ORDS_CONFIG="/opt/oracle/ords/config"
-APEX_IMAGES="/tmp/i"
-ORDS_LOG="/tmp/ords.log"
-ORDS_PORT="8080"
+ORDS_BIN="${ORDS_HOME}/bin/ords"
+ORDS_CONFIG="${ORDS_CONFIG}"
+APEX_IMAGES="${APEX_IMAGES_DIR}"
+ORDS_LOG="${ORDS_LOG}"
+ORDS_PORT="${ORDS_PORT}"
+APEX_SOURCE_IMAGES="${APEX_HOME}/images"
 
-if [ ! -f "${ORDS_BIN}" ]; then
-    echo "ERROR: ORDS not found at ${ORDS_BIN}. Please run installation first."
+if [ ! -f "\${ORDS_BIN}" ]; then
+    echo "ERROR: ORDS not found at \${ORDS_BIN}. Please run installation first."
     exit 1
 fi
 
@@ -719,112 +735,113 @@ echo "Starting ORDS..."
 
 # Kill existing ORDS if running (more thorough cleanup)
 echo "Stopping any existing ORDS processes..."
-PORT_PID=$(netstat -tulnp 2>/dev/null | grep :${ORDS_PORT} | awk '{print $7}' | cut -d/ -f1)
-if [ ! -z "$PORT_PID" ]; then
-    echo "Killing process $PORT_PID on port ${ORDS_PORT}..."
-    kill -9 $PORT_PID 2>/dev/null
+PORT_PID=\$(netstat -tulnp 2>/dev/null | grep :\${ORDS_PORT} | awk '{print \$7}' | cut -d/ -f1)
+if [ ! -z "\$PORT_PID" ]; then
+    echo "Killing process \$PORT_PID on port \${ORDS_PORT}..."
+    kill -9 \$PORT_PID 2>/dev/null
 fi
 pkill -9 -f "ords" 2>/dev/null
 sleep 3
 
 # Ensure images directory exists and is populated
-if [ ! -d "${APEX_IMAGES}" ] || [ -z "$(ls -A ${APEX_IMAGES} 2>/dev/null)" ]; then
-    echo "Copying APEX images to ${APEX_IMAGES}..."
-    rm -rf ${APEX_IMAGES}
-    cp -r /opt/oracle/apex/images ${APEX_IMAGES}
-    echo "Copied $(find ${APEX_IMAGES} -type f | wc -l) image files"
+if [ ! -d "\${APEX_IMAGES}" ] || [ -z "\$(ls -A \${APEX_IMAGES} 2>/dev/null)" ]; then
+    echo "Copying APEX images to \${APEX_IMAGES}..."
+    rm -rf \${APEX_IMAGES}
+    cp -r \${APEX_SOURCE_IMAGES} \${APEX_IMAGES}
+    echo "Copied \$(find \${APEX_IMAGES} -type f | wc -l) image files"
 fi
 
 # Verify ORDS config exists
-if [ ! -f "${ORDS_CONFIG}/databases/default/pool.xml" ]; then
-    echo "ERROR: ORDS configuration not found at ${ORDS_CONFIG}"
+if [ ! -f "\${ORDS_CONFIG}/databases/default/pool.xml" ]; then
+    echo "ERROR: ORDS configuration not found at \${ORDS_CONFIG}"
     echo "Please run ORDS installation first"
     exit 1
 fi
 
 # Verify images directory
-if [ ! -d "${APEX_IMAGES}" ] || [ -z "$(ls -A ${APEX_IMAGES} 2>/dev/null)" ]; then
+if [ ! -d "\${APEX_IMAGES}" ] || [ -z "\$(ls -A \${APEX_IMAGES} 2>/dev/null)" ]; then
     echo "WARNING: Images directory empty or missing, this will cause image serving issues"
 fi
 
 # Start ORDS with proper image serving
-cd "${ORDS_CONFIG}"
-echo "Starting ORDS from config: ${ORDS_CONFIG}"
-echo "Using images from: ${APEX_IMAGES}"
+cd "\${ORDS_CONFIG}"
+echo "Starting ORDS from config: \${ORDS_CONFIG}"
+echo "Using images from: \${APEX_IMAGES}"
 
-nohup ${ORDS_BIN} --config "${ORDS_CONFIG}" serve \
-  --apex-images "${APEX_IMAGES}" \
-  --port ${ORDS_PORT} > "${ORDS_LOG}" 2>&1 &
+nohup \${ORDS_BIN} --config "\${ORDS_CONFIG}" serve \\
+  --apex-images "\${APEX_IMAGES}" \\
+  --port \${ORDS_PORT} > "\${ORDS_LOG}" 2>&1 &
 
-ORDS_PID=$!
-echo "ORDS started with PID: ${ORDS_PID}"
-echo "Waiting for initialization (log: ${ORDS_LOG})..."
+ORDS_PID=\$!
+echo "ORDS started with PID: \${ORDS_PID}"
+echo "Waiting for initialization (log: \${ORDS_LOG})..."
 
 for i in {1..60}; do
-    if grep -q "Oracle REST Data Services initialized" "${ORDS_LOG}" 2>/dev/null; then
+    if grep -q "Oracle REST Data Services initialized" "\${ORDS_LOG}" 2>/dev/null; then
         echo "✓ ORDS started successfully!"
         sleep 2
-        
+
         # Quick verification
-        if netstat -tulnp 2>/dev/null | grep -q :${ORDS_PORT}; then
-            echo "✓ ORDS listening on port ${ORDS_PORT}"
+        if netstat -tulnp 2>/dev/null | grep -q :\${ORDS_PORT}; then
+            echo "✓ ORDS listening on port \${ORDS_PORT}"
         fi
-        
+
         echo ""
         echo "=================================================================="
         echo "🚀 APEX Access URLs:"
         echo "=================================================================="
-        echo "  Application Builder:  http://localhost:${ORDS_PORT}/ords/f?p=4550:1"
-        echo "  SQL Developer Web:    http://localhost:${ORDS_PORT}/ords/sql-developer/"
-        echo "  Images:              http://localhost:${ORDS_PORT}/i/apex_ui/css/Core.css"
+        echo "  Application Builder:  http://localhost:\${ORDS_PORT}/ords/f?p=4550:1"
+        echo "  SQL Developer Web:    http://localhost:\${ORDS_PORT}/ords/sql-developer/"
+        echo "  Images:              http://localhost:\${ORDS_PORT}/i/apex_ui/css/Core.css"
         echo ""
         echo "🔐 Login Credentials:"
         echo "  Workspace: INTERNAL"
-        echo "  Username:  ADMIN"
-        echo "  Password:  Demasy1986"
+        echo "  Username:  ${APEX_ADMIN_USERNAME}"
+        echo "  Password:  ${APEX_PASSWORD}"
         echo "=================================================================="
         exit 0
     fi
-    
+
     # Check for errors
-    if grep -qi "error\|failed\|exception" "${ORDS_LOG}" 2>/dev/null; then
+    if grep -qi "error\|failed\|exception" "\${ORDS_LOG}" 2>/dev/null; then
         echo "⚠ Detected errors in log, but continuing to wait..."
     fi
-    
+
     sleep 1
 done
 
 echo "⚠ Timeout waiting for ORDS initialization"
-echo "Check logs: tail -f ${ORDS_LOG}"
+echo "Check logs: tail -f \${ORDS_LOG}"
 exit 1
 EOFSCRIPT
 
 chmod +x /usr/local/bin/start-ords
 
-cat > /usr/local/bin/stop-ords << 'EOFSCRIPT'
+cat > /usr/local/bin/stop-ords << EOFSCRIPT
 #!/bin/bash
+ORDS_PORT="${ORDS_PORT}"
 echo "Stopping ORDS..."
 
-# Kill any Java process on port 8080
-PORT_PID=$(netstat -tulnp 2>/dev/null | grep :8080 | awk '{print $7}' | cut -d/ -f1)
-if [ ! -z "$PORT_PID" ]; then
-    echo "Killing process $PORT_PID on port 8080..."
-    kill -9 $PORT_PID 2>/dev/null
+# Kill any Java process on the configured ORDS port
+PORT_PID=\$(netstat -tulnp 2>/dev/null | grep :\${ORDS_PORT} | awk '{print \$7}' | cut -d/ -f1)
+if [ ! -z "\$PORT_PID" ]; then
+    echo "Killing process \$PORT_PID on port \${ORDS_PORT}..."
+    kill -9 \$PORT_PID 2>/dev/null
     sleep 2
 fi
 
 # Kill ORDS process (matches java command running ords)
-ORDS_PIDS=$(pgrep -f "ords" 2>/dev/null)
-if [ ! -z "$ORDS_PIDS" ]; then
-    echo "Killing ORDS processes: $ORDS_PIDS"
+ORDS_PIDS=\$(pgrep -f "ords" 2>/dev/null)
+if [ ! -z "\$ORDS_PIDS" ]; then
+    echo "Killing ORDS processes: \$ORDS_PIDS"
     pkill -9 -f "ords" 2>/dev/null
     sleep 2
 fi
 
 # Verify stopped
-if netstat -tulnp 2>/dev/null | grep -q :8080; then
-    echo "✗ ORDS still running on port 8080"
-    netstat -tulnp 2>/dev/null | grep :8080
+if netstat -tulnp 2>/dev/null | grep -q :\${ORDS_PORT}; then
+    echo "✗ ORDS still running on port \${ORDS_PORT}"
+    netstat -tulnp 2>/dev/null | grep :\${ORDS_PORT}
     exit 1
 else
     echo "✓ ORDS stopped successfully"
@@ -875,30 +892,30 @@ EOSQL
 
 # Kill any existing ORDS processes thoroughly
 log_info "Stopping any existing ORDS processes..."
-PORT_PID=$(netstat -tulnp 2>/dev/null | grep :8080 | awk '{print $7}' | cut -d/ -f1 | head -1)
+PORT_PID=$(netstat -tulnp 2>/dev/null | grep :${ORDS_PORT} | awk '{print $7}' | cut -d/ -f1 | head -1)
 if [ ! -z "$PORT_PID" ]; then
-    log_info "Killing process $PORT_PID on port 8080..."
+    log_info "Killing process $PORT_PID on port ${ORDS_PORT}..."
     kill -9 $PORT_PID 2>/dev/null || true
 fi
 pkill -9 -f "ords" 2>/dev/null || true
 sleep 3
 
 # Verify ORDS config and images before starting
-if [ ! -f "/opt/oracle/ords/config/databases/default/pool.xml" ]; then
+if [ ! -f "${ORDS_CONFIG}/databases/default/pool.xml" ]; then
     log_error "ORDS configuration missing! Installation may have failed."
     exit 1
 fi
 
-if [ ! -d "/tmp/i" ] || [ -z "$(ls -A /tmp/i 2>/dev/null)" ]; then
+if [ ! -d "${APEX_IMAGES_DIR}" ] || [ -z "$(ls -A "${APEX_IMAGES_DIR}" 2>/dev/null)" ]; then
     log_warn "Images directory empty, copying now..."
-    rm -rf /tmp/i
-    cp -r /opt/oracle/apex/images /tmp/i
-    log_info "Copied $(find /tmp/i -type f | wc -l) image files"
+    rm -rf "${APEX_IMAGES_DIR}"
+    cp -r "${APEX_HOME}/images" "${APEX_IMAGES_DIR}"
+    log_info "Copied $(find "${APEX_IMAGES_DIR}" -type f | wc -l) image files"
 fi
 
 # Start ORDS in background
 log_info "Starting ORDS service..."
-nohup /opt/oracle/ords/bin/ords --config /opt/oracle/ords/config serve --apex-images /tmp/i --port 8080 > /tmp/ords.log 2>&1 &
+nohup "${ORDS_HOME}/bin/ords" --config "${ORDS_CONFIG}" serve --apex-images "${APEX_IMAGES_DIR}" --port ${ORDS_PORT} > "${ORDS_LOG}" 2>&1 &
 ORDS_PID=$!
 log_info "ORDS started with PID: ${ORDS_PID}"
 
@@ -908,24 +925,24 @@ log_info "Waiting for ORDS to initialize (checking for 60 seconds)..."
 ORDS_RUNNING=false
 for i in {1..60}; do
     # Check if ORDS initialized
-    if grep -q "Oracle REST Data Services initialized" /tmp/ords.log 2>/dev/null; then
+    if grep -q "Oracle REST Data Services initialized" "${ORDS_LOG}" 2>/dev/null; then
         ORDS_RUNNING=true
         log_success "ORDS initialized successfully!"
         break
     fi
-    
+
     # Check for critical errors
-    if grep -qi "could not start\|address already in use\|failed to start" /tmp/ords.log 2>/dev/null; then
-        log_error "ORDS failed to start. Check /tmp/ords.log"
-        tail -20 /tmp/ords.log
+    if grep -qi "could not start\|address already in use\|failed to start" "${ORDS_LOG}" 2>/dev/null; then
+        log_error "ORDS failed to start. Check ${ORDS_LOG}"
+        tail -20 "${ORDS_LOG}"
         exit 1
     fi
-    
+
     # Show progress
     if [ $((i % 10)) -eq 0 ]; then
         echo -n "."
     fi
-    
+
     sleep 1
 done
 echo ""
@@ -933,8 +950,8 @@ echo ""
 # Verify port is listening
 if [ "$ORDS_RUNNING" = true ]; then
     sleep 3
-    if ! netstat -tulnp 2>/dev/null | grep -q :8080; then
-        log_warn "ORDS initialized but not listening on port 8080"
+    if ! netstat -tulnp 2>/dev/null | grep -q :${ORDS_PORT}; then
+        log_warn "ORDS initialized but not listening on port ${ORDS_PORT}"
         ORDS_RUNNING=false
     fi
 fi
@@ -996,18 +1013,18 @@ echo " ORDS Server Status:"
 echo "=================================================================="
 
 if [ "$ORDS_RUNNING" = true ]; then
-    echo "  ✓ ORDS Running on port 8080"
-    
+    echo "  ✓ ORDS Running on port ${ORDS_PORT}"
+
     # Test HTTP endpoints with retry
     log_info "Testing HTTP endpoints (with retry)..."
-    
+
     # Give ORDS a moment to fully initialize
     sleep 5
-    
+
     # Test APEX endpoint with retries
     APEX_CODE="000"
     for retry in {1..3}; do
-        APEX_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ords/f?p=4550:1 2>/dev/null || echo "000")
+        APEX_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${ORDS_PORT}/ords/f?p=4550:1 2>/dev/null || echo "000")
         if [ "$APEX_CODE" = "302" ] || [ "$APEX_CODE" = "200" ]; then
             break
         fi
@@ -1018,13 +1035,13 @@ if [ "$ORDS_RUNNING" = true ]; then
     else
         echo "  ⚠ APEX endpoint returned HTTP $APEX_CODE (may need more time)"
         echo "  --- Last 50 lines of ORDS log ---"
-        tail -50 /tmp/ords.log
+        tail -50 "${ORDS_LOG}"
     fi
-    
+
     # Test static images (CSS file) with retries
     IMAGE_CODE="000"
     for retry in {1..3}; do
-        IMAGE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/i/apex_ui/css/Core.css 2>/dev/null || echo "000")
+        IMAGE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${ORDS_PORT}/i/apex_ui/css/Core.css 2>/dev/null || echo "000")
         if [ "$IMAGE_CODE" = "200" ]; then
             break
         fi
@@ -1035,34 +1052,34 @@ if [ "$ORDS_RUNNING" = true ]; then
     else
         echo "  ⚠ APEX images returned HTTP $IMAGE_CODE"
         echo "  --- Last 50 lines of ORDS log ---"
-        tail -50 /tmp/ords.log
-        if [ -d "/tmp/i" ]; then
-            IMGS=$(find /tmp/i -type f 2>/dev/null | wc -l)
-            echo "     Images directory: /tmp/i exists with $IMGS files"
+        tail -50 "${ORDS_LOG}"
+        if [ -d "${APEX_IMAGES_DIR}" ]; then
+            IMGS=$(find "${APEX_IMAGES_DIR}" -type f 2>/dev/null | wc -l)
+            echo "     Images directory: ${APEX_IMAGES_DIR} exists with $IMGS files"
             if [ "$IMGS" -eq 0 ]; then
                 echo "     ERROR: Images directory is empty! Copying now..."
-                rm -rf /tmp/i
-                cp -r /opt/oracle/apex/images /tmp/i
-                echo "     Copied $(find /tmp/i -type f | wc -l) files. Restart ORDS: stop-ords && start-ords"
+                rm -rf "${APEX_IMAGES_DIR}"
+                cp -r "${APEX_HOME}/images" "${APEX_IMAGES_DIR}"
+                echo "     Copied $(find "${APEX_IMAGES_DIR}" -type f | wc -l) files. Restart ORDS: stop-ords && start-ords"
             fi
         else
-            echo "     ERROR: Images directory /tmp/i does not exist!"
+            echo "     ERROR: Images directory ${APEX_IMAGES_DIR} does not exist!"
             echo "     Copying images now..."
-            cp -r /opt/oracle/apex/images /tmp/i
-            echo "     Copied $(find /tmp/i -type f | wc -l) files. Restart ORDS: stop-ords && start-ords"
+            cp -r "${APEX_HOME}/images" "${APEX_IMAGES_DIR}"
+            echo "     Copied $(find "${APEX_IMAGES_DIR}" -type f | wc -l) files. Restart ORDS: stop-ords && start-ords"
         fi
     fi
-    
+
     # Test SQL Developer Web
-    SQLDEV_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ords/sql-developer 2>/dev/null || echo "000")
+    SQLDEV_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${ORDS_PORT}/ords/sql-developer 2>/dev/null || echo "000")
     if [ "$SQLDEV_CODE" = "200" ] || [ "$SQLDEV_CODE" = "302" ]; then
         echo "  ✓ SQL Developer Web responding (HTTP $SQLDEV_CODE)"
     else
         echo "  ⚠ SQL Developer Web returned HTTP $SQLDEV_CODE"
     fi
 else
-    echo "  ⚠ ORDS not running on port 8080"
-    echo "  ℹ Check logs: tail -f /tmp/ords.log"
+    echo "  ⚠ ORDS not running on port ${ORDS_PORT}"
+    echo "  ℹ Check logs: tail -f ${ORDS_LOG}"
 fi
 
 ################################################################################
@@ -1074,7 +1091,7 @@ COMPLETION_MSG_SCRIPT="/usr/sandbox/app/system/utils/apex-completion.sh"
 if [ -f "$COMPLETION_MSG_SCRIPT" ]; then
     source "$COMPLETION_MSG_SCRIPT"
     # Display completion message with credentials
-    display_completion_message "${APEX_ADMIN_USERNAME}" "${APEX_PASSWORD}" "${APEX_EMAIL}" "8080" "${WORKSPACE_NAME:-DEMASYLABS}"
+    display_completion_message "${APEX_ADMIN_USERNAME}" "${APEX_PASSWORD}" "${APEX_EMAIL}" "${ORDS_PORT}" "${WORKSPACE_NAME:-DEMASYLABS}"
 else
     echo "Warning: apex-completion.sh not found at $COMPLETION_MSG_SCRIPT"
     echo "Installation completed successfully!"
