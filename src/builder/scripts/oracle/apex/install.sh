@@ -702,6 +702,15 @@ SETTINGSEOF
     log_info "ORDS configuration files created"
 fi
 
+# Always enforce pool sizing — `ords install` seeds a pool.xml without jdbc limits,
+# so ORDS falls back to its default of 10 unless we set these explicitly (idempotent).
+"${ORDS_HOME}/bin/ords" --config "${ORDS_CONFIG}" config --db-pool default \
+    set jdbc.MinLimit "${ORDS_JDBC_MIN_LIMIT}"
+"${ORDS_HOME}/bin/ords" --config "${ORDS_CONFIG}" config --db-pool default \
+    set jdbc.MaxLimit "${ORDS_JDBC_MAX_LIMIT}"
+"${ORDS_HOME}/bin/ords" --config "${ORDS_CONFIG}" config --db-pool default \
+    set jdbc.InitialLimit "${ORDS_JDBC_INITIAL_LIMIT}"
+
 # Always verify/update settings to ensure proper config
 if [ -f "${ORDS_CONFIG}/global/settings.xml" ]; then
     if ! grep -q "standalone.doc.root" "${ORDS_CONFIG}/global/settings.xml"; then
