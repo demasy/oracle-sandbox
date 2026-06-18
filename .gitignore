@@ -299,6 +299,5 @@ Dockerfile copy
 package-lock.json
 
 builder
-sandbox-brain
-docker-builder
-security-reports
+
+logs
