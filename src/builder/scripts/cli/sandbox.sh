@@ -193,7 +193,6 @@ unset _filtered_args _arg
 clear
 _suppress_banner=0
 [[ "${SANDBOX_QUIET:-0}" == "1" ]] && _suppress_banner=1
-[[ "$_first_real_arg" == "status" || "$_first_real_arg" == "logs" ]] && _suppress_banner=1
 [[ "$_suppress_banner" == "0" ]] && print_demasy_banner "Sandbox CLI"
 unset _first_real_arg _suppress_banner
 
