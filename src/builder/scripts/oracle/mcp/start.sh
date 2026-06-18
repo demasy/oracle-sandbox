@@ -32,16 +32,22 @@ fi
 CONN_STRING="${MCP_USER}/${MCP_PASS}@//${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${MCP_SERVICE}"
 CONN_NAME="sandbox-ai-conn"
 
-echo "Refreshing saved connection '${CONN_NAME}'..." >&2
+echo "[MCP] Refreshing saved connection '${CONN_NAME}'..." >&2
 
 # Recreate the saved connection from env vars so credentials are always current
-sql /nolog <<EOF >/dev/null 2>&1
+sql /nolog <<EOF 2>&1 | while IFS= read -r line; do echo "[MCP] $line" >&2; done
 CONN -save ${CONN_NAME} -savepwd ${CONN_STRING}
 exit
 EOF
+SAVE_RC=${PIPESTATUS[0]}
+if [ $SAVE_RC -ne 0 ]; then
+    echo "[MCP] Warning: connection save returned exit code $SAVE_RC" >&2
+else
+    echo "[MCP] Saved connection '${CONN_NAME}' refreshed successfully" >&2
+fi
 
-echo "Starting SQLcl MCP Server..." >&2
-echo "Connection: ${MCP_USER}@${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${MCP_SERVICE}" >&2
+echo "[MCP] Starting SQLcl MCP Server..." >&2
+echo "[MCP] Connection: ${MCP_USER}@${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${MCP_SERVICE}" >&2
 
 # Export required environment variables
 export ORACLE_HOME=/opt/oracle/instantclient

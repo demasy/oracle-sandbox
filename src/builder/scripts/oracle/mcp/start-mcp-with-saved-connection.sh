@@ -1,23 +1,20 @@
 #!/bin/bash
 ################################################################################
 # Start SQLcl MCP Server with Saved Connection
-# Uses the demasylabs-ai-conn saved connection
+# Uses the sandbox-ai-conn saved connection (pass a name as $1 to override)
 ################################################################################
 
 # Check if SQLcl is available
 if ! command -v sql &> /dev/null; then
-    echo "Error: SQLcl not found. Please install SQLcl first."
+    echo "[MCP] Error: SQLcl not found. Please install SQLcl first." >&2
     exit 1
 fi
 
 # Use provided connection name or fall back to default
-CONNECTION_NAME="${1:-demasylabs-ai-conn}"
+CONNECTION_NAME="${1:-sandbox-ai-conn}"
 
-echo "Starting SQLcl MCP Server with saved connection..."
-echo "Connection: ${CONNECTION_NAME}"
-
-# Start SQLcl MCP server
-cd /opt/oracle/sqlcl/bin
+echo "[MCP] Starting SQLcl MCP Server with saved connection..." >&2
+echo "[MCP] Connection: ${CONNECTION_NAME}" >&2
 
 # Export required environment variables
 export ORACLE_HOME=/opt/oracle/instantclient
@@ -25,4 +22,4 @@ export LD_LIBRARY_PATH=/opt/oracle/instantclient:$LD_LIBRARY_PATH
 export JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::')
 
 # Start MCP server with saved connection
-./sql -mcp "${CONNECTION_NAME}"
+exec sql -mcp "${CONNECTION_NAME}"

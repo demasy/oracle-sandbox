@@ -187,7 +187,6 @@ RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/sb
 
 # -------------------------------------------- [MCP Tools]
 RUN ln -s /usr/sandbox/app/oracle/mcp/start.sh /usr/local/bin/start-mcp
-# RUN ln -s /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp-saved-conn
 
 # Verify installation and test SQLcl
 # Updated by demasy on November 11, 2025
@@ -202,8 +201,6 @@ RUN ln -s /usr/sandbox/app/oracle/mcp/start.sh /usr/local/bin/start-mcp
 #     echo "Testing SQLPlus..." && \
 #     (sqlplus -version || echo "SQLPlus not available - using Instant Client bundled version")
 
-# Create MCP configuration directory
-RUN mkdir -p /root/.mcp
 
 EXPOSE 3000
 EXPOSE 3001
