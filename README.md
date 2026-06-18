@@ -41,6 +41,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - [Getting Started](#getting-started)
 - [Architecture](#architecture)
 - [Built-in Tools & Scripts](#built-in-tools--scripts)
+- [MCP Server (Claude Code Integration)](#mcp-server-claude-code-integration)
 - [Documentation](https://github.com/demasy/oracle-sandbox/tree/main/docs)
 - [Change Log / Release History](#change-log--release-history)
 - [Contributors](#contributors)
@@ -555,6 +556,119 @@ All scripts are organized in a structured directory layout for better maintainab
 
 > [!NOTE]
 > All scripts are organized using best practices with a flat structure (max three levels). For detailed documentation, see `src/scripts/README.md`.
+
+<br>
+
+## MCP Server (Claude Code Integration)
+
+The sandbox includes a built-in **SQLcl MCP server** that lets Claude Code query the Oracle database directly using natural language. It runs inside the `sandbox-oracle-server` container and communicates via the Model Context Protocol (stdio).
+
+<br>
+
+### How It Works
+
+```
+Claude Code  ──stdio──►  docker exec sandbox-oracle-server start-mcp
+                                        │
+                                   SQLcl -mcp
+                                        │
+                               sandbox-ai-conn (SANDBOX_PDB)
+                                        │
+                            Oracle Database 26ai Free
+```
+
+<br>
+
+### Step 1 — Start the Container
+
+```bash
+docker compose up -d
+```
+
+Verify both containers are healthy:
+
+```bash
+docker ps --filter name=sandbox-oracle-server --format "{{.Names}}\t{{.Status}}"
+```
+
+**Expected:**
+```
+sandbox-oracle-server   Up X minutes (healthy)
+```
+
+<br>
+
+### Step 2 — Start the MCP Server in Claude Code
+
+Open the Command Palette: **`Cmd + Shift + P`** (macOS) / **`Ctrl + Shift + P`** (Windows/Linux)
+
+Type `MCP` → select **`MCP: Restart MCP Server`** → choose:
+
+```
+sandbox-sqlcl-mcp   (oracle-sandbox/.mcp.json)
+```
+
+Status should change to **Running**.
+
+<br>
+
+### Step 3 — Connect to the Database
+
+Ask Claude:
+
+```
+connect to sandbox-ai-conn using the MCP server
+```
+
+> [!NOTE]
+> The connect tool returns an error message — this is a known upstream SQLcl MCP behaviour. **The connection is established successfully despite the error.** Proceed to run queries normally.
+
+<br>
+
+### Step 4 — Run a Query
+
+Ask Claude:
+
+```
+Using the sandbox-sqlcl-mcp MCP server, run:
+select user from dual;
+```
+
+**Expected result:**
+
+```
+USER
+------------
+SANDBOX_AI
+```
+
+<br>
+
+### Available MCP Tools
+
+| Tool | Purpose |
+|------|---------|
+| `connect` | Establish database connection (call once per session) |
+| `run-sql` | Execute SQL queries (`SELECT`, `INSERT`, `UPDATE`, etc.) |
+| `run-sqlcl` | Execute SQLcl commands (`DESC`, `SET`, `SHOW`, etc.) |
+| `list-connections` | List available saved connections |
+
+<br>
+
+### MCP Connection Details
+
+| Property | Value |
+|----------|-------|
+| Connection Name | `sandbox-ai-conn` |
+| Database User | `SANDBOX_AI` |
+| Target PDB | `SANDBOX_PDB` |
+| Config File | `.mcp.json` |
+| Start Script | `src/builder/scripts/oracle/mcp/start.sh` |
+
+<br>
+
+> [!NOTE]
+> The MCP server credentials are read from the container's environment variables (`DEMASYLABS_DB_MCP_USER`, `DEMASYLABS_DB_MCP_SERVICE`, etc.) defined in your `.env` file. The saved connection `sandbox-ai-conn` is refreshed automatically on every MCP server start.
 
 <br>
 
