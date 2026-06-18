@@ -21,16 +21,18 @@ if [ -z "$MCP_USER" ] || [ -z "$MCP_PASS" ]; then
     exit 1
 fi
 
-if [ -z "$DEMASYLABS_DB_HOST" ] || [ -z "$DEMASYLABS_DB_PORT" ] || [ -z "$DEMASYLABS_DB_SERVICE" ]; then
+MCP_SERVICE="${DEMASYLABS_DB_MCP_SERVICE:-${DEMASYLABS_DB_SERVICE}}"
+
+if [ -z "$DEMASYLABS_DB_HOST" ] || [ -z "$DEMASYLABS_DB_PORT" ] || [ -z "$MCP_SERVICE" ]; then
     echo "Error: Database connection parameters not set"
-    echo "Required: DEMASYLABS_DB_HOST, DEMASYLABS_DB_PORT, DEMASYLABS_DB_SERVICE"
+    echo "Required: DEMASYLABS_DB_HOST, DEMASYLABS_DB_PORT, DEMASYLABS_DB_MCP_SERVICE (or DEMASYLABS_DB_SERVICE)"
     exit 1
 fi
 
-DB_CONNECTION="${MCP_USER}/${MCP_PASS}@//${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_SERVICE}"
+DB_CONNECTION="${MCP_USER}/${MCP_PASS}@//${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${MCP_SERVICE}"
 
 echo "Starting SQLcl MCP Server..."
-echo "Connection: ${MCP_USER}@${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_SERVICE}"
+echo "Connection: ${MCP_USER}@${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${MCP_SERVICE}"
 
 # Start SQLcl MCP server
 # SQLcl 25.x+ has built-in MCP support via the 'mcp' command
@@ -42,4 +44,4 @@ export LD_LIBRARY_PATH=/opt/oracle/instantclient:$LD_LIBRARY_PATH
 export JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::')
 
 # Start MCP server
-./sql -mcp "$DB_CONNECTION"
+exec ./sql -mcp "$DB_CONNECTION"

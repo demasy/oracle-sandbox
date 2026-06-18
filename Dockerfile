@@ -186,7 +186,8 @@ RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/sb
 # RUN ln -s /usr/sandbox/app/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
 
 # -------------------------------------------- [MCP Tools]
-# RUN ln -s /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp
+RUN ln -s /usr/sandbox/app/oracle/mcp/start.sh /usr/local/bin/start-mcp
+# RUN ln -s /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp-saved-conn
 
 # Verify installation and test SQLcl
 # Updated by demasy on November 11, 2025

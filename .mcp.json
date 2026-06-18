@@ -7,9 +7,7 @@
         "exec",
         "-i",
         "sandbox-oracle-server",
-        "sql",
-        "-mcp",
-        "sandbox-ai-conn"
+        "start-mcp"
       ]
     }
   }
