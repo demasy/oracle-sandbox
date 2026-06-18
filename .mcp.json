@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "sandbox-sqlcl-mcp": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "sandbox-oracle-server",
+        "sql",
+        "-mcp",
+        "sandbox-ai-conn"
+      ]
+    }
+  }
+}

@@ -172,17 +172,18 @@ RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
 RUN ln -s /usr/sandbox/app/system/download/download.sh /usr/local/bin/download-oracle-components
 
 # -------------------------------------------- [CLI Tools]
+RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/demasy
 RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/sandbox
 RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/sb
-RUN ln -s /usr/sandbox/app/oracle/sqlplus/sqlplus-connect.sh /usr/local/bin/sqlplus
-RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/sqlcl
+# RUN ln -s /usr/sandbox/app/oracle/sqlplus/sqlplus-connect.sh /usr/local/bin/sqlplus
+# RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/sqlcl
 # RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/oracle
 
 # -------------------------------------------- [Admin & Diagnostics]
-RUN ln -s /usr/sandbox/app/system/admin/healthcheck.sh /usr/local/bin/healthcheck
-RUN ln -s /usr/sandbox/app/oracle/admin/create-pdb.sh /usr/local/bin/create-pdb
-RUN ln -s /usr/sandbox/app/oracle/admin/create-demasy-user.sh /usr/local/bin/create-demasy-user
-RUN ln -s /usr/sandbox/app/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
+# RUN ln -s /usr/sandbox/app/system/admin/healthcheck.sh /usr/local/bin/healthcheck
+# RUN ln -s /usr/sandbox/app/oracle/admin/create-pdb.sh /usr/local/bin/create-pdb
+# RUN ln -s /usr/sandbox/app/oracle/admin/create-demasy-user.sh /usr/local/bin/create-demasy-user
+# RUN ln -s /usr/sandbox/app/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
 
 # -------------------------------------------- [MCP Tools]
 # RUN ln -s /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh /usr/local/bin/start-mcp
