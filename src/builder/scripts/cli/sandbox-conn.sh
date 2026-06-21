@@ -3,7 +3,7 @@
 # Variables inherited: ACTION, RESOURCE, PARAMS, logging/color functions
 # ─────────────────────────────────────────────────────────────────────────────
 
-CONN_DIR="/root/.dbtools/connections"
+CONN_DIR="${HOME:-/home/sandbox}/.dbtools/connections"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 

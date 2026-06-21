@@ -726,7 +726,10 @@ log_success "ORDS configured"
 ################################################################################
 log_info "Step 10: Creating ORDS management scripts..."
 
-cat > /usr/local/bin/start-ords << EOFSCRIPT
+BIN_DIR="${DEMASYLABS_BIN_DIR:-/usr/sandbox/app/bin}"
+mkdir -p "${BIN_DIR}"
+
+cat > "${BIN_DIR}/start-ords" << EOFSCRIPT
 #!/bin/bash
 ORDS_BIN="${ORDS_HOME}/bin/ords"
 ORDS_CONFIG="${ORDS_CONFIG}"
@@ -824,9 +827,9 @@ echo "Check logs: tail -f \${ORDS_LOG}"
 exit 1
 EOFSCRIPT
 
-chmod +x /usr/local/bin/start-ords
+chmod +x "${BIN_DIR}/start-ords"
 
-cat > /usr/local/bin/stop-ords << EOFSCRIPT
+cat > "${BIN_DIR}/stop-ords" << EOFSCRIPT
 #!/bin/bash
 ORDS_PORT="${ORDS_PORT}"
 echo "Stopping ORDS..."
@@ -857,7 +860,7 @@ else
 fi
 EOFSCRIPT
 
-chmod +x /usr/local/bin/stop-ords
+chmod +x "${BIN_DIR}/stop-ords"
 
 log_success "Management scripts created"
 

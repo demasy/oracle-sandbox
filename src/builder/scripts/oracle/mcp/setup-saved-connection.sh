@@ -26,13 +26,16 @@ echo "Setting up saved SQLcl connection..."
 echo "User: ${DEMASYLABS_DB_MCP_USER}@${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_MCP_SERVICE}"
 
 # Create (or overwrite) the saved connection — stores credentials in ~/.dbtools
+CONN_DIR="${HOME:-/home/sandbox}/.dbtools/connections"
+mkdir -p "$CONN_DIR"
+
 /opt/oracle/sqlcl/bin/sql /nolog <<EOSQL
 CONN -save sandbox-ai-conn -savepwd ${DEMASYLABS_DB_MCP_USER}/${DEMASYLABS_DB_PASSWORD}@//${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_MCP_SERVICE}
 EXIT
 EOSQL
 
 # SQLcl 26.x stores each connection in its own subdirectory under ~/.dbtools/connections/
-if find /root/.dbtools/connections -name "dbtools.properties" 2>/dev/null | xargs grep -l "sandbox-ai-conn" 2>/dev/null | grep -q .; then
+if grep -R -q "^name=sandbox-ai-conn$" "$CONN_DIR" 2>/dev/null; then
     echo "Saved connection 'sandbox-ai-conn' created successfully"
 else
     echo "Error: saved connection 'sandbox-ai-conn' not found in ~/.dbtools/connections — setup failed"

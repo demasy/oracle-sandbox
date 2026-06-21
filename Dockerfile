@@ -132,6 +132,7 @@ RUN JAVA_HOME_CANDIDATE=$(find /usr/lib/jvm -name "java-17-openjdk*" -type d | h
 ENV JAVA_HOME_DYNAMIC=/usr/lib/jvm/java-17-openjdk-arm64
 ENV CLASSPATH="/opt/oracle/sqlcl/lib/*"
 ENV HOST=0.0.0.0
+ENV PATH="/usr/sandbox/app/bin:${PATH}"
 
 # Pass build argument to runtime environment
 ARG INSTALL_APEX
@@ -200,6 +201,11 @@ RUN TMPDIR=/tmp/mcp-patch && \
     jar uf /opt/oracle/sqlcl/lib/dbtools-mcp.jar oracle/dbtools/extension/mcp/command/xml/McpToolsQueries.xml && \
     rm -rf $TMPDIR
 
+# Run runtime services as non-root for better container isolation.
+RUN groupadd --gid 10001 sandbox && \
+  useradd --uid 10001 --gid sandbox --create-home --shell /bin/bash sandbox && \
+  chown -R sandbox:sandbox /usr/sandbox/app /opt/oracle
+
 # Verify installation and test SQLcl
 # Updated by demasy on November 11, 2025
 # Enhanced verification to test both SQLcl and SQL*Plus installations
@@ -221,6 +227,8 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
 WORKDIR /usr/sandbox/app
+
+USER sandbox
 
 # Use startup script to handle initialization
 CMD ["/usr/sandbox/app/system/build/startup.sh"]

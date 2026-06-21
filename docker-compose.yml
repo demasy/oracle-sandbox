@@ -107,7 +107,7 @@ services:
       - DEMASYLABS_STARTUP_DB_WAIT_INTERVAL=${ENV_STARTUP_DB_WAIT_INTERVAL}
     volumes:  
       - sandbox_logs_vol:/home/oracle/logs
-      - sandbox_dbtools_vol:/root/.dbtools
+      - sandbox_dbtools_vol:/home/sandbox/.dbtools
     logging:
       driver: "json-file"
       options:
