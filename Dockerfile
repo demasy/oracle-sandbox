@@ -186,6 +186,18 @@ RUN groupadd --gid 10001 sandbox && \
   mkdir -p /home/sandbox/.dbtools /home/oracle/logs && \
   chown -R sandbox:sandbox /usr/sandbox/app /opt/oracle /home/sandbox/.dbtools /home/oracle/logs
 
+# Setup CLI aliases automatically on container startup
+# Append alias source to sandbox user's .bashrc
+RUN echo '' >> /root/.bashrc && \
+    echo '# Sandbox CLI aliases (Phase 1)' >> /root/.bashrc && \
+    echo '[[ -f /usr/sandbox/app/cli/sandbox-aliases.sh ]] && source /usr/sandbox/app/cli/sandbox-aliases.sh' >> /root/.bashrc && \
+    echo '' >> /root/.bashrc && \
+    echo '' >> /home/sandbox/.bashrc && \
+    echo '# Sandbox CLI aliases (Phase 1)' >> /home/sandbox/.bashrc && \
+    echo '[[ -f /usr/sandbox/app/cli/sandbox-aliases.sh ]] && source /usr/sandbox/app/cli/sandbox-aliases.sh' >> /home/sandbox/.bashrc && \
+    echo '' >> /home/sandbox/.bashrc && \
+    chown sandbox:sandbox /home/sandbox/.bashrc
+
 EXPOSE 3000
 EXPOSE 3001
 

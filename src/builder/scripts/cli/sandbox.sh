@@ -39,21 +39,12 @@ source /usr/sandbox/app/system/utils/logging.sh
 source /usr/sandbox/app/system/utils/banner.sh
 source /usr/sandbox/app/cli/sandbox-config.sh
 
-# ─── Resource sets per action ─────────────────────────────────────────────────
+# ─── Resource lookup helper ───────────────────────────────────────────────────
+# Wraps centralized SANDBOX_RESOURCES map (from sandbox-config.sh)
 
 resources_for() {
-    case "$1" in
-        download)                   echo "apex ords" ;;
-        install)                    echo "apex" ;;
-        uninstall)                  echo "apex" ;;
-        start)                      echo "apex mcp" ;;
-        stop|restart)               echo "apex mcp" ;;
-        run)                        echo "sqlcl mcp healthcheck monitor" ;;
-        status)                     echo "database apex mcp" ;;
-        conn)                       echo "list add delete test rename" ;;
-        logs)                       echo "apex install ords startup mcp all" ;;
-        *)                          echo "" ;;
-    esac
+    local action="$1"
+    echo "${SANDBOX_RESOURCES[$action]:-}"
 }
 
 # ─── Usage ───────────────────────────────────────────────────────────────────
@@ -137,7 +128,7 @@ _did_you_mean() {
 
 # ─── Validation ──────────────────────────────────────────────────────────────
 
-VALID_ACTIONS="download install uninstall start stop restart run status conn logs"
+VALID_ACTIONS="download install uninstall start stop restart run status conn logs help"
 
 validate_action() {
     local action="$1"
@@ -150,6 +141,7 @@ validate_action() {
     suggestion=$(_did_you_mean "$action" "$VALID_ACTIONS")
     [[ -n "$suggestion" ]] && echo -e "  ${YELLOW}Did you mean:${NC} ${CYAN}${suggestion}${NC}?"
     echo -e "  ${YELLOW}Available actions:${NC} ${CYAN}${VALID_ACTIONS}${NC}"
+    echo -e "  ${YELLOW}Tip:${NC} Use ${CYAN}sandbox help search <keyword>${NC} to find commands"
     echo ""
     exit $EXIT_USAGE
 }
@@ -167,6 +159,7 @@ validate_resource() {
     suggestion=$(_did_you_mean "$resource" "$valid")
     [[ -n "$suggestion" ]] && echo -e "  ${YELLOW}Did you mean:${NC} ${CYAN}${suggestion}${NC}?"
     echo -e "  ${YELLOW}Valid resources for ${CYAN}${action}${YELLOW}:${NC} ${CYAN}${valid}${NC}"
+    echo -e "  ${YELLOW}Tip:${NC} Use ${CYAN}sandbox help search ${resource}${NC} to learn more"
     echo ""
     exit $EXIT_USAGE
 }
@@ -191,13 +184,12 @@ _first_real_arg="${_filtered_args[0]:-}"
 set -- "${_filtered_args[@]}"
 unset _filtered_args _arg
 
-clear
-_suppress_banner=0
-[[ "${SANDBOX_QUIET:-0}" == "1" ]] && _suppress_banner=1
-[[ "$_suppress_banner" == "0" ]] && print_demasy_banner "Sandbox CLI"
-unset _first_real_arg _suppress_banner
-
 if [[ $# -lt 1 ]]; then
+    clear
+    _suppress_banner=0
+    [[ "${SANDBOX_QUIET:-0}" == "1" ]] && _suppress_banner=1
+    [[ "$_suppress_banner" == "0" ]] && print_demasy_banner "Sandbox CLI"
+    unset _suppress_banner
     print_usage
     exit 0
 fi
@@ -206,6 +198,15 @@ ACTION="$1"
 RESOURCE="${2:-}"
 shift 2 2>/dev/null || true
 PARAMS="$*"
+
+# ─── Print banner (defer clear for non-help actions to preserve banner) ──────
+_suppress_banner=0
+[[ "${SANDBOX_QUIET:-0}" == "1" ]] && _suppress_banner=1
+if [[ "$ACTION" != "help" ]]; then
+    clear
+fi
+[[ "$_suppress_banner" == "0" ]] && print_demasy_banner "Sandbox CLI"
+unset _suppress_banner
 
 # ─── Help intercept ──────────────────────────────────────────────────────────
 if [[ "$ACTION" == "-h" || "$ACTION" == "--help" ]]; then
@@ -221,10 +222,17 @@ if [[ "$PARAMS" == "-h" || "$PARAMS" == "--help" ]]; then
     exit 0
 fi
 
+# ─── Special handling for help action (Phase 2) ────────────────────────────────
+if [[ "$ACTION" == "help" ]]; then
+    source /usr/sandbox/app/cli/sandbox-help-search.sh "$RESOURCE" "$PARAMS"
+    exit 0
+fi
+
 validate_action "$ACTION"
 
 # Actions that allow omitting the resource (run all resources as dashboard)
-_optional_resource_actions="status"
+# Now loaded from SANDBOX_OPTIONAL_RESOURCE_ACTIONS in sandbox-config.sh
+_optional_resource_actions="$SANDBOX_OPTIONAL_RESOURCE_ACTIONS"
 
 if [[ -z "$RESOURCE" ]]; then
     _is_optional=false
@@ -236,6 +244,7 @@ if [[ -z "$RESOURCE" ]]; then
         log_error "Missing resource for action '${ACTION}'"
         valid=$(resources_for "$ACTION")
         echo -e "  ${YELLOW}Available resources:${NC} ${CYAN}${valid}${NC}"
+        echo -e "  ${YELLOW}Tip:${NC} Use ${CYAN}sandbox help search ${ACTION}${NC} to learn more"
         echo ""
         exit $EXIT_USAGE
     fi
