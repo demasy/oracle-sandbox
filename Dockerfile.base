@@ -33,13 +33,14 @@ LABEL org.opencontainers.image.source="https://github.com/demasy/oracle-sandbox"
 LABEL org.opencontainers.image.documentation="https://github.com/demasy/oracle-sandbox/blob/main/README.md"
 
 # Install system dependencies
-RUN apt-get update && \
-  apt-get upgrade -y && \
-  apt-get install -y --no-install-recommends \
+RUN apt-get update -o Acquire::AllowDownsideGradedSecurityCertificates=true -o Acquire::Retries=5 || true && \
+  apt-get install -y -o Acquire::AllowDownsideGradedSecurityCertificates=true -o APT::Get::AllowUnauthenticated=true -o Acquire::Retries=5 ca-certificates && \
+  apt-get update && \
+  apt-get upgrade -y -o Acquire::Retries=5 && \
+  apt-get install -y --no-install-recommends -o Acquire::Retries=5 \
     curl \
     unzip \
     libaio1 \
-    ca-certificates \
     bash \
     iputils-ping \
     vim \

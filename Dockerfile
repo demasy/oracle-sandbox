@@ -1,9 +1,13 @@
 # Stage 1: Build Stage
 FROM node:20-bookworm-slim AS sandbox-builder
 
-RUN apt-get update && \
-  apt-get upgrade -y && \
-  apt-get install -y --no-install-recommends curl unzip ca-certificates && \
+# Add robust retry logic for apt-get to handle transient network failures
+# Use -o options for trusted repositories and allow unauthenticated packages
+RUN apt-get update -o Acquire::AllowDownsideGradedSecurityCertificates=true -o Acquire::Retries=5 || true && \
+  apt-get install -y -o Acquire::AllowDownsideGradedSecurityCertificates=true -o APT::Get::AllowUnauthenticated=true -o Acquire::Retries=5 ca-certificates && \
+  apt-get update && \
+  apt-get upgrade -y -o Acquire::Retries=5 && \
+  apt-get install -y --no-install-recommends -o Acquire::Retries=5 curl unzip && \
   rm -rf /var/lib/apt/lists/*
 
 ARG SRC_ORACLE_SQLCL
@@ -81,14 +85,15 @@ RUN if [ "$INSTALL_APEX" = "true" ]; then \
 
 FROM node:20-bookworm-slim
 
-RUN apt-get update && \
-  apt-get upgrade -y && \
-  apt-get install -y --no-install-recommends \
+RUN apt-get update -o Acquire::AllowDownsideGradedSecurityCertificates=true -o Acquire::Retries=5 || true && \
+  apt-get install -y -o Acquire::AllowDownsideGradedSecurityCertificates=true -o APT::Get::AllowUnauthenticated=true -o Acquire::Retries=5 ca-certificates && \
+  apt-get update && \
+  apt-get upgrade -y -o Acquire::Retries=5 && \
+  apt-get install -y --no-install-recommends -o Acquire::Retries=5 \
   curl \
   unzip \
   libaio1 \
   openjdk-17-jdk \
-  ca-certificates \
   bash \
   iputils-ping \
   vim \
