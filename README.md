@@ -403,23 +403,72 @@ sandbox run sqlcl
 
 ## 🛠️ Available Management Tools
 
-Once your Oracle Sandbox is running, access these management interfaces:
+Once your Oracle Sandbox is running and APEX is installed, access these management interfaces:
 
 | Tool | URL | Purpose |
 |------|-----|---------|
-| **APEX Web Interface** | `http://localhost:8080/ords/apex` | Application development, dashboards, low-code development |
-| **APEX Admin Console** | `http://localhost:8080/ords/apex_admin` | Workspace management, user administration, workspace settings |
+| **APEX Application Builder** | `http://localhost:8080/ords/f?p=4550:1` | Low-code application development, APEX dashboard |
+| **SQL Developer Web** | `http://localhost:8080/ords/sandbox/_sdw/` | Browser-based SQL development and execution |
+| **APEX Admin Console** | `http://localhost:8080/ords/apex_admin` | Workspace management, user administration, settings |
 | **ORDS REST API** | `http://localhost:8080/ords/` | RESTful data access, API documentation, services |
 | **Health Check** | `http://localhost:3000/health` | System diagnostics and configuration validation |
 | **Database Connectivity** | `localhost:1521` (FREEPDB1) | Direct SQL*Plus, SQLcl, or SQL Developer connections |
 
-### Credentials
+### APEX Access Credentials
 
-| Component | Username | Password |
-|-----------|----------|----------|
-| **APEX Workspace** | `ADMIN` | `Demasy1986` |
-| **Database** | `system` | `Demasy1986` |
-| **PDB Name** | `FREEPDB1` | - |
+#### APEX Admin (INTERNAL Workspace)
+| Property | Value |
+|----------|-------|
+| **Workspace** | `INTERNAL` |
+| **Username** | `ADMIN` |
+| **Password** | `Demasy1986` |
+| **URL** | `http://localhost:8080/ords/apex_admin` |
+
+#### APEX Developer Workspace (SANDBOX)
+| Property | Value |
+|----------|-------|
+| **Workspace** | `SANDBOX` |
+| **Username** | `ADMIN` |
+| **Password** | `Demasy1986` |
+| **Email** | `founder@demasy.io` |
+| **URL** | `http://localhost:8080/ords/f?p=4550:1` |
+
+#### SQL Developer Web (Schema: SANDBOX)
+| Property | Value |
+|----------|-------|
+| **Username** | `SANDBOX` |
+| **Password** | `Demasy1986` |
+| **URL** | `http://localhost:8080/ords/sandbox/_sdw/` |
+
+#### Database Connection
+| Property | Value |
+|----------|-------|
+| **Database User** | `system` |
+| **Database Password** | `Demasy1986` |
+| **PDB Name** | `FREEPDB1` |
+| **TNS Port** | `1521` |
+
+### APEX Management Commands
+
+```bash
+# Start APEX and ORDS services
+sandbox start apex
+
+# Stop APEX and ORDS services
+sandbox stop apex
+
+# Restart APEX and ORDS services
+sandbox restart apex
+
+# View ORDS logs
+sandbox logs ords
+
+# View APEX installation logs
+sandbox logs apex
+
+# Reinstall APEX (if needed)
+sandbox install apex
+```
 
 ### Command-Line Access
 
@@ -429,6 +478,11 @@ sandbox run sqlcl
 
 # Connect with SQL*Plus
 sandbox run sqlplus system@FREEPDB1
+
+# Run monitoring scripts
+sandbox run monitor active-connections
+sandbox run monitor database-size
+sandbox run monitor tablespace-usage
 
 # Run arbitrary SQL
 sandbox run sqlcl <<EOF
@@ -453,6 +507,41 @@ Connect from your local machine using:
 - **Service Name:** FREEPDB1
 - **Username:** system
 - **Password:** Demasy1986
+
+### APEX Troubleshooting
+
+**If APEX images are not loading:**
+1. Restart APEX and ORDS:
+   ```bash
+   sandbox restart apex
+   ```
+2. Check ORDS logs for errors:
+   ```bash
+   sandbox logs ords
+   ```
+3. Verify APEX workspace users are unlocked:
+   ```bash
+   sandbox run sqlcl
+   SQL> SELECT username, account_status FROM dba_users WHERE username LIKE 'APEX%' OR username LIKE 'ORDS%';
+   ```
+
+**If connection errors occur:**
+1. Check that containers are running:
+   ```bash
+   docker compose ps
+   ```
+2. Verify database health:
+   ```bash
+   sandbox run healthcheck
+   ```
+3. Reinstall APEX if needed:
+   ```bash
+   sandbox install apex
+   ```
+
+**For complete APEX documentation and troubleshooting:**
+- See [Oracle APEX Installation](docs/oracle-apex-installation.md)
+- See [Troubleshooting Guide](docs/troubleshooting.md)
 
 <br>
 
@@ -597,10 +686,11 @@ All scripts are organized in a structured directory layout for better maintainab
 |-------|--------------|----------|
 | `sandbox run sqlcl` | SQLcl connection tool | Connect via SQLcl |
 | `sandbox run sqlplus` | SQL*Plus connection tool | Connect via SQL*Plus |
+| `sandbox run monitor` | Monitoring script runner | Execute database monitoring scripts |
 | `sandbox healthcheck` | Health diagnostics | Run health check |
 | `sandbox install apex` | APEX & ORDS installer | Install APEX and ORDS |
-| `sandbox start ords` | ORDS service | Start ORDS after APEX installation |
-| `sandbox stop ords` | ORDS service | Stop ORDS after APEX installation |
+| `sandbox start apex` | ORDS service | Start ORDS after APEX installation |
+| `sandbox stop apex` | ORDS service | Stop ORDS after APEX installation |
 
 <br>
 
