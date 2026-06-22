@@ -132,4 +132,57 @@ case "$RESOURCE" in
         log_step "Running healthcheck..."
         bash /usr/sandbox/app/system/admin/healthcheck.sh
         ;;
+    monitor)
+        # Get available monitoring scripts
+        MONITOR_SCRIPT="${PARAMS%% *}"
+        MONITOR_DIR="/usr/sandbox/app/oracle/admin/monitoring"
+        
+        if [[ -z "$MONITOR_SCRIPT" ]]; then
+            echo ""
+            echo -e "  ${YELLOW}Available monitoring scripts:${NC}"
+            echo ""
+            if [[ -d "$MONITOR_DIR" ]]; then
+                _idx=1
+                for _script in "$MONITOR_DIR"/*.sql; do
+                    _name=$(basename "$_script" .sql)
+                    echo -e "    ${CYAN}${_idx})${NC} ${_name}"
+                    _idx=$(( _idx + 1 ))
+                done
+                echo ""
+                echo -e "  ${YELLOW}Usage:${NC} ${CYAN}sandbox run monitor <script-name>${NC}"
+                echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox run monitor active-connections${NC}"
+                echo ""
+            else
+                log_error "Monitoring scripts directory not found: $MONITOR_DIR"
+                exit 1
+            fi
+        else
+            # Execute monitoring script
+            SCRIPT_FILE="${MONITOR_DIR}/${MONITOR_SCRIPT}.sql"
+            
+            if [[ ! -f "$SCRIPT_FILE" ]]; then
+                echo ""
+                log_error "Monitoring script not found: ${MONITOR_SCRIPT}"
+                echo -e "  ${YELLOW}Available scripts:${NC}"
+                ls -1 "$MONITOR_DIR"/*.sql | xargs -n1 basename -s .sql
+                echo ""
+                exit 1
+            fi
+            
+            log_step "Running monitoring script: ${MONITOR_SCRIPT}..."
+            log_info "Location: ${SCRIPT_FILE}"
+            echo ""
+            
+            # Execute as SYSTEM user
+            CONN_PASS="${SANDBOX_DB_PASSWORD}"
+            CONN_HOST="${SANDBOX_DB_HOST}"
+            CONN_PORT="${SANDBOX_DB_PORT}"
+            CONN_PDB="${SANDBOX_DB_SERVICE}"
+            
+            sql "system/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}" <<EOF
+@${SCRIPT_FILE}
+exit
+EOF
+        fi
+        ;;
 esac

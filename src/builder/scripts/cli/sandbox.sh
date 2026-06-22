@@ -48,7 +48,7 @@ resources_for() {
         uninstall)                  echo "apex" ;;
         start)                      echo "apex mcp" ;;
         stop|restart)               echo "apex mcp" ;;
-        run)                        echo "sqlcl mcp healthcheck" ;;
+        run)                        echo "sqlcl mcp healthcheck monitor" ;;
         status)                     echo "database apex mcp" ;;
         conn)                       echo "list add delete test rename" ;;
         logs)                       echo "apex install ords startup mcp all" ;;
@@ -68,7 +68,7 @@ print_usage() {
     echo -e "           sandbox <action> <resource> -h | --help"
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
-    echo -e "    ${CYAN}run${NC}        sqlcl | mcp | healthcheck"
+    echo -e "    ${CYAN}run${NC}        sqlcl | mcp | healthcheck | monitor"
     echo -e "    ${CYAN}status${NC}     database | apex | mcp"
     echo -e "    ${CYAN}conn${NC}       list | add | delete | rename | test"
     echo -e "    ${CYAN}logs${NC}       apex | install | ords | startup | mcp | all"
@@ -81,6 +81,7 @@ print_usage() {
     echo ""
     echo -e "  ${YELLOW}Examples:${NC}"
     echo -e "    sandbox run sqlcl -u system"
+    echo -e "    sandbox run monitor active-connections"
     echo -e "    sandbox status apex"
     echo -e "    sandbox logs startup"
     echo -e "    sandbox conn list"
