@@ -132,7 +132,7 @@ _did_you_mean() {
 
 # ─── Validation ──────────────────────────────────────────────────────────────
 
-VALID_ACTIONS="download install uninstall start stop restart run status conn logs help"
+VALID_ACTIONS="download install uninstall start stop restart run status conn logs export help"
 
 validate_action() {
     local action="$1"
@@ -200,8 +200,15 @@ fi
 
 ACTION="$1"
 RESOURCE="${2:-}"
-shift 2 2>/dev/null || true
-PARAMS="$*"
+# For optional resource actions, if second arg is a flag (starts with --), treat as param
+if [[ -n "$RESOURCE" && "$RESOURCE" == --* ]]; then
+    shift 1
+    PARAMS="$*"
+    RESOURCE=""
+else
+    shift 2 2>/dev/null || true
+    PARAMS="$*"
+fi
 
 # ─── Print banner (defer clear for non-help actions to preserve banner) ──────
 _suppress_banner=0

@@ -19,10 +19,11 @@ declare -A SANDBOX_RESOURCES=(
     [status]="database apex mcp"
     [conn]="list add delete test rename"
     [logs]="apex install ords startup mcp all"
+    [export]="config connections all"
 )
 
 # Actions that allow omitting resource (run all resources as dashboard)
-SANDBOX_OPTIONAL_RESOURCE_ACTIONS="status"
+SANDBOX_OPTIONAL_RESOURCE_ACTIONS="status export"
 
 # ─── Log File Registry ────────────────────────────────────────────────────────
 # Centralized paths for log files (replaces hard-coded paths in action scripts)

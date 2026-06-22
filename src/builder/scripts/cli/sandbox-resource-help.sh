@@ -417,4 +417,55 @@ case "${ACTION}/${RESOURCE}" in
         echo ""
         ;;
 
+    # ── export ────────────────────────────────────────────────────────────────
+
+    export/config)
+        echo ""
+        echo -e "  ${CYAN}sandbox export config${NC} — Export all sandbox settings"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox export config [--format json|csv|table]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--format${NC}  <format>   Output format: json|csv|table (default: table)"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox export config"
+        echo -e "    sandbox export config --format json"
+        echo -e "    sandbox export config --format csv"
+        echo ""
+        ;;
+
+    export/connections)
+        echo ""
+        echo -e "  ${CYAN}sandbox export connections${NC} — Export saved database connections"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox export connections [--format json|csv|table]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--format${NC}  <format>   Output format: json|csv|table (default: table)"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox export connections"
+        echo -e "    sandbox export connections --format json"
+        echo -e "    sandbox export connections --format csv > connections.csv"
+        echo ""
+        ;;
+
+    export/all)
+        echo ""
+        echo -e "  ${CYAN}sandbox export all${NC} — Export all settings and connections"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox export all [--format json|csv|table]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--format${NC}  <format>   Output format: json|csv|table (default: table)"
+        echo ""
+        echo -e "  ${WHITE}Note:${NC}      Same as ${CYAN}sandbox export config${NC}"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox export all"
+        echo -e "    sandbox export all --format json > config.json"
+        echo ""
+        ;;
+
 esac

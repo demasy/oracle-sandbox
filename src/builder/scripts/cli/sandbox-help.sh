@@ -208,4 +208,24 @@ case "$ACTION" in
         echo -e "    sandbox download ords"
         echo ""
         ;;
+    export)
+        echo ""
+        echo -e "  ${CYAN}sandbox export${NC} — Export configurations and connections"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox export [resource] [--format json|csv|table]"
+        echo ""
+        echo -e "  ${YELLOW}Resources:${NC}"
+        echo -e "    ${CYAN}config${NC}       Export all settings (default)"
+        echo -e "    ${CYAN}connections${NC}  Export saved database connections only"
+        echo -e "    ${CYAN}all${NC}          Export everything (same as config)"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--format${NC}  <format>   Output format: json|csv|table (default: table)"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox export"
+        echo -e "    sandbox export --format json"
+        echo -e "    sandbox export connections --format csv"
+        echo ""
+        ;;
 esac
