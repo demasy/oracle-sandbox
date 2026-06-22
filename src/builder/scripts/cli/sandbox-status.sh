@@ -117,6 +117,75 @@ _check_mcp_status() {
     fi
 }
 
+# Check network status
+_check_network_status() {
+    local network_name="sandbox_network"
+    
+    _STATUS_DATA[network_name]="$network_name"
+    _STATUS_DATA[network_status]="OK"
+    _STATUS_DATA[network_driver]="bridge"
+    
+    # Get gateway from netstat
+    local gateway
+    gateway=$(netstat -rn 2>/dev/null | grep "^0.0.0.0" | awk '{print $2}' || echo "unknown")
+    _STATUS_DATA[network_gateway]="$gateway"
+    
+    # Get container IP and subnet from ifconfig
+    local container_ip
+    container_ip=$(ifconfig 2>/dev/null | grep -A1 "^eth0" | grep "inet " | awk '{print $2}' || echo "unknown")
+    [[ -z "$container_ip" ]] && container_ip="unknown"
+    
+    local netmask
+    netmask=$(ifconfig 2>/dev/null | grep -A1 "^eth0" | grep "inet " | awk '{print $4}' || echo "255.255.255.0")
+    
+    # Format subnet as CIDR
+    local subnet
+    if [[ "$netmask" == "255.255.255.0" ]]; then
+        subnet=$(echo "$container_ip" | sed 's/\.[0-9]*$/.0\/24/')
+    elif [[ "$netmask" == "255.255.0.0" ]]; then
+        subnet=$(echo "$container_ip" | sed 's/\.[0-9]*\.[0-9]*$/.0.0\/16/')
+    else
+        subnet="$container_ip/24"
+    fi
+    _STATUS_DATA[network_subnet]="$subnet"
+    
+    # Get current container hostname
+    local current_hostname
+    current_hostname=$(hostname 2>/dev/null)
+    [[ -z "$current_hostname" ]] && current_hostname="$(cat /etc/hostname 2>/dev/null)"
+    
+    _STATUS_DATA[container_1_name]="$current_hostname"
+    _STATUS_DATA[container_1_ip]="$container_ip"
+    
+    # Parse other containers from /etc/hosts
+    local container_count=1
+    if [[ -f /etc/hosts ]]; then
+        while IFS= read -r line; do
+            # Skip comments, empty lines, and localhost entries
+            [[ "$line" =~ ^# ]] && continue
+            [[ -z "$(echo "$line" | xargs)" ]] && continue
+            [[ "$line" =~ localhost ]] && continue
+            [[ "$line" =~ "ip6-" ]] && continue
+            
+            local ip_addr=$(echo "$line" | awk '{print $1}')
+            local hostname_entry=$(echo "$line" | awk '{print $2}')
+            
+            # Skip our own IP
+            [[ "$ip_addr" == "$container_ip" ]] && continue
+            [[ -z "$hostname_entry" ]] && continue
+            
+            # Only count if IP looks like network (192.168.x.x, 10.x.x.x, etc)
+            if [[ "$ip_addr" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                ((container_count++))
+                _STATUS_DATA[container_${container_count}_name]="$hostname_entry"
+                _STATUS_DATA[container_${container_count}_ip]="$ip_addr"
+            fi
+        done < /etc/hosts
+    fi
+    
+    _STATUS_DATA[container_count]="$container_count"
+}
+
 # Output status as table (default format) - resource aware
 _status_output_table() {
     case "${_STATUS_RESOURCE_CHECKED:-all}" in
@@ -162,6 +231,23 @@ _status_output_table() {
                 echo -e "  ${RED}✗${NC} MCP not running"
             fi
             ;;
+        network)
+            log_section "Docker Network"
+            if [[ "${_STATUS_DATA[network_status]}" == "OK" ]]; then
+                echo -e "  ${GREEN}✓${NC} Network: ${_STATUS_DATA[network_name]}"
+                echo -e "  ${CYAN}Driver:${NC}  ${_STATUS_DATA[network_driver]}"
+                echo -e "  ${CYAN}Subnet:${NC}  ${_STATUS_DATA[network_subnet]}"
+                echo -e "  ${CYAN}Gateway:${NC} ${_STATUS_DATA[network_gateway]}"
+                echo -e "  ${CYAN}Containers (${_STATUS_DATA[container_count]}):${NC}"
+                for ((i=1; i<=${_STATUS_DATA[container_count]:-0}; i++)); do
+                    local container_name="${_STATUS_DATA[container_${i}_name]}"
+                    local container_ip="${_STATUS_DATA[container_${i}_ip]}"
+                    [[ -n "$container_name" ]] && echo -e "    • ${CYAN}${container_name}${NC} @ ${container_ip}"
+                done
+            else
+                echo -e "  ${RED}✗${NC} Network not found: ${_STATUS_DATA[network_name]}"
+            fi
+            ;;
         *)
             # Full status when no specific resource checked
             log_section "Oracle Database"
@@ -204,6 +290,23 @@ _status_output_table() {
             else
                 echo -e "  ${RED}✗${NC} MCP not running"
             fi
+            echo ""
+            
+            log_section "Docker Network"
+            if [[ "${_STATUS_DATA[network_status]}" == "OK" ]]; then
+                echo -e "  ${GREEN}✓${NC} Network: ${_STATUS_DATA[network_name]}"
+                echo -e "  ${CYAN}Driver:${NC}  ${_STATUS_DATA[network_driver]}"
+                echo -e "  ${CYAN}Subnet:${NC}  ${_STATUS_DATA[network_subnet]}"
+                echo -e "  ${CYAN}Gateway:${NC} ${_STATUS_DATA[network_gateway]}"
+                echo -e "  ${CYAN}Containers (${_STATUS_DATA[container_count]}):${NC}"
+                for ((i=1; i<=${_STATUS_DATA[container_count]:-0}; i++)); do
+                    local container_name="${_STATUS_DATA[container_${i}_name]}"
+                    local container_ip="${_STATUS_DATA[container_${i}_ip]}"
+                    [[ -n "$container_name" ]] && echo -e "    • ${CYAN}${container_name}${NC} @ ${container_ip}"
+                done
+            else
+                echo -e "  ${RED}✗${NC} Network not found: ${_STATUS_DATA[network_name]}"
+            fi
             ;;
     esac
 }
@@ -241,6 +344,24 @@ _status_output_json() {
     [[ -n "${_STATUS_DATA[mcp_pid]}" ]] && printf "    \"pid\": %s,\n" "${_STATUS_DATA[mcp_pid]}"
     [[ -n "${_STATUS_DATA[mcp_connection]}" ]] && printf "    \"connection\": \"%s\",\n" "${_STATUS_DATA[mcp_connection]}"
     printf "    \"available\": true\n"
+    printf "  },\n"
+    printf "  \"network\": {\n"
+    printf "    \"name\": \"%s\",\n" "${_STATUS_DATA[network_name]}"
+    printf "    \"status\": \"%s\",\n" "${_STATUS_DATA[network_status]}"
+    printf "    \"driver\": \"%s\",\n" "${_STATUS_DATA[network_driver]}"
+    printf "    \"subnet\": \"%s\",\n" "${_STATUS_DATA[network_subnet]}"
+    printf "    \"gateway\": \"%s\",\n" "${_STATUS_DATA[network_gateway]}"
+    printf "    \"containers\": ["
+    
+    local container_count="${_STATUS_DATA[container_count]:-0}"
+    for ((i=1; i<=container_count; i++)); do
+        [[ $i -gt 1 ]] && printf ","
+        printf "{\n"
+        printf "        \"name\": \"%s\",\n" "${_STATUS_DATA[container_${i}_name]}"
+        printf "        \"ip\": \"%s\"\n" "${_STATUS_DATA[container_${i}_ip]}"
+        printf "      }"
+    done
+    printf "\n    ]\n"
     printf "  }\n"
     printf "}\n"
 }
@@ -268,6 +389,18 @@ _status_output_csv() {
     printf "mcp,process_status,%s\n" "${_STATUS_DATA[mcp_process_status]}"
     [[ -n "${_STATUS_DATA[mcp_pid]}" ]] && printf "mcp,pid,%s\n" "${_STATUS_DATA[mcp_pid]}"
     [[ -n "${_STATUS_DATA[mcp_connection]}" ]] && printf "mcp,connection,%s\n" "${_STATUS_DATA[mcp_connection]}"
+    
+    printf "network,name,%s\n" "${_STATUS_DATA[network_name]}"
+    printf "network,status,%s\n" "${_STATUS_DATA[network_status]}"
+    printf "network,driver,%s\n" "${_STATUS_DATA[network_driver]}"
+    printf "network,subnet,%s\n" "${_STATUS_DATA[network_subnet]}"
+    printf "network,gateway,%s\n" "${_STATUS_DATA[network_gateway]}"
+    
+    local container_count="${_STATUS_DATA[container_count]:-0}"
+    for ((i=1; i<=container_count; i++)); do
+        printf "network,container_%s_name,%s\n" "$i" "${_STATUS_DATA[container_${i}_name]}"
+        printf "network,container_%s_ip,%s\n" "$i" "${_STATUS_DATA[container_${i}_ip]}"
+    done
 }
 
 # ─── Dispatch ─────────────────────────────────────────────────────────────────
@@ -282,8 +415,9 @@ if [[ -z "$RESOURCE" ]]; then
     echo "  1) database"
     echo "  2) apex"
     echo "  3) mcp"
-    echo "  4) all"
-    echo -n "Select [1-4]: "
+    echo "  4) network"
+    echo "  5) all"
+    echo -n "Select [1-5]: "
     read -r choice
     echo ""
     
@@ -291,7 +425,8 @@ if [[ -z "$RESOURCE" ]]; then
         1) RESOURCE="database" ;;
         2) RESOURCE="apex" ;;
         3) RESOURCE="mcp" ;;
-        4) RESOURCE="all" ;;
+        4) RESOURCE="network" ;;
+        5) RESOURCE="all" ;;
         *)
             log_error "Invalid selection: $choice"
             exit 1
@@ -305,6 +440,7 @@ if [[ "$RESOURCE" == "all" ]]; then
     _check_oracle_status
     _check_apex_status
     _check_mcp_status
+    _check_network_status
 else
     _STATUS_RESOURCE_CHECKED="$RESOURCE"
     case "$RESOURCE" in
@@ -316,6 +452,9 @@ else
             ;;
         mcp)
             _check_mcp_status
+            ;;
+        network)
+            _check_network_status
             ;;
     esac
 fi
