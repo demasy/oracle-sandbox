@@ -41,6 +41,7 @@ source /usr/sandbox/app/cli/sandbox-config.sh
 source /usr/sandbox/app/cli/sandbox-params.sh
 source /usr/sandbox/app/cli/sandbox-status-helpers.sh
 source /usr/sandbox/app/cli/sandbox-menu.sh
+source /usr/sandbox/app/cli/sandbox-format.sh
 
 # ─── Resource lookup helper ───────────────────────────────────────────────────
 # Wraps centralized SANDBOX_RESOURCES map (from sandbox-config.sh)

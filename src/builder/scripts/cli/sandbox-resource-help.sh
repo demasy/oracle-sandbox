@@ -11,10 +11,15 @@ case "${ACTION}/${RESOURCE}" in
         echo ""
         echo -e "  ${CYAN}sandbox conn list${NC} — List all saved MCP connections"
         echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox conn list"
+        echo -e "  ${WHITE}Usage:${NC}     sandbox conn list [parameters]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--format${NC}  <format>   Output format: json|csv|table (default: table)"
         echo ""
         echo -e "  ${YELLOW}Examples:${NC}"
         echo -e "    sandbox conn list"
+        echo -e "    sandbox conn list --format json"
+        echo -e "    sandbox conn list --format csv"
         echo ""
         ;;
 

@@ -22,6 +22,9 @@ _conn_get_prop() {
 # ── list ──────────────────────────────────────────────────────────────────────
 
 _conn_do_list() {
+    # Parse --format flag
+    _parse_output_format $PARAMS
+    
     local props_files
     props_files=$(find "$CONN_DIR" -name "dbtools.properties" 2>/dev/null | sort)
 
@@ -38,16 +41,54 @@ _conn_do_list() {
         return
     fi
 
-    echo -e "  ${YELLOW}Saved connections:${NC}"
-    echo ""
+    # Collect connections into array
+    local -a conn_names conn_users conn_strings
+    local count=0
+    
     while IFS= read -r props; do
         local name user conn_str
         name=$(_conn_get_prop "$props" "name")
         user=$(_conn_get_prop "$props" "userName")
         conn_str=$(_conn_get_prop "$props" "connectionString")
-        echo -e "    ${CYAN}${name}${NC}   ${user}@${conn_str}"
+        
+        conn_names[$count]="$name"
+        conn_users[$count]="$user"
+        conn_strings[$count]="$conn_str"
+        ((count++))
     done <<< "$props_files"
-    echo ""
+
+    # Output in requested format
+    case "$OUTPUT_FORMAT" in
+        json)
+            printf "{\n"
+            printf "  \"connections\": [\n"
+            for i in "${!conn_names[@]}"; do
+                [[ $i -gt 0 ]] && printf ",\n"
+                printf "    {\n"
+                printf "      \"name\": \"%s\",\n" "${conn_names[$i]}"
+                printf "      \"user\": \"%s\",\n" "${conn_users[$i]}"
+                printf "      \"connection\": \"%s\"\n" "${conn_strings[$i]}"
+                printf "    }"
+            done
+            printf "\n  ]\n"
+            printf "}\n"
+            ;;
+        csv)
+            printf "name,user,connection\n"
+            for i in "${!conn_names[@]}"; do
+                printf "%s,%s,%s\n" "${conn_names[$i]}" "${conn_users[$i]}" "${conn_strings[$i]}"
+            done
+            ;;
+        *)
+            # Default table format
+            echo -e "  ${YELLOW}Saved connections:${NC}"
+            echo ""
+            for i in "${!conn_names[@]}"; do
+                echo -e "    ${CYAN}${conn_names[$i]}${NC}   ${conn_users[$i]}@${conn_strings[$i]}"
+            done
+            echo ""
+            ;;
+    esac
 }
 
 # ── add ───────────────────────────────────────────────────────────────────────

@@ -139,3 +139,58 @@ _show_param_error() {
     log_error "Unknown parameter '${param_name}' for sandbox $action $resource"
     echo ""
 }
+
+# Parse --format flag for output formatting
+# Usage: _parse_output_format $PARAMS
+# Sets: OUTPUT_FORMAT="json|csv|table" (defaults to "table")
+_parse_output_format() {
+    OUTPUT_FORMAT="table"  # Default
+    
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" || "$1" == "-f" ]]; then
+            if [[ -z "${2:-}" ]]; then
+                log_error "--format requires a format (json|csv|table)"
+                return 1
+            fi
+            case "${2}" in
+                json|csv|table)
+                    OUTPUT_FORMAT="${2}"
+                    ;;
+                *)
+                    log_error "Unknown format: ${2} (use json|csv|table)"
+                    return 1
+                    ;;
+            esac
+            return 0
+        fi
+        shift
+    done
+    return 0
+}
+
+# Validate output format is set correctly
+# Usage: _require_format_flag
+_require_format_flag() {
+    if [[ -z "${OUTPUT_FORMAT:-}" ]]; then
+        OUTPUT_FORMAT="table"
+    fi
+    
+    case "$OUTPUT_FORMAT" in
+        json|csv|table)
+            return 0
+            ;;
+        *)
+            log_error "Invalid output format: $OUTPUT_FORMAT"
+            return 1
+            ;;
+    esac
+}
+
+# Show format options in help text
+# Usage: _show_format_help
+_show_format_help() {
+    echo -e "  ${YELLOW}Output Formats:${NC}"
+    _show_param_help "-f" "--format json" "Output as JSON (machine-readable)"
+    _show_param_help "" "--format csv" "Output as CSV (spreadsheet-compatible)"
+    _show_param_help "" "--format table" "Output as table (human-readable, default)"
+}
