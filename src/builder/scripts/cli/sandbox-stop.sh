@@ -1,14 +1,17 @@
 # ─── sandbox stop ─────────────────────────────────────────────────────────────
 # Sourced by sandbox.sh — handles: sandbox stop <resource>
 # Variables inherited: ACTION, RESOURCE, PARAMS, logging/color functions
+# Dependencies: sandbox-params.sh
 # ─────────────────────────────────────────────────────────────────────────────
 
 case "$RESOURCE" in
     apex)
+        _if_dry_run "Would run: bash /usr/sandbox/app/oracle/apex/stop.sh" && exit 0
         log_step "Stopping APEX (ORDS)..."
         bash /usr/sandbox/app/oracle/apex/stop.sh
         ;;
     mcp)
+        _if_dry_run "Would stop MCP server" && exit 0
         log_step "Stopping MCP server..."
         _mcp_pid=$(pgrep -f "sql.*-mcp" 2>/dev/null | head -1)
         if [[ -z "$_mcp_pid" ]]; then

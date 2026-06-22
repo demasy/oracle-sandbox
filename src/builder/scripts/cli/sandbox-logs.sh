@@ -1,6 +1,7 @@
 # ─── sandbox logs ─────────────────────────────────────────────────────────────
 # Sourced by sandbox.sh — handles: sandbox logs <resource> [parameters]
 # Variables inherited: ACTION, RESOURCE, PARAMS, logging/color functions
+# Dependencies: sandbox-params.sh
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Log file registry ─────────────────────────────────────────────────────────
@@ -46,16 +47,15 @@ _logs_parse_params() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --follow|-f)
-                LOGS_FOLLOW=true; shift ;;
+                LOGS_FOLLOW=true
+                shift ;;
             --lines|-n)
-                [[ -z "${2:-}" ]] && { log_error "--lines requires a number"; exit 1; }
-                LOGS_LINES="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" LOGS_LINES || exit 1
+                shift 2 ;;
             *)
                 log_error "Unknown parameter '${1}' for sandbox logs"
-                echo -e "  ${YELLOW}Parameters:${NC}"
-                echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output (like tail -f)"
-                echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Number of lines to show (default: 50)"
-                echo ""
+                _show_param_help "-f|--follow" "" "Stream log output (like tail -f)"
+                _show_param_help "-n|--lines" "<N>" "Number of lines to show (default: 50)"
                 exit 1 ;;
         esac
     done
