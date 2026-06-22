@@ -275,8 +275,32 @@ _status_output_csv() {
 # Parse --format flag
 _parse_output_format $PARAMS
 
+# Interactive resource selection if not provided
+if [[ -z "$RESOURCE" ]]; then
+    echo ""
+    echo -e "${CYAN}Which resource would you like to check?${NC}"
+    echo "  1) database"
+    echo "  2) apex"
+    echo "  3) mcp"
+    echo "  4) all"
+    echo -n "Select [1-4]: "
+    read -r choice
+    echo ""
+    
+    case "$choice" in
+        1) RESOURCE="database" ;;
+        2) RESOURCE="apex" ;;
+        3) RESOURCE="mcp" ;;
+        4) RESOURCE="all" ;;
+        *)
+            log_error "Invalid selection: $choice"
+            exit 1
+            ;;
+    esac
+fi
+
 # Collect all status data
-if [[ -z "$RESOURCE" || "$RESOURCE" == "all" ]]; then
+if [[ "$RESOURCE" == "all" ]]; then
     _STATUS_RESOURCE_CHECKED="all"
     _check_oracle_status
     _check_apex_status
