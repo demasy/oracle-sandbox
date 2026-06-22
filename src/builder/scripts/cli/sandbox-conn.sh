@@ -1,6 +1,7 @@
 # ─── sandbox conn ─────────────────────────────────────────────────────────────
 # Sourced by sandbox.sh — handles: sandbox conn <resource> [parameters]
 # Variables inherited: ACTION, RESOURCE, PARAMS, logging/color functions
+# Dependencies: sandbox-params.sh
 # ─────────────────────────────────────────────────────────────────────────────
 
 CONN_DIR="${HOME:-/home/sandbox}/.dbtools/connections"
@@ -57,49 +58,44 @@ _conn_do_add() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --name|-n)
-                [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_NAME="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_NAME || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             --user|-u)
-                [[ -z "${2:-}" ]] && { log_error "--user requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_USER="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_USER || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             --pass|-p)
-                [[ -z "${2:-}" ]] && { log_error "--pass requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_PASS="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_PASS "optional" || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             --host)
-                [[ -z "${2:-}" ]] && { log_error "--host requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_HOST="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_HOST "optional" || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             --port)
-                [[ -z "${2:-}" ]] && { log_error "--port requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_PORT="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_PORT "optional" || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             --pdb)
-                [[ -z "${2:-}" ]] && { log_error "--pdb requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_PDB="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_PDB "optional" || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             *)
                 log_error "Unknown parameter '${1}' for sandbox conn add"
-                echo -e "  ${YELLOW}Parameters:${NC}"
-                echo -e "    ${CYAN}--name${NC}  <name>       Required. Connection name"
-                echo -e "    ${CYAN}--user${NC}  <user>       Required. Database user"
-                echo -e "    ${CYAN}--pass${NC}  <password>   Optional. Default: env password"
-                echo -e "    ${CYAN}--host${NC}  <host>       Optional. Default: ${SANDBOX_DB_HOST}"
-                echo -e "    ${CYAN}--port${NC}  <port>       Optional. Default: ${SANDBOX_DB_PORT}"
-                echo -e "    ${CYAN}--pdb${NC}   <PDB name>   Optional. Default: ${SANDBOX_DB_SERVICE}"
-                echo ""
+                _show_param_help "--name|-n" "<name>" "Required. Connection name"
+                _show_param_help "--user|-u" "<user>" "Required. Database user"
+                _show_param_help "--pass|-p" "<password>" "Optional. Default: env password"
+                _show_param_help "--host" "<host>" "Optional. Default: ${SANDBOX_DB_HOST}"
+                _show_param_help "--port" "<port>" "Optional. Default: ${SANDBOX_DB_PORT}"
+                _show_param_help "--pdb" "<PDB name>" "Optional. Default: ${SANDBOX_DB_SERVICE}"
                 exit ${EXIT_USAGE:-1} ;;
         esac
     done
 
-    [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn add requires --name <name>"; exit ${EXIT_USAGE:-1}; }
-    [[ -z "$CONN_USER" ]] && { log_error "sandbox conn add requires --user <user>"; exit ${EXIT_USAGE:-1}; }
+    _require_param_flag "$CONN_NAME" "--name" "sandbox conn add" || exit ${EXIT_USAGE:-1}
+    _require_param_flag "$CONN_USER" "--user" "sandbox conn add" || exit ${EXIT_USAGE:-1}
 
     CONN_PASS="${CONN_PASS:-${SANDBOX_DB_PASSWORD}}"
     CONN_HOST="${CONN_HOST:-${SANDBOX_DB_HOST}}"
     CONN_PORT="${CONN_PORT:-${SANDBOX_DB_PORT}}"
     CONN_PDB="${CONN_PDB:-${SANDBOX_DB_SERVICE}}"
 
-    if [[ "${SANDBOX_DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] Would save connection: ${CONN_NAME} → ${CONN_USER}@${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
-        return
-    fi
+    _if_dry_run "Would save connection: ${CONN_NAME} → ${CONN_USER}@${CONN_HOST}:${CONN_PORT}/${CONN_PDB}" && return
 
     # Remove existing connection with the same name so SQLcl won't refuse
     _existing=$(_conn_find_dir "$CONN_NAME")
@@ -133,17 +129,16 @@ _conn_do_delete() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --name|-n)
-                [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_NAME="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_NAME || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             *)
                 log_error "Unknown parameter '${1}' for sandbox conn delete"
-                echo -e "  ${YELLOW}Parameters:${NC}  ${CYAN}--name${NC} <name>   Required. Connection name to delete"
-                echo ""
+                _show_param_help "--name|-n" "<name>" "Required. Connection name to delete"
                 exit ${EXIT_USAGE:-1} ;;
         esac
     done
 
-    [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn delete requires --name <name>"; exit ${EXIT_USAGE:-1}; }
+    _require_param_flag "$CONN_NAME" "--name" "sandbox conn delete" || exit ${EXIT_USAGE:-1}
 
     local conn_dir
     conn_dir=$(_conn_find_dir "$CONN_NAME")
@@ -154,10 +149,7 @@ _conn_do_delete() {
         exit ${EXIT_USAGE:-1}
     fi
 
-    if [[ "${SANDBOX_DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] Would delete connection: ${CONN_NAME} (${conn_dir})"
-        return
-    fi
+    _if_dry_run "Would delete connection: ${CONN_NAME} (${conn_dir})" && return
 
     rm -rf "$conn_dir"
     log_success "Connection '${CONN_NAME}' deleted."
@@ -171,17 +163,16 @@ _conn_do_test() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --name|-n)
-                [[ -z "${2:-}" ]] && { log_error "--name requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_NAME="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_NAME || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             *)
                 log_error "Unknown parameter '${1}' for sandbox conn test"
-                echo -e "  ${YELLOW}Parameters:${NC}  ${CYAN}--name${NC} <name>   Required. Connection name to test"
-                echo ""
+                _show_param_help "--name|-n" "<name>" "Required. Connection name to test"
                 exit ${EXIT_USAGE:-1} ;;
         esac
     done
 
-    [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn test requires --name <name>"; exit ${EXIT_USAGE:-1}; }
+    _require_param_flag "$CONN_NAME" "--name" "sandbox conn test" || exit ${EXIT_USAGE:-1}
 
     local conn_dir
     conn_dir=$(_conn_find_dir "$CONN_NAME")
@@ -216,23 +207,21 @@ _conn_do_rename() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --from|-f)
-                [[ -z "${2:-}" ]] && { log_error "--from requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_FROM="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_FROM || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             --to|-t)
-                [[ -z "${2:-}" ]] && { log_error "--to requires a value"; exit ${EXIT_USAGE:-1}; }
-                CONN_TO="$2"; shift 2 ;;
+                _parse_flag_with_value "$1" "${2:-}" CONN_TO || exit ${EXIT_USAGE:-1}
+                shift 2 ;;
             *)
                 log_error "Unknown parameter '${1}' for sandbox conn rename"
-                echo -e "  ${YELLOW}Parameters:${NC}"
-                echo -e "    ${CYAN}--from${NC}  <name>   Required. Current connection name"
-                echo -e "    ${CYAN}--to${NC}    <name>   Required. New connection name"
-                echo ""
+                _show_param_help "--from|-f" "<name>" "Required. Current connection name"
+                _show_param_help "--to|-t" "<name>" "Required. New connection name"
                 exit ${EXIT_USAGE:-1} ;;
         esac
     done
 
-    [[ -z "$CONN_FROM" ]] && { log_error "sandbox conn rename requires --from <name>"; exit ${EXIT_USAGE:-1}; }
-    [[ -z "$CONN_TO" ]]   && { log_error "sandbox conn rename requires --to <name>"; exit ${EXIT_USAGE:-1}; }
+    _require_param_flag "$CONN_FROM" "--from" "sandbox conn rename" || exit ${EXIT_USAGE:-1}
+    _require_param_flag "$CONN_TO" "--to" "sandbox conn rename" || exit ${EXIT_USAGE:-1}
 
     local conn_dir
     conn_dir=$(_conn_find_dir "$CONN_FROM")

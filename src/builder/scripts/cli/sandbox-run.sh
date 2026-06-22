@@ -1,6 +1,7 @@
 # ─── sandbox run ──────────────────────────────────────────────────────────────
 # Sourced by sandbox.sh — handles: sandbox run <resource> [parameters]
 # Variables inherited: ACTION, RESOURCE, PARAMS, logging/color functions
+# Dependencies: sandbox-params.sh, sandbox-menu.sh
 # ─────────────────────────────────────────────────────────────────────────────
 
 case "$RESOURCE" in
@@ -10,51 +11,29 @@ case "$RESOURCE" in
         while [[ $# -gt 0 ]]; do
             case "$1" in
                 -u|--user)
-                    if [[ -z "${2:-}" ]]; then
-                        echo ""
-                        log_error "--user requires a value"
-                        echo -e "  ${YELLOW}Valid users:${NC} ${CYAN}${VALID_SQLCL_USERS}${NC}"
-                        echo ""
-                        exit ${EXIT_USAGE:-1}
-                    fi
-                    SQLCL_USER="$2"; shift 2
-                    ;;
+                    _parse_flag_with_value "$1" "${2:-}" SQLCL_USER || exit ${EXIT_USAGE:-1}
+                    shift 2 ;;
                 -p|--pass)
-                    if [[ -z "${2:-}" ]]; then
-                        echo ""
-                        log_error "--pass requires a value"
-                        echo ""
-                        exit ${EXIT_USAGE:-1}
-                    fi
-                    SQLCL_PASS="$2"; shift 2
-                    ;;
+                    _parse_flag_with_value "$1" "${2:-}" SQLCL_PASS || exit ${EXIT_USAGE:-1}
+                    shift 2 ;;
                 --pdb)
-                    if [[ -z "${2:-}" ]]; then
-                        echo ""
-                        log_error "--pdb requires a PDB name"
-                        echo ""
-                        exit ${EXIT_USAGE:-1}
-                    fi
-                    SQLCL_PDB="$2"; shift 2
-                    ;;
+                    _parse_flag_with_value "$1" "${2:-}" SQLCL_PDB || exit ${EXIT_USAGE:-1}
+                    shift 2 ;;
                 *)
-                    echo ""
                     log_error "Unknown parameter '${1}' for sandbox run sqlcl"
-                    echo -e "  ${YELLOW}Parameters:${NC}"
-                    echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} <user>       Required. One of: ${VALID_SQLCL_USERS}"
-                    echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: Default Password"
-                    echo -e "    ${CYAN}--pdb${NC} <PDB name>          Optional. Override the default PDB"
-                    echo ""
-                    exit ${EXIT_USAGE:-1}
-                    ;;
+                    _show_param_help "-u|--user" "<user>" "Required. One of: ${VALID_SQLCL_USERS}"
+                    _show_param_help "-p|--pass" "<password>" "Optional. Default: Default Password"
+                    _show_param_help "--pdb" "<PDB name>" "Optional. Override the default PDB"
+                    exit ${EXIT_USAGE:-1} ;;
             esac
         done
 
+        # Prompt for user if not provided
         if [[ -z "$SQLCL_USER" ]]; then
             echo ""
             echo -e "  ${YELLOW}Select a user:${NC}"
             echo ""
-            _idx=1
+            local _idx=1 _u _choice
             for _u in $VALID_SQLCL_USERS; do
                 echo -e "    ${CYAN}${_idx})${NC} ${_u}"
                 _idx=$(( _idx + 1 ))
@@ -68,19 +47,19 @@ case "$RESOURCE" in
                 [[ "$_idx" == "$_choice" ]] && SQLCL_USER="$_u" && break
                 _idx=$(( _idx + 1 ))
             done
-            unset _idx _u _choice
             if [[ -z "$SQLCL_USER" ]]; then
                 log_error "Invalid selection"
                 exit ${EXIT_USAGE:-1}
             fi
         fi
 
-        VALID_USER=false
-        for u in $VALID_SQLCL_USERS; do
-            [[ "$u" == "$SQLCL_USER" ]] && VALID_USER=true && break
+        # Validate user is in allowed list
+        local -a users=($VALID_SQLCL_USERS)
+        local valid_user=false
+        for u in "${users[@]}"; do
+            [[ "$u" == "$SQLCL_USER" ]] && valid_user=true && break
         done
-        if [[ "$VALID_USER" == false ]]; then
-            echo ""
+        if [[ "$valid_user" != "true" ]]; then
             log_error "Unknown user '${SQLCL_USER}' for sandbox run sqlcl"
             echo -e "  ${YELLOW}Valid users:${NC} ${CYAN}${VALID_SQLCL_USERS}${NC}"
             echo ""
