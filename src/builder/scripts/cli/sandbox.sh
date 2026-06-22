@@ -38,6 +38,9 @@ source /usr/sandbox/app/system/utils/colors.sh
 source /usr/sandbox/app/system/utils/logging.sh
 source /usr/sandbox/app/system/utils/banner.sh
 source /usr/sandbox/app/cli/sandbox-config.sh
+source /usr/sandbox/app/cli/sandbox-params.sh
+source /usr/sandbox/app/cli/sandbox-status-helpers.sh
+source /usr/sandbox/app/cli/sandbox-menu.sh
 
 # ─── Resource lookup helper ───────────────────────────────────────────────────
 # Wraps centralized SANDBOX_RESOURCES map (from sandbox-config.sh)

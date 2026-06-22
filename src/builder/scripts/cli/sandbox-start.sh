@@ -1,16 +1,17 @@
 # ─── sandbox start ────────────────────────────────────────────────────────────
 # Sourced by sandbox.sh — handles: sandbox start <resource> [parameters]
 # Variables inherited: ACTION, RESOURCE, PARAMS, logging/color functions
+# Uses: sandbox-params.sh for parameter parsing helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
 case "$RESOURCE" in
     mcp)
-        MCP_FLAG="" MCP_CONN_NAME=""
+        MCP_DEFAULT=false MCP_CONN=""
         set -- $PARAMS
         while [[ $# -gt 0 ]]; do
             case "$1" in
                 -d|--default)
-                    MCP_FLAG="default"
+                    MCP_DEFAULT=true
                     shift
                     ;;
                 -c|--conn)
@@ -21,46 +22,44 @@ case "$RESOURCE" in
                         echo ""
                         exit ${EXIT_USAGE:-1}
                     fi
-                    MCP_FLAG="conn"
-                    MCP_CONN_NAME="$2"
+                    MCP_CONN="$2"
                     shift 2
                     ;;
                 *)
                     echo ""
                     log_error "Unknown parameter '${1}' for sandbox start mcp"
                     echo -e "  ${YELLOW}Parameters:${NC}"
-                    echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Start MCP using the default saved connection"
-                    echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC} <name>  Start MCP using the specified saved connection"
+                    _show_param_help "-d" "--default" "Start with default connection"
+                    _show_param_help "-c" "--conn <name>" "Start with specific connection"
                     echo ""
                     exit ${EXIT_USAGE:-1}
                     ;;
             esac
         done
 
-        if [[ -z "$MCP_FLAG" ]]; then
+        if ! $MCP_DEFAULT && [[ -z "$MCP_CONN" ]]; then
             echo ""
-            log_error "sandbox start mcp requires a parameter"
+            log_error "sandbox start mcp requires: --default or --conn <name>"
             echo -e "  ${YELLOW}Parameters:${NC}"
-            echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Start MCP using the default saved connection (demasylabs-ai-conn)"
-            echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC} <name>  Start MCP using the specified saved connection"
+            _show_param_help "-d" "--default" "Start MCP with default connection (demasylabs-ai-conn)"
+            _show_param_help "-c" "--conn <name>" "Start MCP with specified connection"
             echo ""
             exit ${EXIT_USAGE:-1}
         fi
 
-        case "$MCP_FLAG" in
-            default)
-                log_step "Starting MCP server with default saved connection..."
-                bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh
-                ;;
-            conn)
-                log_step "Starting MCP server with saved connection: ${MCP_CONN_NAME}..."
-                bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh "$MCP_CONN_NAME"
-                ;;
-        esac
+        if $MCP_DEFAULT; then
+            log_step "Starting MCP server with default saved connection..."
+            bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh
+        elif [[ -n "$MCP_CONN" ]]; then
+            log_step "Starting MCP server with saved connection: ${MCP_CONN}..."
+            bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh "$MCP_CONN"
+        fi
         ;;
     apex)
         log_step "Starting APEX (ORDS)..."
         bash /usr/sandbox/app/oracle/apex/start.sh
         ;;
-    system)   log_warn "sandbox start system — not implemented yet" ;;
+    system)   
+        log_warn "sandbox start system — not implemented yet"
+        ;;
 esac
