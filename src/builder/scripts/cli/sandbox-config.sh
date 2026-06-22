@@ -22,10 +22,13 @@ declare -A SANDBOX_RESOURCES=(
     [export]="config connections all"
     [import]="config connections all"
     [batch]="apply-connections apply-commands apply-with-rollback execute"
+    [monitor]="system database apex all"
+    [audit]="list show search export stats rollback"
+    [template]="save load list delete export import"
 )
 
 # Actions that allow omitting resource (run all resources as dashboard)
-SANDBOX_OPTIONAL_RESOURCE_ACTIONS="status export import batch"
+SANDBOX_OPTIONAL_RESOURCE_ACTIONS="status export import batch monitor audit template"
 
 # ─── Log File Registry ────────────────────────────────────────────────────────
 # Centralized paths for log files (replaces hard-coded paths in action scripts)
