@@ -128,7 +128,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 > [!NOTE]
 > - Oracle Database, SQLcl, and SQL*Plus are pre-installed in the container - no separate installation required.
-> - Oracle APEX and ORDS can be installed manually using the `install-apex` command inside the management container.
+> - Oracle APEX and ORDS can be installed manually using the `sandbox install apex` command.
 
 <br>
 
@@ -390,10 +390,8 @@ docker ps
 docker logs -f sandbox-oracle-database  # Wait for "READY TO USE"
 curl http://localhost:3000/health
 
-# 4. (Optional) Run the APEX & ORDS installer inside the database container
-docker exec -it sandbox-oracle-server bash
-install-apex
-exit
+# 4. (Optional) Install APEX and ORDS
+sandbox install apex
 
 # APEX / ORDS Web UI: open http://localhost:8080 (or your configured port) in a browser
 
@@ -598,12 +596,12 @@ All scripts are organized in a structured directory layout for better maintainab
 
 | Command Alias | Target Script | Purpose |
 |-------|--------------|----------|
-| `sqlcl` | `/usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh` | Connect via SQLcl |
-| `sqlplus` | `/usr/sandbox/app/oracle/sqlplus/sqlplus-connect.sh` | Connect via SQL*Plus |
-| `healthcheck` | `/usr/sandbox/app/system/admin/healthcheck.sh` | Run health check |
-| `install-apex` | `/usr/sandbox/app/oracle/apex/install.sh` | Install APEX |
-| `start-ords` | `/usr/local/bin/start-ords` | Start ORDS after APEX installation |
-| `stop-ords` | `/usr/local/bin/stop-ords` | Stop ORDS after APEX installation |
+| `sandbox run sqlcl` | SQLcl connection tool | Connect via SQLcl |
+| `sandbox run sqlplus` | SQL*Plus connection tool | Connect via SQL*Plus |
+| `sandbox healthcheck` | Health diagnostics | Run health check |
+| `sandbox install apex` | APEX & ORDS installer | Install APEX and ORDS |
+| `sandbox start ords` | ORDS service | Start ORDS after APEX installation |
+| `sandbox stop ords` | ORDS service | Stop ORDS after APEX installation |
 
 <br>
 
@@ -756,7 +754,7 @@ For comprehensive guides, see the [src/docs](src/docs) directory:
 - Oracle Database 26ai Free container image  
 - APEX 24.2, ORDS 25.3, SQLcl integration  
 - Docker Compose setup (DB + Management Server)  
-- Core shell scripts (healthcheck, install-apex, SQLcl / SQL*Plus helpers)  
+- Core shell scripts via sandbox CLI (healthcheck, install apex, sqlcl/sqlplus, and more)  
 - Complete documentation, including architecture diagram, environment variable descriptions, usage instructions, and directory structure  
 
 ### [v1.0.1] – 2025-12-01
