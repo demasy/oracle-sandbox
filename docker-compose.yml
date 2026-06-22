@@ -2,6 +2,10 @@ services:
   sandbox-oracle-database:
     image: container-registry.oracle.com/database/free:latest
     container_name: sandbox-oracle-database
+    labels:
+      com.sandbox.service: "database"
+      com.sandbox.description: "Oracle AI Database 26ai Free"
+      com.sandbox.version: "26ai"
     ports:
       - "127.0.0.1:${ENV_DB_PORT_LISTENER}:1521"
       # Note: Enterprise Manager (5500) not available in Database Free Edition
@@ -32,15 +36,24 @@ services:
     networks:
       sandbox_network:
         ipv4_address: ${ENV_IP_DB_SERVER}
+        aliases:
+          - sandbox-db
+          - oracle-database
     restart: unless-stopped
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETFCAP
+      - NET_BIND_SERVICE
+      - SYS_NICE
     deploy:
       resources:
         limits:
           cpus: "${ENV_DB_CPU_LIMIT}"
           memory: "${ENV_DB_MEMORY_LIMIT}"
         reservations:
-          cpus: "1"
-          memory: "2g"
+          cpus: "2"
+          memory: "4g"
 
   sandbox-oracle-server:
     image: sandbox-oracle-sandbox:latest
@@ -54,16 +67,22 @@ services:
         SRC_ORACLE_INSTANTCLIENT: ${ENV_SRC_ORACLE_INSTANTCLIENT}
         INSTALL_APEX: ${ENV_INSTALL_APEX}
     container_name: sandbox-oracle-server
+    labels:
+      com.sandbox.service: "application"
+      com.sandbox.description: "Oracle Sandbox Management Server"
+      com.sandbox.version: "1.0.0"
     ports:
-      - "127.0.0.1:${ENV_SERVER_PORT}:3000"
-      - "127.0.0.1:${ENV_APEX_PORT:-8080}:8080" # for Apex
-      - "127.0.0.1:${ENV_MCP_PORT:-3001}:3001"  # for MCP
+      - "127.0.0.1:${ENV_SERVER_PORT}:3000"      # Management server health check & API
+      - "127.0.0.1:${ENV_APEX_PORT:-8080}:8080"  # APEX & ORDS web interface
+      - "127.0.0.1:${ENV_MCP_PORT:-3001}:3001"   # Claude Code MCP server
     depends_on:
       sandbox-oracle-database:
         condition: service_healthy
     environment:
+      - COMPOSE_FILE=docker-compose.yml
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-sandbox}
       - TZ=${ENV_TIME_ZONE}
-      - NODE_ENV=${ENV_NODE_ENV:-sandbox}
+      - NODE_ENV=${ENV_NODE_ENV:-demasylabs-sandbox}
       - HOST=0.0.0.0
       - SANDBOX_DB_CLIENT=${ENV_DB_CLIENT}
       - SANDBOX_DB_CONNECT_STRING=${ENV_IP_DB_SERVER}:${ENV_DB_PORT_LISTENER}/${ENV_DB_SERVICE}
@@ -118,19 +137,26 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     restart: unless-stopped
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
     networks:
       sandbox_network:
         ipv4_address: ${ENV_IP_APP_SERVER}
+        aliases:
+          - sandbox-server
+          - sandbox-app
     deploy:
       resources:
         limits:
           cpus: "${ENV_SERVER_CPU_LIMIT}"
           memory: "${ENV_SERVER_MEMORY_LIMIT}"
         reservations:
-          cpus: "0.25"
-          memory: "256M"
+          cpus: "2"
+          memory: "2g"
 
 networks:
   sandbox_network:
@@ -152,9 +178,46 @@ volumes:
   sandbox_oracle_vol:
     driver: local
     name: sandbox_oracle_vol
+    # Note: Volume size limits require quota support. If your Docker daemon doesn't support
+    # quota (common on macOS/Docker Desktop), remove the driver_opts section below.
+    # Uncomment to enable size limits on systems that support it:
+    # driver_opts:
+    #   size: 20g
+    labels:
+      com.sandbox.description: "Oracle database files and ORDS/APEX data"
+      com.sandbox.backup: "true"
+      com.sandbox.data-classification: "internal"
+      com.sandbox.compliance: "development-only"
+      com.sandbox.services: "sandbox-oracle-database"
+      com.sandbox.sensitive-data: "true"
+      com.sandbox.snapshot-frequency: "daily"
+      com.sandbox.snapshot-retention: "7 days"
   sandbox_logs_vol:
     driver: local
     name: sandbox_logs_vol
+    # driver_opts:
+    #   size: 5g
+    labels:
+      com.sandbox.description: "Application and database logs"
+      com.sandbox.retention: "30 days"
+      com.sandbox.backup: "false"
+      com.sandbox.data-classification: "internal"
+      com.sandbox.compliance: "development-only"
+      com.sandbox.services: "sandbox-oracle-database,sandbox-oracle-server"
+      com.sandbox.sensitive-data: "false"
+      com.sandbox.snapshot-frequency: "weekly"
+      com.sandbox.snapshot-retention: "2 weeks"
   sandbox_dbtools_vol:
     driver: local
     name: sandbox_dbtools_vol
+    # driver_opts:
+    #   size: 2g
+    labels:
+      com.sandbox.description: "DBTools configuration and cache"
+      com.sandbox.backup: "false"
+      com.sandbox.data-classification: "internal"
+      com.sandbox.compliance: "development-only"
+      com.sandbox.services: "sandbox-oracle-server"
+      com.sandbox.sensitive-data: "false"
+      com.sandbox.snapshot-frequency: "none"
+      com.sandbox.snapshot-retention: "none"
