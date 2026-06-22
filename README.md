@@ -358,7 +358,7 @@ docker exec -it sandbox-oracle-server bash
 Connect to the database:
 
 ```bash
-sqlcl
+sandbox run sqlcl
 ```
 
 Expected output: 
@@ -399,7 +399,7 @@ exit
 
 
 # 5. Connect
-docker exec -it sandbox-oracle-server sqlcl
+sandbox run sqlcl
 ```
 
 <br>
@@ -427,14 +427,14 @@ Once your Oracle Sandbox is running, access these management interfaces:
 ### Command-Line Access
 
 ```bash
-# Connect with SQLcl (inside container)
-docker exec -it sandbox-oracle-server sqlcl
+# Connect with SQLcl
+sandbox run sqlcl
 
-# Connect with SQL*Plus (inside container)
-docker exec -it sandbox-oracle-server sqlplus system@FREEPDB1
+# Connect with SQL*Plus
+sandbox run sqlplus system@FREEPDB1
 
 # Run arbitrary SQL
-docker exec -it sandbox-oracle-server sqlcl <<EOF
+sandbox run sqlcl <<EOF
 CONNECT system/password@192.168.1.110:1521/FREEPDB1
 SELECT * FROM dba_users;
 EXIT;
