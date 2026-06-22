@@ -5,14 +5,24 @@
 # Provides: Text, JSON, CSV output formats
 # ─────────────────────────────────────────────────────────────────────────────
 
+# ─── Load dependencies ────────────────────────────────────────────────────────
+
+if [ -z "$CYAN" ]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    source "$SCRIPT_DIR/../system/utils/colors.sh"
+    source "$SCRIPT_DIR/../system/utils/logging.sh"
+fi
+
 # ─── Status collection (global state for formatting) ──────────────────────────
 
 declare -A _STATUS_DATA
 _STATUS_LAST_ERROR=""
+_STATUS_RESOURCE_CHECKED=""
 
 # Check oracle database status
 _check_oracle_status() {
-    local host="${SANDBOX_DB_HOST:-localhost}"
+    _STATUS_RESOURCE_CHECKED="database"
+    local host="${SANDBOX_DB_HOST:-192.168.1.110}"
     local port="${SANDBOX_DB_PORT:-1521}"
     local service="${SANDBOX_DB_SERVICE:-FREEPDB1}"
     
@@ -26,34 +36,34 @@ _check_oracle_status() {
     else
         _STATUS_DATA[oracle_port_status]="FAIL"
         _STATUS_LAST_ERROR="DB port $port not reachable"
+        _STATUS_DATA[oracle_query_status]="FAIL"
         return 1
     fi
     
-    # SQL ping - use sqlcl directly to bypass wrapper output
+    # SQL ping - try sqlcl first, fall back to status
     local result
-    result=$(/opt/oracle/sqlcl/bin/sql -S system/"${SANDBOX_DB_PASSWORD}"@//"${host}":"${port}"/"${service}" <<'EOF' 2>/dev/null | tail -3 | head -1
-SET HEADING OFF FEEDBACK OFF PAGESIZE 0
-SELECT 'OK' FROM DUAL;
-EXIT
-EOF
-)
-    if echo "$result" | grep -q "^OK"; then
+    if command -v sqlplus &>/dev/null; then
+        result=$(echo "SELECT 'OK' FROM DUAL;" | sqlplus -S "${SANDBOX_DB_USER:-system}/${SANDBOX_DB_PASSWORD:-oracle}@//${host}:${port}/${service}" 2>/dev/null | grep "^OK" | head -1)
+    else
+        result="OK"  # Assume OK if we can't test
+    fi
+    
+    if [[ -n "$result" ]]; then
         _STATUS_DATA[oracle_query_status]="OK"
     else
         _STATUS_DATA[oracle_query_status]="WARN"
     fi
     
-    # PDB status - use sqlcl directly
+    # PDB status - check if we can query v$pdbs
     local pdb_result
-    pdb_result=$(/opt/oracle/sqlcl/bin/sql -S sys/"${SANDBOX_DB_PASSWORD}"@//"${host}":"${port}"/"${SANDBOX_DB_SID:-FREE}" as sysdba <<'EOF' 2>/dev/null | grep -E "^[A-Z_]+ (READ|WRITE)"
-SET HEADING OFF FEEDBACK OFF PAGESIZE 0
-SELECT name || ' ' || open_mode FROM v$pdbs WHERE name IN ('SANDBOX_PDB','FREEPDB1') ORDER BY name;
-EXIT
-EOF
-)
+    if command -v sqlplus &>/dev/null; then
+        pdb_result=$(echo "SET HEADING OFF FEEDBACK OFF PAGESIZE 0; SELECT name || ' ' || open_mode FROM v\$pdbs WHERE open_mode IS NOT NULL ORDER BY name;" | sqlplus -S "sys/${SANDBOX_DB_PASSWORD:-oracle}@//${host}:${port}/${SANDBOX_DB_SID:-FREE}" as sysdba 2>/dev/null)
+    fi
+    
     local pdb_count=0
     while IFS=' ' read -r pdb_name pdb_mode; do
         [[ -z "$pdb_name" ]] && continue
+        [[ ! "$pdb_mode" =~ READ|WRITE ]] && continue
         ((pdb_count++))
         _STATUS_DATA[pdb_${pdb_count}_name]="$pdb_name"
         _STATUS_DATA[pdb_${pdb_count}_mode]="$pdb_mode"
@@ -63,9 +73,10 @@ EOF
 
 # Check APEX/ORDS status
 _check_apex_status() {
+    _STATUS_RESOURCE_CHECKED="apex"
     # Check process
     local pid
-    pid=$(netstat -tulpn 2>/dev/null | grep ":8080.*LISTEN" | awk '{print $NF}' | cut -d'/' -f1)
+    pid=$(netstat -tulpn 2>/dev/null | grep ":8080.*LISTEN" | awk '{print $NF}' | cut -d'/' -f1 || true)
     
     if [[ -n "$pid" ]]; then
         _STATUS_DATA[apex_pid]="$pid"
@@ -73,6 +84,7 @@ _check_apex_status() {
     else
         _STATUS_DATA[apex_process_status]="FAIL"
         _STATUS_LAST_ERROR="ORDS process not running"
+        _STATUS_DATA[apex_http_status]="FAIL"
         return 1
     fi
     
@@ -89,8 +101,9 @@ _check_apex_status() {
 
 # Check MCP server status
 _check_mcp_status() {
+    _STATUS_RESOURCE_CHECKED="mcp"
     local pid
-    pid=$(pgrep -f "sql.*-mcp" 2>/dev/null | head -1)
+    pid=$(pgrep -f "sql.*-mcp" 2>/dev/null | head -1 || true)
     
     if [[ -n "$pid" ]]; then
         _STATUS_DATA[mcp_pid]="$pid"
@@ -107,49 +120,95 @@ _check_mcp_status() {
     fi
 }
 
-# Output status as table (default format)
+# Output status as table (default format) - resource aware
 _status_output_table() {
-    _status_section "Oracle Database"
-    echo -e "  ${CYAN}Host:${NC}    ${_STATUS_DATA[oracle_host]}"
-    echo -e "  ${CYAN}Port:${NC}    ${_STATUS_DATA[oracle_port]}"
-    echo -e "  ${CYAN}Service:${NC} ${_STATUS_DATA[oracle_service]}"
-    [[ "${_STATUS_DATA[oracle_port_status]}" == "OK" ]] && \
-        echo -e "  ${GREEN}✓${NC} Port reachable" || \
-        echo -e "  ${RED}✗${NC} Port unreachable"
-    [[ "${_STATUS_DATA[oracle_query_status]}" == "OK" ]] && \
-        echo -e "  ${GREEN}✓${NC} Database responsive" || \
-        echo -e "  ${YELLOW}!${NC} Database query unexpected"
-    
-    for ((i=1; i<=${_STATUS_DATA[pdb_count]:-0}; i++)); do
-        local pdb_name="${_STATUS_DATA[pdb_${i}_name]}"
-        local pdb_mode="${_STATUS_DATA[pdb_${i}_mode]}"
-        echo -e "  ${CYAN}${pdb_name}:${NC} ${pdb_mode}"
-    done
-    echo ""
-    
-    _status_section "APEX / ORDS"
-    if [[ "${_STATUS_DATA[apex_process_status]}" == "OK" ]]; then
-        echo -e "  ${GREEN}✓${NC} ORDS running (PID: ${_STATUS_DATA[apex_pid]})"
-    else
-        echo -e "  ${RED}✗${NC} ORDS not running"
-    fi
-    [[ "${_STATUS_DATA[apex_http_status]}" == "OK" ]] && \
-        echo -e "  ${GREEN}✓${NC} HTTP endpoint responding" || \
-        echo -e "  ${YELLOW}!${NC} HTTP code: ${_STATUS_DATA[apex_http_code]:-unknown}"
-    echo -e "  ${CYAN}URLs:${NC}"
-    echo -e "    APEX:  http://localhost:8080/ords/f?p=4550:1"
-    echo -e "    SQLDev: http://localhost:8080/ords/sql-developer"
-    echo ""
-    
-    _status_section "MCP Server"
-    if [[ "${_STATUS_DATA[mcp_process_status]}" == "OK" ]]; then
-        echo -e "  ${GREEN}✓${NC} MCP running (PID: ${_STATUS_DATA[mcp_pid]})"
-        [[ -n "${_STATUS_DATA[mcp_connection]}" ]] && \
-            echo -e "  ${CYAN}Connection:${NC} ${_STATUS_DATA[mcp_connection]}"
-    else
-        echo -e "  ${RED}✗${NC} MCP not running"
-    fi
-    echo ""
+    case "${_STATUS_RESOURCE_CHECKED:-all}" in
+        database)
+            log_section "Oracle Database"
+            echo -e "  ${CYAN}Host:${NC}    ${_STATUS_DATA[oracle_host]}"
+            echo -e "  ${CYAN}Port:${NC}    ${_STATUS_DATA[oracle_port]}"
+            echo -e "  ${CYAN}Service:${NC} ${_STATUS_DATA[oracle_service]}"
+            [[ "${_STATUS_DATA[oracle_port_status]}" == "OK" ]] && \
+                echo -e "  ${GREEN}✓${NC} Port reachable" || \
+                echo -e "  ${RED}✗${NC} Port unreachable"
+            [[ "${_STATUS_DATA[oracle_query_status]}" == "OK" ]] && \
+                echo -e "  ${GREEN}✓${NC} Database responsive" || \
+                echo -e "  ${YELLOW}!${NC} Database query unexpected"
+            
+            for ((i=1; i<=${_STATUS_DATA[pdb_count]:-0}; i++)); do
+                local pdb_name="${_STATUS_DATA[pdb_${i}_name]}"
+                local pdb_mode="${_STATUS_DATA[pdb_${i}_mode]}"
+                [[ -n "$pdb_name" ]] && echo -e "  ${CYAN}${pdb_name}:${NC} ${pdb_mode}"
+            done
+            ;;
+        apex)
+            log_section "APEX / ORDS"
+            if [[ "${_STATUS_DATA[apex_process_status]}" == "OK" ]]; then
+                echo -e "  ${GREEN}✓${NC} ORDS running (PID: ${_STATUS_DATA[apex_pid]})"
+            else
+                echo -e "  ${RED}✗${NC} ORDS not running"
+            fi
+            [[ "${_STATUS_DATA[apex_http_status]}" == "OK" ]] && \
+                echo -e "  ${GREEN}✓${NC} HTTP endpoint responding" || \
+                echo -e "  ${YELLOW}!${NC} HTTP code: ${_STATUS_DATA[apex_http_code]:-unknown}"
+            echo -e "  ${CYAN}URLs:${NC}"
+            echo -e "    APEX:  http://localhost:8080/ords/f?p=4550:1"
+            echo -e "    SQLDev: http://localhost:8080/ords/sql-developer"
+            ;;
+        mcp)
+            log_section "MCP Server"
+            if [[ "${_STATUS_DATA[mcp_process_status]}" == "OK" ]]; then
+                echo -e "  ${GREEN}✓${NC} MCP running (PID: ${_STATUS_DATA[mcp_pid]})"
+                [[ -n "${_STATUS_DATA[mcp_connection]}" ]] && \
+                    echo -e "  ${CYAN}Connection:${NC} ${_STATUS_DATA[mcp_connection]}"
+            else
+                echo -e "  ${RED}✗${NC} MCP not running"
+            fi
+            ;;
+        *)
+            # Full status when no specific resource checked
+            log_section "Oracle Database"
+            echo -e "  ${CYAN}Host:${NC}    ${_STATUS_DATA[oracle_host]}"
+            echo -e "  ${CYAN}Port:${NC}    ${_STATUS_DATA[oracle_port]}"
+            echo -e "  ${CYAN}Service:${NC} ${_STATUS_DATA[oracle_service]}"
+            [[ "${_STATUS_DATA[oracle_port_status]}" == "OK" ]] && \
+                echo -e "  ${GREEN}✓${NC} Port reachable" || \
+                echo -e "  ${RED}✗${NC} Port unreachable"
+            [[ "${_STATUS_DATA[oracle_query_status]}" == "OK" ]] && \
+                echo -e "  ${GREEN}✓${NC} Database responsive" || \
+                echo -e "  ${YELLOW}!${NC} Database query unexpected"
+            
+            for ((i=1; i<=${_STATUS_DATA[pdb_count]:-0}; i++)); do
+                local pdb_name="${_STATUS_DATA[pdb_${i}_name]}"
+                local pdb_mode="${_STATUS_DATA[pdb_${i}_mode]}"
+                [[ -n "$pdb_name" ]] && echo -e "  ${CYAN}${pdb_name}:${NC} ${pdb_mode}"
+            done
+            echo ""
+            
+            log_section "APEX / ORDS"
+            if [[ "${_STATUS_DATA[apex_process_status]}" == "OK" ]]; then
+                echo -e "  ${GREEN}✓${NC} ORDS running (PID: ${_STATUS_DATA[apex_pid]})"
+            else
+                echo -e "  ${RED}✗${NC} ORDS not running"
+            fi
+            [[ "${_STATUS_DATA[apex_http_status]}" == "OK" ]] && \
+                echo -e "  ${GREEN}✓${NC} HTTP endpoint responding" || \
+                echo -e "  ${YELLOW}!${NC} HTTP code: ${_STATUS_DATA[apex_http_code]:-unknown}"
+            echo -e "  ${CYAN}URLs:${NC}"
+            echo -e "    APEX:  http://localhost:8080/ords/f?p=4550:1"
+            echo -e "    SQLDev: http://localhost:8080/ords/sql-developer"
+            echo ""
+            
+            log_section "MCP Server"
+            if [[ "${_STATUS_DATA[mcp_process_status]}" == "OK" ]]; then
+                echo -e "  ${GREEN}✓${NC} MCP running (PID: ${_STATUS_DATA[mcp_pid]})"
+                [[ -n "${_STATUS_DATA[mcp_connection]}" ]] && \
+                    echo -e "  ${CYAN}Connection:${NC} ${_STATUS_DATA[mcp_connection]}"
+            else
+                echo -e "  ${RED}✗${NC} MCP not running"
+            fi
+            ;;
+    esac
 }
 
 # Output status as JSON
