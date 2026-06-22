@@ -309,9 +309,9 @@ docker ps --filter "name=sandbox-oracle-database" --filter "name=sandbox-oracle-
 
 **Expected output:**
 ```
-CONTAINER ID   IMAGE                                               STATUS                    PORTS                                              NAMES
-abc123def456   container-registry.oracle.com/database/free:latest  Up 2 minutes (healthy)    127.0.0.1:1521->1521/tcp, 127.0.0.1:5500->5500/tcp   sandbox-oracle-database
-def456ghi789   demasylabs-oracle-sandbox:latest                    Up 2 minutes (healthy)    127.0.0.1:3000->3000/tcp, 127.0.0.1:8080->8080/tcp   sandbox-oracle-server
+CONTAINER ID   IMAGE                                               STATUS                    PORTS                                          NAMES
+abc123def456   container-registry.oracle.com/database/free:latest  Up 2 minutes (healthy)    localhost:1521->1521/tcp                        sandbox-oracle-database
+def456ghi789   sandbox-oracle-sandbox:latest                       Up 2 minutes (healthy)    localhost:3000->3000/tcp, localhost:8080->8080  sandbox-oracle-server
 ```
 
 ##### 2. Wait for Database Initialization
@@ -404,7 +404,60 @@ docker exec -it sandbox-oracle-server sqlcl
 
 <br>
 
+## 🛠️ Available Management Tools
 
+Once your Oracle Sandbox is running, access these management interfaces:
+
+| Tool | URL | Purpose |
+|------|-----|---------|
+| **APEX Web Interface** | `http://localhost:8080/ords/apex` | Application development, dashboards, low-code development |
+| **APEX Admin Console** | `http://localhost:8080/ords/apex_admin` | Workspace management, user administration, workspace settings |
+| **ORDS REST API** | `http://localhost:8080/ords/` | RESTful data access, API documentation, services |
+| **Health Check** | `http://localhost:3000/health` | System diagnostics and configuration validation |
+| **Database Connectivity** | `localhost:1521` (FREEPDB1) | Direct SQL*Plus, SQLcl, or SQL Developer connections |
+
+### Credentials
+
+| Component | Username | Password |
+|-----------|----------|----------|
+| **APEX Workspace** | `ADMIN` | `Demasy1986` |
+| **Database** | `system` | `Demasy1986` |
+| **PDB Name** | `FREEPDB1` | - |
+
+### Command-Line Access
+
+```bash
+# Connect with SQLcl (inside container)
+docker exec -it sandbox-oracle-server sqlcl
+
+# Connect with SQL*Plus (inside container)
+docker exec -it sandbox-oracle-server sqlplus system@FREEPDB1
+
+# Run arbitrary SQL
+docker exec -it sandbox-oracle-server sqlcl <<EOF
+CONNECT system/password@192.168.1.110:1521/FREEPDB1
+SELECT * FROM dba_users;
+EXIT;
+EOF
+```
+
+### External Database Tools
+
+Connect from your local machine using:
+
+- **SQL Developer** (download from Oracle)
+- **DBeaver** (free version available)
+- **DataGrip** (JetBrains IDE)
+- **VS Code** (with Oracle extension)
+
+**Connection Details:**
+- **Host:** localhost (or 127.0.0.1)
+- **Port:** 1521
+- **Service Name:** FREEPDB1
+- **Username:** system
+- **Password:** Demasy1986
+
+<br>
 
 # Architecture
 The environment consists of two primary containerized services:
