@@ -7,9 +7,9 @@
 [![Database](https://img.shields.io/badge/Oracle%20AI%20DB-26ai-blue.svg)](https://www.oracle.com/database/free/)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org)
-[![APEX](https://img.shields.io/badge/APEX-24.2-red.svg)](https://apex.oracle.com)
-[![ORDS](https://img.shields.io/badge/ORDS-25.3-success.svg)](https://www.oracle.com/database/technologies/appdev/rest.html)
-[![SQLcl](https://img.shields.io/badge/SQLcl-25.3-blueviolet.svg)](https://www.oracle.com/database/sqldeveloper/technologies/sqlcl/)
+[![APEX](https://img.shields.io/badge/APEX-26.1.0-red.svg)](https://apex.oracle.com)
+[![ORDS](https://img.shields.io/badge/ORDS-26.1.2-success.svg)](https://www.oracle.com/database/technologies/appdev/rest.html)
+[![SQLcl](https://img.shields.io/badge/SQLcl-26.1-blueviolet.svg)](https://www.oracle.com/database/sqldeveloper/technologies/sqlcl/)
 [![Made with Love](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-red.svg)](https://github.com/demasy)
 
 </div>
@@ -18,7 +18,7 @@
 
 # Overview
 
-The **Oracle AI Database 26ai Free - Developer Environment** offers a clean, fully containerized development stack designed for modern application development, in-depth technical learning, and hands-on exploration of Oracle's latest AI-powered capabilities. By combining **Oracle Database 26ai Free**, **APEX 24.2**, **ORDS 25.3**, and **SQLcl** into a unified Docker-based environment, this setup simplifies installation. It provides a consistent, reproducible workspace across macOS, Linux, and Windows WSL2 environments.
+The **Oracle AI Database 26ai Free - Developer Environment** offers a clean, fully containerized development stack designed for modern application development, in-depth technical learning, and hands-on exploration of Oracle's latest AI-powered capabilities. By combining **Oracle Database 26ai Free**, **APEX 26.1.0**, **ORDS 26.1.2**, and **SQLcl** into a unified Docker-based environment, this setup simplifies installation. It provides a consistent, reproducible workspace across macOS, Linux, and Windows WSL2 environments.
 
 This environment is specifically tailored for **PL/SQL developers**, **APEX builders**, **database administrators (DBAs)**, **architects**, **instructors**, and the broader **Oracle community**. It serves as a reliable and portable foundation for rapid prototyping, REST API development, workshops, and classroom training. Users can discover and test the latest features of Oracle Database 26ai, experiment with AI-enhanced SQL and application patterns, and build full-stack solutions all without requiring production-scale infrastructure.
 
@@ -51,7 +51,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 ## Key Features
 - Oracle Database 26ai Free, preconfigured for local development
-- APEX 24.2 + ORDS 25.3 fully integrated and ready to use
+- APEX 26.1.0 + ORDS 26.1.2 fully integrated and ready to use
 - SQLcl & SQL*Plus included for scripting, labs, and automation
 - Clean Docker Compose setup (Database + Management Server)
 - Compatible with Linux, macOS (Intel/ARM), and Windows WSL2
@@ -70,7 +70,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 | **Isolated Development and Testing Environment** | Reproducible, containerized Oracle instances that enable developers to test changes, isolate work streams, and keep clean project environments without impacting the local system. |
 | **Technology Exploration and Feature Discovery** | A secure, isolated sandbox for exploring Oracle AI Database’s newest features, enhancements, and modern development workflows, enabling developers to learn through experimentation. |
 | **Proof of Concept (POC)** | A flexible, temporary environment for creating prototypes, validating technical approaches, and showcasing Oracle AI Database capabilities without the complexity of a complete production infrastructure. |
-| **APEX Application Development** | An all-in-one, low-code development platform featuring APEX 24.2, ORDS 25.3, and database services. Ideal for designing, testing, and deploying enterprise-level applications.|
+| **APEX Application Development** | An all-in-one, low-code development platform featuring APEX 26.1.0, ORDS 26.1.2, and database services. Ideal for designing, testing, and deploying enterprise-level applications.|
 | **Community, Collaboration, and Open Source** | A shared workspace that supports testing, collaborative projects, hackathons, knowledge exchange, and community-driven innovation within the Oracle ecosystem. |
 | **Professional Training and Education** | A comprehensive, hands-on learning platform focusing on Oracle Database, SQL, PL/SQL, APEX, and Oracle REST Data Services (ORDS). Perfect for instructors, workshops, bootcamps, certification preparation, and Oracle community training projects.|
 
@@ -84,13 +84,14 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 | Resource             | Minimum                            | Recommended                 |
 |-----------------     |------------------                  |-----------------------------|
-| **Operating System** | -                                  | Linux, macOS, or Windows with WSL2 |
-| **CPU**              | 2 cores (x86_64 or ARM64)          | 2+ cores (x86_64 or ARM64)  |
-| **RAM**              | 4 GB                               | **8 GB or more**            |
-| **Disk Space**       | 12 GB free                         | 20+ GB available disk space |
-| **Swap Space**       | -                                  | 2 GB (or twice RAM)         |
-| **Docker Engine**    | -                                  | 24.0.0 or later             |
-| **Docker Compose**   | -                                  | v2.20.0 or later            |
+| **Operating System** | Linux, macOS (Intel/ARM), or Windows WSL2 | Linux, macOS (Intel/ARM), or Windows with WSL2 |
+| **CPU**              | 2 cores (x86_64 or ARM64)          | 4+ cores (x86_64 or ARM64)  |
+| **RAM**              | 6 GB                               | **12 GB or more**           |
+| **Disk Space**       | 15 GB free                         | 25+ GB available disk space |
+| **Swap Space**       | 2 GB                               | 4 GB (or twice RAM)         |
+| **Docker Engine**    | 24.0.0 or later                    | 26.0.0 or later             |
+| **Docker Compose**   | v2.20.0 or later                   | v2.30.0 or later            |
+| **Java Runtime**     | OpenJDK 11 or later                | OpenJDK 17 LTS (included in image) |
 
 
 <br>
@@ -113,14 +114,12 @@ Designed to facilitate learning through practical experience, this setup allows 
 
 <div style="padding: 10px;">
   
-| Port | Service | Protocol |
-|------|---------|----------|
-| 3000 | Demasy Labs Management Server | HTTP |
-| 8080 / 8443 | ORDS and APEX web access | HTTP |
-| 1521 | Oracle Database Listener | TCP |
-| 5500 | Enterprise Manager (optional) | HTTP |
-| 3000 | Management API | HTTP |
-| 8080 | Oracle ORDS/APEX | HTTP |
+| Port | Service | Status | Notes |
+|------|---------|--------|-------|
+| 1521 | Oracle Database Listener (TNS) | ✅ Active | Database connectivity |
+| 3000 | Management Server (Health Check & API) | ✅ Active | Node.js application server |
+| 8080 | APEX & ORDS Web Interface | ✅ Active | Low-code development, REST APIs |
+| 3001 | MCP Connection Port (Optional) | ✅ Available | Claude Code integration |
 
 </div>
   
@@ -478,7 +477,7 @@ flowchart LR
         
         mgmt["<b>sandbox-oracle-server</b><br/>(Management Server)<br/><br/>Components:<br/>+ Node.js<br/>+ Oracle Client<br/><br/>Services:<br/>- sqlcl<br/>- sqlplus<br/>- healthcheck<br/><br/>Ports: <br/>- 3000<br/><br/><b>192.168.1.120</b>"]
         
-        db["<b>sandbox-oracle-database</b><br/>(Database Server)<br/><br/>Components:<br/>+ Oracle AI Database 26ai<br/>+ APEX 24.2<br/>+ ORDS 25.3<br/><br/>Ports:<br/>- 1521, 5500, 8080<br/><br/><b>192.168.1.110</b>"]
+        db["<b>sandbox-oracle-database</b><br/>(Database Server)<br/><br/>Components:<br/>+ Oracle AI Database 26ai<br/>+ APEX 26.1.0<br/>+ ORDS 26.1.2<br/><br/>Ports:<br/>- 1521, 8080<br/><br/><b>192.168.1.110</b>"]
         
          mgmt e1@---> |connects to| db
          e1@{ animation: fast }
@@ -503,10 +502,10 @@ flowchart LR
 |-----------|---------|
 | Base Image | Oracle AI Database 26ai Free Edition |
 | Container Name | `sandbox-oracle-database` |
-| Database Name | DEMASY |
-| Exposed Ports | • 1521 (Database Listener)<br>• 5500 (Enterprise Manager Express) |
+| Database Name | FREEPDB1 (Pluggable Database) |
+| Exposed Ports | • 1521 (TNS Listener) |
 | Network | 192.168.1.110 |
-| Resources | • CPU: 1 core<br>• Memory: 3GB |
+| Resources | • CPU: 2 cores<br>• Memory: 4GB |
 | Health Check | Every 30s via SQL connectivity test |
 
 <br>
@@ -519,8 +518,8 @@ flowchart LR
 | Container Name | `sandbox-oracle-server` |
 | Exposed Port | 3000 (API & Health Check) |
 | Network | 192.168.1.120 |
-| Resources | • CPU: 1 core<br>• Memory: 512MB |
-| Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7 |
+| Resources | • CPU: 2 cores<br>• Memory: 2GB |
+| Integrations | • Oracle SQLcl<br>• Oracle APEX<br>• Oracle Instant Client 23.7<br>• Node.js 20 LTS |
 | Connection Pool | • Min: 1<br>• Max: 5<br>• Increment: 1 |
 
 
@@ -531,9 +530,9 @@ flowchart LR
 | Component | Version | Release Date | Status |
 |-----------|---------|--------------|--------|
 | Oracle AI Database | 26ai Free | 2025 | ✅ Production-Ready |
-| Oracle APEX | 24.2.0 | October 2024 | ✅ Current Release |
-| Oracle ORDS | 25.3.1 | November 2024 | ✅ Current Release |
-| Oracle SQLcl | 25.3 | November 2024 | ✅ Current Release |
+| Oracle APEX | 26.1.0 | 2025 | ✅ Current Release |
+| Oracle ORDS | 26.1.2 | 2025 | ✅ Current Release |
+| Oracle SQLcl | 26.1 | 2025 | ✅ Current Release |
 | Oracle Instant Client | 23.7 | 2024 | ✅ Stable |
 | Node.js | 20.19.4 LTS | 2024 | ✅ Long-Term Support |
 | Docker Engine | 24.0.0+ | - | ✅ Required |
