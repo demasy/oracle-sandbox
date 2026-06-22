@@ -3,23 +3,31 @@
 # Sourced by action scripts (sandbox-start.sh, sandbox-install.sh, etc.)
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Parse a flag that requires a value (e.g., -c <connection> or --conn <connection>)
-# Usage: parse_flag_with_value "current_flag" "short_flag" "long_flag" "param_array_name"
-# Returns: Sets ${param_name}_FLAG to the value, shifts arguments
+# Parse a flag that requires a value (e.g., --name <value> or -n <value>)
+# Usage: _parse_flag_with_value "<flag>" "<value>" "VARIABLE_NAME" ["optional"]
+# Sets: ${VARIABLE_NAME}="<value>", returns 0 on success, 1 if missing required value
+# Note: <flag> is only used for error messages; <value> is what gets stored
 _parse_flag_with_value() {
-    local current_flag="$1"
-    local short_flag="$2"
-    local long_flag="$3"
-    local param_name="$4"
+    local flag="$1"
+    local value="$2"
+    local var_name="$3"
+    local optional="$4"
     
-    if [[ "$current_flag" == "$short_flag" || "$current_flag" == "$long_flag" ]]; then
-        if [[ -z "${2:-}" ]]; then
-            return 1  # Caller should handle: flag requires a value
+    # If value is empty/missing
+    if [[ -z "$value" ]]; then
+        # If this is an optional parameter, allow it
+        if [[ "$optional" == "optional" ]]; then
+            eval "${var_name}=\"\""
+            return 0
         fi
-        eval "${param_name}_FLAG=$2"
-        return 0
+        # Otherwise fail - required parameter missing
+        log_error "Flag '${flag}' requires a value"
+        return 1
     fi
-    return 2  # Not this flag
+    
+    # Store the value in the variable
+    eval "${var_name}=\"${value}\""
+    return 0
 }
 
 # Parse a standalone flag (no value required, e.g., -d or --default)
@@ -38,33 +46,31 @@ _parse_flag_standalone() {
     return 1
 }
 
-# Validate that a required flag was provided
-# Usage: require_param_flag "param_name" "error_message"
+# Validate that a required parameter was provided
+# Usage: _require_param_flag "VARIABLE_NAME" "--flag-name" "command_context"
+# Returns: 0 if value exists, 1 if missing (logs error)
 _require_param_flag() {
-    local param_name="$1"
-    local error_msg="$2"
-    local param_value=$(eval echo "\${${param_name}_FLAG:-}")
+    local value="$1"
+    local flag_name="$2"
+    local context="$3"
     
-    if [[ -z "$param_value" ]]; then
-        echo ""
-        log_error "$error_msg"
+    if [[ -z "$value" ]]; then
+        log_error "Missing required parameter: ${flag_name}"
+        echo -e "  ${YELLOW}Usage:${NC} ${CYAN}${context} ${flag_name} <value>${NC}"
         return 1
     fi
     return 0
 }
 
 # Display parameter help in consistent format
-# Usage: _show_param_help "short_flag" "long_flag" "description" "example"
+# Usage: _show_param_help "<flag_spec>" "<value_spec>" "<description>"
+# Example: _show_param_help "--name|-n" "<name>" "Connection name"
 _show_param_help() {
-    local short="$1"
-    local long="$2"
+    local flag_spec="$1"
+    local value_spec="$2"
     local desc="$3"
-    local example="${4:-}"
     
-    printf "    ${CYAN}%-2s${NC}, ${CYAN}%-20s${NC} %-40s\n" "$short" "$long" "$desc"
-    if [[ -n "$example" ]]; then
-        printf "       ${YELLOW}Example:${NC} ${CYAN}%s${NC}\n" "$example"
-    fi
+    printf "    ${CYAN}%-20s${NC} ${CYAN}%-15s${NC} %-45s\n" "$flag_spec" "$value_spec" "$desc"
 }
 
 # Check if dry-run mode is enabled and log appropriate message
