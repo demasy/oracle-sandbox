@@ -271,20 +271,25 @@ _monitor_output_table() {
             printf "  %-25s: %-15s\n" "Memory Usage" "${METRICS[memory_mb]}MB"
             printf "  %-25s: %-15s\n" "Disk Usage" "${METRICS[disk_percent]}%"
             echo ""
+            echo -e "${YELLOW}HEALTH${NC}"
+            printf "  %-25s: %-15s\n" "Errors (Last Hour)" "${METRICS[errors_last_hour]}"
+            printf "  %-25s: %-15s\n" "Timestamp" "${METRICS[timestamp]}"
+            echo ""
             ;;
         database)
             echo -e "${YELLOW}DATABASE METRICS${NC}"
             printf "  %-25s: %-15s\n" "Active Connections" "${METRICS[db_connections]}"
             printf "  %-25s: %-15s\n" "Transactions" "${METRICS[db_transactions]}"
             echo ""
+            echo -e "${YELLOW}HEALTH${NC}"
+            printf "  %-25s: %-15s\n" "Errors (Last Hour)" "${METRICS[errors_last_hour]}"
+            printf "  %-25s: %-15s\n" "Timestamp" "${METRICS[timestamp]}"
+            echo ""
             ;;
         apex)
             echo -e "${YELLOW}APEX METRICS${NC}"
             printf "  %-25s: %-15s\n" "Response Time" "${METRICS[apex_response_time_ms]}ms"
             printf "  %-25s: %-15s\n" "Total Requests" "${METRICS[apex_requests_total]}"
-            echo ""
-            echo -e "${YELLOW}MCP SERVICE${NC}"
-            printf "  %-25s: %-15s\n" "Uptime" "${METRICS[mcp_uptime_seconds]}s"
             echo ""
             ;;
         *)
@@ -309,13 +314,13 @@ _monitor_output_table() {
             echo -e "${YELLOW}MCP SERVICE${NC}"
             printf "  %-25s: %-15s\n" "Uptime" "${METRICS[mcp_uptime_seconds]}s"
             echo ""
+            
+            echo -e "${YELLOW}HEALTH${NC}"
+            printf "  %-25s: %-15s\n" "Errors (Last Hour)" "${METRICS[errors_last_hour]}"
+            printf "  %-25s: %-15s\n" "Timestamp" "${METRICS[timestamp]}"
+            echo ""
             ;;
     esac
-    
-    echo -e "${YELLOW}HEALTH${NC}"
-    printf "  %-25s: %-15s\n" "Errors (Last Hour)" "${METRICS[errors_last_hour]}"
-    printf "  %-25s: %-15s\n" "Timestamp" "${METRICS[timestamp]}"
-    echo ""
     echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
     echo ""
 }
