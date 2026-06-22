@@ -30,7 +30,7 @@ case "$ACTION" in
         echo ""
         echo -e "  ${YELLOW}Examples:${NC}"
         echo -e "    sandbox conn list"
-        echo -e "    sandbox conn add --name sandbox-mcp --user demasy_ai --pdb DEMASYLABS_PDB"
+        echo -e "    sandbox conn add --name sandbox-mcp --user demasy_ai --pdb SANDBOX_PDB"
         echo -e "    sandbox conn rename --from sandbox-mcp --to demasy-mcp"
         echo -e "    sandbox conn test --name sandbox-mcp"
         echo -e "    sandbox conn delete --name sandbox-mcp"

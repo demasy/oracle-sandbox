@@ -81,8 +81,8 @@ status_mcp() {
 status_oracle() {
     echo -e "${YELLOW}Oracle Database${NC}"
 
-    local host="${DEMASYLABS_DB_HOST:-localhost}"
-    local port="${DEMASYLABS_DB_PORT:-1521}"
+    local host="${SANDBOX_DB_HOST:-localhost}"
+    local port="${SANDBOX_DB_PORT:-1521}"
 
     # TCP reachability
     if (exec 3<>/dev/tcp/"$host"/"$port") 2>/dev/null; then
@@ -94,7 +94,7 @@ status_oracle() {
 
     # SQL ping
     local result
-    result=$(sql -S system/"${DEMASYLABS_DB_PASSWORD}"@//"${host}":"${port}"/"${DEMASYLABS_DB_SERVICE}" \
+    result=$(sql -S system/"${SANDBOX_DB_PASSWORD}"@//"${host}":"${port}"/"${SANDBOX_DB_SERVICE}" \
         2>/dev/null <<'EOF'
 SET HEADING OFF FEEDBACK OFF PAGESIZE 0
 SELECT 'OK' FROM DUAL;
@@ -109,10 +109,10 @@ EOF
 
     # PDB status — must connect as sysdba to CDB to see all PDBs
     local pdb_result
-    pdb_result=$(sql -S sys/"${DEMASYLABS_DB_PASSWORD}"@//"${host}":"${port}"/"${DEMASYLABS_DB_SID:-FREE}" as sysdba \
+    pdb_result=$(sql -S sys/"${SANDBOX_DB_PASSWORD}"@//"${host}":"${port}"/"${SANDBOX_DB_SID:-FREE}" as sysdba \
         2>/dev/null <<'EOF'
 SET HEADING OFF FEEDBACK OFF PAGESIZE 0
-SELECT name || ' ' || open_mode FROM v$pdbs WHERE name IN ('SANDBOX_PDB','DEMASYLABS_PDB','FREEPDB1') ORDER BY name;
+SELECT name || ' ' || open_mode FROM v$pdbs WHERE name IN ('SANDBOX_PDB','SANDBOX_PDB','FREEPDB1') ORDER BY name;
 EXIT
 EOF
 )

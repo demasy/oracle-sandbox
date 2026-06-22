@@ -668,7 +668,7 @@ SANDBOX_AI
 <br>
 
 > [!NOTE]
-> The MCP server credentials are read from the container's environment variables (`DEMASYLABS_DB_MCP_USER`, `DEMASYLABS_DB_MCP_SERVICE`, etc.) defined in your `.env` file. The saved connection `sandbox-ai-conn` is refreshed automatically on every MCP server start.
+> The MCP server credentials are read from the container's environment variables (`SANDBOX_DB_MCP_USER`, `SANDBOX_DB_MCP_SERVICE`, etc.) defined in your `.env` file. The saved connection `sandbox-ai-conn` is refreshed automatically on every MCP server start.
 
 <br>
 

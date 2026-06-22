@@ -52,7 +52,7 @@ src/scripts/
 
 ### CLI Tools
 ```bash
-# Connect with SQLcl — auto-login as system (uses DEMASYLABS_* env vars)
+# Connect with SQLcl — auto-login as system (uses SANDBOX_* env vars)
 docker exec -it sandbox-oracle-server sqlcl
 
 # Connect with SQLcl — custom credentials / connection string (pass-through)

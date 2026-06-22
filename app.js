@@ -4,11 +4,11 @@ const PORT = Number(process.env.PORT || process.env.ENV_SERVER_PORT || 3000);
 const HOST = process.env.HOST || '127.0.0.1';
 
 const requiredHealthEnv = [
-  'DEMASYLABS_DB_HOST',
-  'DEMASYLABS_DB_PORT',
-  'DEMASYLABS_DB_SERVICE',
-  'DEMASYLABS_DB_USER',
-  'DEMASYLABS_DB_PASS',
+  'SANDBOX_DB_HOST',
+  'SANDBOX_DB_PORT',
+  'SANDBOX_DB_SERVICE',
+  'SANDBOX_DB_USER',
+  'SANDBOX_DB_PASS',
 ];
 
 function sendJson(res, statusCode, payload) {

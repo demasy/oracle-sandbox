@@ -30,32 +30,32 @@ log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_step() { echo -e "${CYAN}[STEP]${NC} $1"; }
 
 # Configuration - Use environment variables (required)
-DB_HOST="${DEMASYLABS_DB_HOST}"
-DB_PORT="${DEMASYLABS_DB_PORT}"
-DB_SERVICE="${DEMASYLABS_DB_SERVICE}"
-SYS_PASSWORD="${DEMASYLABS_DB_PASSWORD}"
-APEX_ADMIN_USERNAME="${DEMASYLABS_APEX_ADMIN_USERNAME}"
-APEX_PASSWORD="${DEMASYLABS_APEX_ADMIN_PASSWORD}"
-APEX_EMAIL="${DEMASYLABS_APEX_EMAIL}"
-APEX_WORKSPACE="${DEMASYLABS_APEX_DEFAULT_WORKSPACE}"
+DB_HOST="${SANDBOX_DB_HOST}"
+DB_PORT="${SANDBOX_DB_PORT}"
+DB_SERVICE="${SANDBOX_DB_SERVICE}"
+SYS_PASSWORD="${SANDBOX_DB_PASSWORD}"
+APEX_ADMIN_USERNAME="${SANDBOX_APEX_ADMIN_USERNAME}"
+APEX_PASSWORD="${SANDBOX_APEX_ADMIN_PASSWORD}"
+APEX_EMAIL="${SANDBOX_APEX_EMAIL}"
+APEX_WORKSPACE="${SANDBOX_APEX_DEFAULT_WORKSPACE}"
 
 # Configuration - Use environment variables (with sensible fallbacks)
-APEX_HOME="${DEMASYLABS_APEX_HOME:-/opt/oracle/apex}"
-APEX_IMAGES_DIR="${DEMASYLABS_APEX_IMAGES_DIR:-/tmp/i}"
-APEX_INSTALL_LOG="${DEMASYLABS_APEX_INSTALL_LOG:-/tmp/apex_install.log}"
-APEX_TABLE_SPACE="${DEMASYLABS_APEX_TABLE_SPACE:-APEX}"
-APEX_TABLE_SPACE_FILES="${DEMASYLABS_APEX_TABLE_SPACE_FILES:-APEX_FILES}"
-APEX_SECURITY_GROUP_ID="${DEMASYLABS_APEX_SECURITY_GROUP_ID:-10}"
-APEX_TABLESPACE_SIZE="${DEMASYLABS_APEX_TABLESPACE_SIZE:-500M}"
-APEX_TABLESPACE_AUTOEXTEND="${DEMASYLABS_APEX_TABLESPACE_AUTOEXTEND:-100M}"
-ORDS_HOME="${DEMASYLABS_ORDS_HOME:-/opt/oracle/ords}"
-ORDS_CONFIG="${DEMASYLABS_ORDS_CONFIG:-/opt/oracle/ords/config}"
-ORDS_LOG="${DEMASYLABS_ORDS_LOG:-/tmp/ords.log}"
-ORDS_PORT="${DEMASYLABS_ORDS_PORT:-8080}"
-ORDS_JDBC_MIN_LIMIT="${DEMASYLABS_ORDS_JDBC_MIN_LIMIT:-3}"
-ORDS_JDBC_MAX_LIMIT="${DEMASYLABS_ORDS_JDBC_MAX_LIMIT:-20}"
-ORDS_JDBC_INITIAL_LIMIT="${DEMASYLABS_ORDS_JDBC_INITIAL_LIMIT:-3}"
-ORDS_STATEMENT_TIMEOUT="${DEMASYLABS_ORDS_STATEMENT_TIMEOUT:-900}"
+APEX_HOME="${SANDBOX_APEX_HOME:-/opt/oracle/apex}"
+APEX_IMAGES_DIR="${SANDBOX_APEX_IMAGES_DIR:-/tmp/i}"
+APEX_INSTALL_LOG="${SANDBOX_APEX_INSTALL_LOG:-/tmp/apex_install.log}"
+APEX_TABLE_SPACE="${SANDBOX_APEX_TABLE_SPACE:-APEX}"
+APEX_TABLE_SPACE_FILES="${SANDBOX_APEX_TABLE_SPACE_FILES:-APEX_FILES}"
+APEX_SECURITY_GROUP_ID="${SANDBOX_APEX_SECURITY_GROUP_ID:-10}"
+APEX_TABLESPACE_SIZE="${SANDBOX_APEX_TABLESPACE_SIZE:-500M}"
+APEX_TABLESPACE_AUTOEXTEND="${SANDBOX_APEX_TABLESPACE_AUTOEXTEND:-100M}"
+ORDS_HOME="${SANDBOX_ORDS_HOME:-/opt/oracle/ords}"
+ORDS_CONFIG="${SANDBOX_ORDS_CONFIG:-/opt/oracle/ords/config}"
+ORDS_LOG="${SANDBOX_ORDS_LOG:-/tmp/ords.log}"
+ORDS_PORT="${SANDBOX_ORDS_PORT:-8080}"
+ORDS_JDBC_MIN_LIMIT="${SANDBOX_ORDS_JDBC_MIN_LIMIT:-3}"
+ORDS_JDBC_MAX_LIMIT="${SANDBOX_ORDS_JDBC_MAX_LIMIT:-20}"
+ORDS_JDBC_INITIAL_LIMIT="${SANDBOX_ORDS_JDBC_INITIAL_LIMIT:-3}"
+ORDS_STATEMENT_TIMEOUT="${SANDBOX_ORDS_STATEMENT_TIMEOUT:-900}"
 
 # Display Demasy Labs banner
 print_demasy_banner "Oracle APEX Complete Installation"
@@ -369,9 +369,9 @@ log_success "APEX configured with ${APEX_ADMIN_USERNAME} user (Workspace: INTERN
 ################################################################################
 # STEP 5C: Create default APEX workspace and workspace admin user
 ################################################################################
-log_info "Step 5C: Creating default APEX workspace (${APEX_WORKSPACE:-DEMASYLABS})..."
+log_info "Step 5C: Creating default APEX workspace (${APEX_WORKSPACE:-SANDBOX})..."
 
-WORKSPACE_NAME="${APEX_WORKSPACE:-DEMASYLABS}"
+WORKSPACE_NAME="${APEX_WORKSPACE:-SANDBOX}"
 WORKSPACE_SCHEMA="${APEX_DEFAULT_WORKSPACE_SCHEMA:-${WORKSPACE_NAME}}"
 WORKSPACE_SCHEMA_LOWER="$(echo "${WORKSPACE_SCHEMA}" | tr '[:upper:]' '[:lower:]')"
 WORKSPACE_ADMIN="${APEX_ADMIN_USERNAME:-demasylabs}"
@@ -468,7 +468,7 @@ END;
 EXIT
 EOSQL
 
-log_success "Workspace ${WORKSPACE_NAME:-DEMASYLABS} created with admin ${WORKSPACE_ADMIN:-demasylabs}"
+log_success "Workspace ${WORKSPACE_NAME:-SANDBOX} created with admin ${WORKSPACE_ADMIN:-demasylabs}"
 
 ################################################################################
 # STEP 6: Configure APEX REST
@@ -624,7 +624,7 @@ log_success "ORDS configuration verified - SQL Developer Web is enabled"
 ################################################################################
 # STEP 8C: REST-enable workspace schema (ORDS_METADATA now exists)
 ################################################################################
-_WS_SCHEMA="${WORKSPACE_SCHEMA:-DEMASYLABS}"
+_WS_SCHEMA="${WORKSPACE_SCHEMA:-SANDBOX}"
 _WS_PATTERN="$(echo "${_WS_SCHEMA}" | tr '[:upper:]' '[:lower:]')"
 log_info "Step 8C: REST-enabling workspace schema ${_WS_SCHEMA} for SQL Developer Web..."
 
@@ -726,7 +726,7 @@ log_success "ORDS configured"
 ################################################################################
 log_info "Step 10: Creating ORDS management scripts..."
 
-BIN_DIR="${DEMASYLABS_BIN_DIR:-/usr/sandbox/app/bin}"
+BIN_DIR="${SANDBOX_BIN_DIR:-/usr/sandbox/app/bin}"
 mkdir -p "${BIN_DIR}"
 
 cat > "${BIN_DIR}/start-ords" << EOFSCRIPT
@@ -1103,7 +1103,7 @@ COMPLETION_MSG_SCRIPT="/usr/sandbox/app/system/utils/apex-completion.sh"
 if [ -f "$COMPLETION_MSG_SCRIPT" ]; then
     source "$COMPLETION_MSG_SCRIPT"
     # Display completion message with credentials
-    display_completion_message "${APEX_ADMIN_USERNAME}" "${APEX_PASSWORD}" "${APEX_EMAIL}" "${ORDS_PORT}" "${WORKSPACE_NAME:-DEMASYLABS}"
+    display_completion_message "${APEX_ADMIN_USERNAME}" "${APEX_PASSWORD}" "${APEX_EMAIL}" "${ORDS_PORT}" "${WORKSPACE_NAME:-SANDBOX}"
 else
     echo "Warning: apex-completion.sh not found at $COMPLETION_MSG_SCRIPT"
     echo "Installation completed successfully!"

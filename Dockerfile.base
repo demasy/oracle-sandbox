@@ -130,12 +130,12 @@ RUN ln -s /usr/sandbox/app/system/admin/healthcheck.sh /usr/local/bin/healthchec
 RUN npm ci --only=production && npm cache clean --force
 
 # Environment variables for database connectivity
-ENV DEMASYLABS_DB_HOST=oracle-al-database-26ai \
-    DEMASYLABS_DB_PORT=1521 \
-    DEMASYLABS_DB_SERVICE=FREEPDB1 \
-    DEMASYLABS_DB_USER=system \
-    DEMASYLABS_DB_PASS=CHANGE_ME_SECURE_PASSWORD \
-    DEMASYLABS_ORDS_PORT=8080 \
+ENV SANDBOX_DB_HOST=oracle-al-database-26ai \
+    SANDBOX_DB_PORT=1521 \
+    SANDBOX_DB_SERVICE=FREEPDB1 \
+    SANDBOX_DB_USER=system \
+    SANDBOX_DB_PASS=CHANGE_ME_SECURE_PASSWORD \
+    SANDBOX_ORDS_PORT=8080 \
     HOST=0.0.0.0 \
     NODE_ENV=production
 

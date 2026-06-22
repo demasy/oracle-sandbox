@@ -18,12 +18,12 @@
 #   remote_host      (required) - Remote database hostname or IP
 #   remote_port      (required) - Remote database listener port
 #   remote_service   (required) - Remote database service name
-#   pdb_name         (optional) - Local PDB name (defaults to DEMASYLABS_PDB)
+#   pdb_name         (optional) - Local PDB name (defaults to SANDBOX_PDB)
 #
 # EXAMPLES:
 #   create-db-link.sh ebs_link roketto Roketto1986 apps apps ORACLE.ROKETTO.MOBI 1521 EBSDB ROKETTO_PDB
 #   create-db-link.sh prod_link myuser MyPass01 sys SysPass01 192.168.1.10 1521 PRODDB
-#   create-db-link.sh hr_link demasy Demasy1986 hr hrpass 10.0.0.5 1521 HRPDB DEMASYLABS_PDB
+#   create-db-link.sh hr_link demasy Demasy1986 hr hrpass 10.0.0.5 1521 HRPDB SANDBOX_PDB
 #
 # NOTES:
 #   - Creates a PRIVATE database link (owned by owner_user, not PUBLIC)
@@ -61,7 +61,7 @@ if [ $# -lt 8 ]; then
     echo "  remote_host      (required) Remote database hostname or IP"
     echo "  remote_port      (required) Remote database listener port (e.g. 1521)"
     echo "  remote_service   (required) Remote database service name"
-    echo "  pdb_name         (optional) Local PDB name (default: DEMASYLABS_PDB)"
+    echo "  pdb_name         (optional) Local PDB name (default: SANDBOX_PDB)"
     echo ""
     echo "Examples:"
     echo "  $(basename "$0") ebs_link roketto Roketto1986 apps apps ORACLE.ROKETTO.MOBI 1521 EBSDB ROKETTO_PDB"
@@ -113,7 +113,7 @@ fi
 # Normalize to uppercase for Oracle comparisons
 LINK_NAME_UPPER=$(echo "$LINK_NAME"   | tr '[:lower:]' '[:upper:]')
 OWNER_USER_UPPER=$(echo "$OWNER_USER" | tr '[:lower:]' '[:upper:]')
-PDB_NAME="${INPUT_PDB:-DEMASYLABS_PDB}"
+PDB_NAME="${INPUT_PDB:-SANDBOX_PDB}"
 
 # Display banner
 print_demasy_banner "Oracle Create DB Link: $LINK_NAME"
@@ -123,17 +123,17 @@ print_demasy_banner "Oracle Create DB Link: $LINK_NAME"
 ################################################################################
 log_info "Reading configuration from environment variables..."
 
-DB_HOST="${DEMASYLABS_DB_HOST}"
-DB_PORT="${DEMASYLABS_DB_PORT}"
-DB_PASSWORD="${DEMASYLABS_DB_PASSWORD}"
-DB_SID="${DEMASYLABS_DB_SID}"
+DB_HOST="${SANDBOX_DB_HOST}"
+DB_PORT="${SANDBOX_DB_PORT}"
+DB_PASSWORD="${SANDBOX_DB_PASSWORD}"
+DB_SID="${SANDBOX_DB_SID}"
 
 log_step "Validating environment variables..."
 MISSING_VARS=()
-[[ -z "$DB_HOST" ]]     && MISSING_VARS+=("DEMASYLABS_DB_HOST")
-[[ -z "$DB_PORT" ]]     && MISSING_VARS+=("DEMASYLABS_DB_PORT")
-[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("DEMASYLABS_DB_PASSWORD")
-[[ -z "$DB_SID" ]]      && MISSING_VARS+=("DEMASYLABS_DB_SID")
+[[ -z "$DB_HOST" ]]     && MISSING_VARS+=("SANDBOX_DB_HOST")
+[[ -z "$DB_PORT" ]]     && MISSING_VARS+=("SANDBOX_DB_PORT")
+[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("SANDBOX_DB_PASSWORD")
+[[ -z "$DB_SID" ]]      && MISSING_VARS+=("SANDBOX_DB_SID")
 
 if [ ${#MISSING_VARS[@]} -ne 0 ]; then
     log_error "Missing required environment variables:"

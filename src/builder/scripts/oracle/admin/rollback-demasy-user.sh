@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ################################################################################
-# DEMASYLABS PDB and User Rollback Script
+# SANDBOX PDB and User Rollback Script
 # This script runs FROM INSIDE the Docker container
-# Removes DEMASYLABS_PDB pluggable database and demasy user
+# Removes SANDBOX_PDB pluggable database and demasy user
 ################################################################################
 
 set -e
@@ -18,18 +18,18 @@ source "/usr/sandbox/app/system/utils/logging.sh"
 source "/usr/sandbox/app/system/utils/colors.sh"
 
 # Display Demasy Labs banner
-print_demasy_banner "DEMASYLABS PDB and User Rollback"
+print_demasy_banner "SANDBOX PDB and User Rollback"
 
 ################################################################################
 # CONFIGURATION - Read from Environment Variables
 ################################################################################
 log_info "Reading configuration from environment variables..."
 
-DB_HOST="${DEMASYLABS_DB_HOST}"
-DB_PORT="${DEMASYLABS_DB_PORT}"
-DB_PASSWORD="${DEMASYLABS_DB_PASSWORD}"
-DB_SID="${DEMASYLABS_DB_SID}"
-PDB_NAME="DEMASYLABS_PDB"
+DB_HOST="${SANDBOX_DB_HOST}"
+DB_PORT="${SANDBOX_DB_PORT}"
+DB_PASSWORD="${SANDBOX_DB_PASSWORD}"
+DB_SID="${SANDBOX_DB_SID}"
+PDB_NAME="SANDBOX_PDB"
 DEMASY_USER="demasy"
 COMMON_USER="c##demasy"
 
@@ -37,10 +37,10 @@ COMMON_USER="c##demasy"
 log_step "Validating environment variables..."
 MISSING_VARS=()
 
-[[ -z "$DB_HOST" ]] && MISSING_VARS+=("DEMASYLABS_DB_HOST")
-[[ -z "$DB_PORT" ]] && MISSING_VARS+=("DEMASYLABS_DB_PORT")
-[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("DEMASYLABS_DB_PASSWORD")
-[[ -z "$DB_SID" ]] && MISSING_VARS+=("DEMASYLABS_DB_SID")
+[[ -z "$DB_HOST" ]] && MISSING_VARS+=("SANDBOX_DB_HOST")
+[[ -z "$DB_PORT" ]] && MISSING_VARS+=("SANDBOX_DB_PORT")
+[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("SANDBOX_DB_PASSWORD")
+[[ -z "$DB_SID" ]] && MISSING_VARS+=("SANDBOX_DB_SID")
 
 if [ ${#MISSING_VARS[@]} -ne 0 ]; then
     log_error "Missing required environment variables:"
@@ -832,7 +832,7 @@ if [ "$COMMON_USER_EXISTS" = "1" ]; then
 sql system/${DB_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SID} << 'EOF' > /dev/null 2>&1
 BEGIN
     -- Drop any tablespaces that might contain demasy objects
-    FOR ts IN (SELECT tablespace_name FROM dba_tablespaces WHERE tablespace_name LIKE '%DEMASY%' OR tablespace_name LIKE '%DEMASYLABS%') LOOP
+    FOR ts IN (SELECT tablespace_name FROM dba_tablespaces WHERE tablespace_name LIKE '%DEMASY%' OR tablespace_name LIKE '%SANDBOX%') LOOP
         BEGIN
             EXECUTE IMMEDIATE 'DROP TABLESPACE ' || ts.tablespace_name || ' INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS';
         EXCEPTION

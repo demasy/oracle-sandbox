@@ -42,7 +42,7 @@ NC='\033[0m'
 print_banner() {
     echo -e ""
     echo -e "${BLUE}${BOLD}═══════════════════════════════════════════════════════════${NC}"
-    echo -e "${BLUE}${BOLD}   DEMASYLABS 🔄 Container Reset Tool${NC}"
+    echo -e "${BLUE}${BOLD}   SANDBOX 🔄 Container Reset Tool${NC}"
     echo -e "${BLUE}${BOLD}═══════════════════════════════════════════════════════════${NC}"
     echo -e ""
 }

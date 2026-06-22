@@ -11,7 +11,7 @@
 # PARAMETERS:
 #   username  (required) - The target user to grant privileges to
 #   level     (optional) - Privilege level: minimal | normal | all (default: normal)
-#   pdb_name  (optional) - Target PDB name (defaults to DEMASYLABS_PDB)
+#   pdb_name  (optional) - Target PDB name (defaults to SANDBOX_PDB)
 #
 # PRIVILEGE LEVELS:
 #   minimal   Basic connectivity + own-schema DDL/DML only
@@ -64,7 +64,7 @@ if [ $# -eq 0 ]; then
     echo ""
     echo "  username   (required) Target user to grant privileges to"
     echo "  level      (optional) minimal | normal | all  (default: normal)"
-    echo "  pdb_name   (optional) Target PDB name        (default: DEMASYLABS_PDB)"
+    echo "  pdb_name   (optional) Target PDB name        (default: SANDBOX_PDB)"
     echo ""
     echo "Levels:"
     echo "  minimal    Basic connectivity + own-schema DDL/DML"
@@ -114,23 +114,23 @@ print_demasy_banner "Oracle Grant Privileges: $INPUT_USER ($PRIV_LEVEL)"
 ################################################################################
 log_info "Reading configuration from environment variables..."
 
-DB_HOST="${DEMASYLABS_DB_HOST}"
-DB_PORT="${DEMASYLABS_DB_PORT}"
-DB_PASSWORD="${DEMASYLABS_DB_PASSWORD}"
-DB_SID="${DEMASYLABS_DB_SID}"
+DB_HOST="${SANDBOX_DB_HOST}"
+DB_PORT="${SANDBOX_DB_PORT}"
+DB_PASSWORD="${SANDBOX_DB_PASSWORD}"
+DB_SID="${SANDBOX_DB_SID}"
 
 # Apply parameter overrides
 TARGET_USER=$(echo "$INPUT_USER" | tr '[:lower:]' '[:upper:]')
-PDB_NAME="${INPUT_PDB:-DEMASYLABS_PDB}"
+PDB_NAME="${INPUT_PDB:-SANDBOX_PDB}"
 
 # Validate required environment variables
 log_step "Validating environment variables..."
 MISSING_VARS=()
 
-[[ -z "$DB_HOST" ]]     && MISSING_VARS+=("DEMASYLABS_DB_HOST")
-[[ -z "$DB_PORT" ]]     && MISSING_VARS+=("DEMASYLABS_DB_PORT")
-[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("DEMASYLABS_DB_PASSWORD")
-[[ -z "$DB_SID" ]]      && MISSING_VARS+=("DEMASYLABS_DB_SID")
+[[ -z "$DB_HOST" ]]     && MISSING_VARS+=("SANDBOX_DB_HOST")
+[[ -z "$DB_PORT" ]]     && MISSING_VARS+=("SANDBOX_DB_PORT")
+[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("SANDBOX_DB_PASSWORD")
+[[ -z "$DB_SID" ]]      && MISSING_VARS+=("SANDBOX_DB_SID")
 
 if [ ${#MISSING_VARS[@]} -ne 0 ]; then
     log_error "Missing required environment variables:"

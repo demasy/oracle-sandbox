@@ -26,7 +26,7 @@ display_completion_message() {
     local APEX_PASSWORD="${2}"
     local APEX_EMAIL="${3}"
     local ORDS_PORT="${4:-8080}"
-    local WORKSPACE_NAME="${5:-DEMASYLABS}"
+    local WORKSPACE_NAME="${5:-SANDBOX}"
     local WORKSPACE_SCHEMA_LOWER="$(echo "${WORKSPACE_NAME}" | tr '[:upper:]' '[:lower:]')"
 
     # Clear terminal and show Demasy Labs banner

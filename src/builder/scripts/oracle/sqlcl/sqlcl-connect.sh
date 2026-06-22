@@ -63,7 +63,7 @@ if [[ $# -gt 0 ]]; then
     log_info "Troubleshooting steps:"
     echo -e "  1. Check if database container is running: ${BOLD}${CYAN}docker ps${RESET}"
     echo -e "  2. Check database logs: ${BOLD}${CYAN}docker logs demasylabs-oracle-database${RESET}"
-    echo -e "  3. Verify database is accessible: ${BOLD}${CYAN}docker exec demasylabs-oracle-server ping $DEMASYLABS_DB_HOST${RESET}"
+    echo -e "  3. Verify database is accessible: ${BOLD}${CYAN}docker exec demasylabs-oracle-server ping $SANDBOX_DB_HOST${RESET}"
     echo "  4. Verify credentials and service name"
     echo ""
     exit 2
@@ -72,31 +72,31 @@ if [[ $# -gt 0 ]]; then
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Mode: default — auto-connect using DEMASYLABS_* environment variables
+# Mode: default — auto-connect using SANDBOX_* environment variables
 # Usage: sqlcl  (connects as system to FREEPDB1)
 # ─────────────────────────────────────────────────────────────────────────────
 echo "Connection Information:"
 echo ""
-echo "Host:    $DEMASYLABS_DB_HOST"
-echo "Port:    $DEMASYLABS_DB_PORT"
-echo "Service: $DEMASYLABS_DB_SERVICE"
-echo "User:    $DEMASYLABS_DB_USER"
+echo "Host:    $SANDBOX_DB_HOST"
+echo "Port:    $SANDBOX_DB_PORT"
+echo "Service: $SANDBOX_DB_SERVICE"
+echo "User:    $SANDBOX_DB_USER"
 echo ""
 
 # Check required environment variables
-if [[ -z "$DEMASYLABS_DB_HOST" || -z "$DEMASYLABS_DB_PORT" || -z "$DEMASYLABS_DB_SERVICE" || -z "$DEMASYLABS_DB_USER" || -z "$DEMASYLABS_DB_PASS" ]]; then
+if [[ -z "$SANDBOX_DB_HOST" || -z "$SANDBOX_DB_PORT" || -z "$SANDBOX_DB_SERVICE" || -z "$SANDBOX_DB_USER" || -z "$SANDBOX_DB_PASS" ]]; then
   echo ""
   log_error "Missing required environment variables"
   echo ""
   log_info "Missing variables (check which ones are empty):"
-  [[ -z "$DEMASYLABS_DB_HOST" ]] && echo "  ✗ DEMASYLABS_DB_HOST" || echo "  ✓ DEMASYLABS_DB_HOST = $DEMASYLABS_DB_HOST"
-  [[ -z "$DEMASYLABS_DB_PORT" ]] && echo "  ✗ DEMASYLABS_DB_PORT" || echo "  ✓ DEMASYLABS_DB_PORT = $DEMASYLABS_DB_PORT"
-  [[ -z "$DEMASYLABS_DB_SERVICE" ]] && echo "  ✗ DEMASYLABS_DB_SERVICE" || echo "  ✓ DEMASYLABS_DB_SERVICE = $DEMASYLABS_DB_SERVICE"
-  [[ -z "$DEMASYLABS_DB_USER" ]] && echo "  ✗ DEMASYLABS_DB_USER" || echo "  ✓ DEMASYLABS_DB_USER = $DEMASYLABS_DB_USER"
-  [[ -z "$DEMASYLABS_DB_PASS" ]] && echo "  ✗ DEMASYLABS_DB_PASS" || echo "  ✓ DEMASYLABS_DB_PASS = ********"
+  [[ -z "$SANDBOX_DB_HOST" ]] && echo "  ✗ SANDBOX_DB_HOST" || echo "  ✓ SANDBOX_DB_HOST = $SANDBOX_DB_HOST"
+  [[ -z "$SANDBOX_DB_PORT" ]] && echo "  ✗ SANDBOX_DB_PORT" || echo "  ✓ SANDBOX_DB_PORT = $SANDBOX_DB_PORT"
+  [[ -z "$SANDBOX_DB_SERVICE" ]] && echo "  ✗ SANDBOX_DB_SERVICE" || echo "  ✓ SANDBOX_DB_SERVICE = $SANDBOX_DB_SERVICE"
+  [[ -z "$SANDBOX_DB_USER" ]] && echo "  ✗ SANDBOX_DB_USER" || echo "  ✓ SANDBOX_DB_USER = $SANDBOX_DB_USER"
+  [[ -z "$SANDBOX_DB_PASS" ]] && echo "  ✗ SANDBOX_DB_PASS" || echo "  ✓ SANDBOX_DB_PASS = ********"
   echo ""
   log_info "If running standalone container, pass environment variables:"
-  echo -e "  ${CYAN}docker run -e DEMASYLABS_DB_PASS=YourPassword ... demasy/oracle-sandbox:base${RESET}"
+  echo -e "  ${CYAN}docker run -e SANDBOX_DB_PASS=YourPassword ... demasy/oracle-sandbox:base${RESET}"
   echo ""
   log_info "Or use docker-compose which sets all variables automatically"
   echo ""
@@ -107,14 +107,14 @@ echo "Connecting to database..."
 echo ""
 
 # Connect to Oracle
-sql "$DEMASYLABS_DB_USER/$DEMASYLABS_DB_PASS@$DEMASYLABS_DB_HOST:$DEMASYLABS_DB_PORT/$DEMASYLABS_DB_SERVICE" || {
+sql "$SANDBOX_DB_USER/$SANDBOX_DB_PASS@$SANDBOX_DB_HOST:$SANDBOX_DB_PORT/$SANDBOX_DB_SERVICE" || {
   echo ""
   log_error "Connection Failed"
   echo ""
   log_info "Troubleshooting steps:"
   echo -e "  1. Check if database container is running: ${BOLD}${CYAN}docker ps${RESET}"
   echo -e "  2. Check database logs: ${BOLD}${CYAN}docker logs demasylabs-oracle-database${RESET}"
-  echo -e "  3. Verify database is accessible: ${BOLD}${CYAN}docker exec demasylabs-oracle-server ping $DEMASYLABS_DB_HOST${RESET}"
+  echo -e "  3. Verify database is accessible: ${BOLD}${CYAN}docker exec demasylabs-oracle-server ping $SANDBOX_DB_HOST${RESET}"
   echo "  4. Verify credentials and service name"
   echo ""
   exit 2

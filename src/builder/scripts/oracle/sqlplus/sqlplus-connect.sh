@@ -54,22 +54,22 @@ echo -e "${BLUE}$(date '+%Y-%m-%d %H:%M:%S')${NC} Preparing to connect to Oracle
 echo ""
 echo -e " \033[1;33mArchitecture:\033[0m \033[0;30m$ARCH${NC}"
 echo -e " \033[1;33mClient Type:\033[0m  $CLIENT_TYPE"
-echo -e " \033[1;33mHost:\033[0m         \033[0;30m$DEMASYLABS_DB_HOST${NC}"
-echo -e " \033[1;33mPort:\033[0m         \033[0;30m$DEMASYLABS_DB_PORT${NC}"
-echo -e " \033[1;33mService:\033[0m      \033[0;30m$DEMASYLABS_DB_SERVICE${NC}"
-echo -e " \033[1;33mUser:\033[0m         \033[0;30m$DEMASYLABS_DB_USER${NC}"
+echo -e " \033[1;33mHost:\033[0m         \033[0;30m$SANDBOX_DB_HOST${NC}"
+echo -e " \033[1;33mPort:\033[0m         \033[0;30m$SANDBOX_DB_PORT${NC}"
+echo -e " \033[1;33mService:\033[0m      \033[0;30m$SANDBOX_DB_SERVICE${NC}"
+echo -e " \033[1;33mUser:\033[0m         \033[0;30m$SANDBOX_DB_USER${NC}"
 echo ""
 
 # Check required environment variables
-if [[ -z "$DEMASYLABS_DB_HOST" || -z "$DEMASYLABS_DB_PORT" || -z "$DEMASYLABS_DB_SERVICE" || -z "$DEMASYLABS_DB_USER" || -z "$DEMASYLABS_DB_PASS" ]]; then
+if [[ -z "$SANDBOX_DB_HOST" || -z "$SANDBOX_DB_PORT" || -z "$SANDBOX_DB_SERVICE" || -z "$SANDBOX_DB_USER" || -z "$SANDBOX_DB_PASS" ]]; then
   echo -e "${RED}✗ Error: Missing required environment variables${NC}"
   echo ""
   echo "Please ensure the following are set:"
-  echo "  - DEMASYLABS_DB_HOST"
-  echo "  - DEMASYLABS_DB_PORT"
-  echo "  - DEMASYLABS_DB_SERVICE"
-  echo "  - DEMASYLABS_DB_USER"
-  echo "  - DEMASYLABS_DB_PASS"
+  echo "  - SANDBOX_DB_HOST"
+  echo "  - SANDBOX_DB_PORT"
+  echo "  - SANDBOX_DB_SERVICE"
+  echo "  - SANDBOX_DB_USER"
+  echo "  - SANDBOX_DB_PASS"
   echo ""
   exit 1
 fi
@@ -120,7 +120,7 @@ if [[ $# -gt 0 ]]; then
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Mode: default — auto-connect using DEMASYLABS_* environment variables
+# Mode: default — auto-connect using SANDBOX_* environment variables
 # Usage: sqlplus  (connects as system to FREEPDB1)
 # ─────────────────────────────────────────────────────────────────────────────
 echo -e "${YELLOW}⏳ Connecting to database...${NC}"
@@ -128,14 +128,14 @@ echo ""
 
 if [[ "$ARCH" = "x86_64" ]] && [[ -f "/opt/oracle/instantclient/sqlplus" ]]; then
     # Use native SQL*Plus on x86_64
-    /opt/oracle/instantclient/sqlplus "$DEMASYLABS_DB_USER/$DEMASYLABS_DB_PASS@$DEMASYLABS_DB_HOST:$DEMASYLABS_DB_PORT/$DEMASYLABS_DB_SERVICE" || {
+    /opt/oracle/instantclient/sqlplus "$SANDBOX_DB_USER/$SANDBOX_DB_PASS@$SANDBOX_DB_HOST:$SANDBOX_DB_PORT/$SANDBOX_DB_SERVICE" || {
         echo ""
         echo -e "${RED}✗ Connection Failed${NC}"
         echo ""
         echo "Troubleshooting steps:"
         echo "  1. Check if database container is running: docker ps"
         echo "  2. Check database logs: docker logs demasylabs-oracle-database"
-        echo "  3. Verify database is accessible: docker exec demasylabs-oracle-server ping $DEMASYLABS_DB_HOST"
+        echo "  3. Verify database is accessible: docker exec demasylabs-oracle-server ping $SANDBOX_DB_HOST"
         echo "  4. Verify credentials and service name"
         echo ""
         exit 2
@@ -143,14 +143,14 @@ if [[ "$ARCH" = "x86_64" ]] && [[ -f "/opt/oracle/instantclient/sqlplus" ]]; the
 else
     # Use SQLcl as fallback on ARM64 or when SQL*Plus is not available
     echo -e "${YELLOW}Using SQLcl as fallback...${NC}"
-    sql "$DEMASYLABS_DB_USER/$DEMASYLABS_DB_PASS@$DEMASYLABS_DB_HOST:$DEMASYLABS_DB_PORT/$DEMASYLABS_DB_SERVICE" || {
+    sql "$SANDBOX_DB_USER/$SANDBOX_DB_PASS@$SANDBOX_DB_HOST:$SANDBOX_DB_PORT/$SANDBOX_DB_SERVICE" || {
         echo ""
         echo -e "${RED}✗ Connection Failed${NC}"
         echo ""
         echo "Troubleshooting steps:"
         echo "  1. Check if database container is running: docker ps"
         echo "  2. Check database logs: docker logs demasylabs-oracle-database"
-        echo "  3. Verify database is accessible: docker exec demasylabs-oracle-server ping $DEMASYLABS_DB_HOST"
+        echo "  3. Verify database is accessible: docker exec demasylabs-oracle-server ping $SANDBOX_DB_HOST"
         echo "  4. Verify credentials and service name"
         echo ""
         exit 2

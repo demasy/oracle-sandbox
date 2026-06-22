@@ -66,21 +66,21 @@ check_database_health() {
     # echo -e "- Testing database port connectivity"
     
     # Check if environment variables are set
-    if [[ -z "$DEMASYLABS_DB_HOST" || -z "$DEMASYLABS_DB_PORT" || -z "$DEMASYLABS_DB_SERVICE" ]]; then
+    if [[ -z "$SANDBOX_DB_HOST" || -z "$SANDBOX_DB_PORT" || -z "$SANDBOX_DB_SERVICE" ]]; then
         echo -e " - Database Config: ${YELLOW}⚠ INCOMPLETE${NC} - Missing environment variables"
         return 1
     fi
     
-    # echo -e " - Database: ${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_SERVICE}"
+    # echo -e " - Database: ${SANDBOX_DB_HOST}:${SANDBOX_DB_PORT}/${SANDBOX_DB_SERVICE}"
     
     # Test database connection using a simple network check first
-    local port_check=$(timeout 5 bash -c "</dev/tcp/$DEMASYLABS_DB_HOST/$DEMASYLABS_DB_PORT" 2>/dev/null && echo "OK" || echo "FAILED")
+    local port_check=$(timeout 5 bash -c "</dev/tcp/$SANDBOX_DB_HOST/$SANDBOX_DB_PORT" 2>/dev/null && echo "OK" || echo "FAILED")
     
     if [ "$port_check" = "OK" ]; then
         echo -e " - Database Port: ${GREEN}✓ REACHABLE${NC}"
         
         # Test actual database connection using SQLcl
-        local db_test=$(timeout 10 bash -c "echo 'SELECT 1 FROM DUAL; EXIT;' | sql -S system/${DEMASYLABS_DB_PASS}@${DEMASYLABS_DB_HOST}:${DEMASYLABS_DB_PORT}/${DEMASYLABS_DB_SERVICE}" 2>/dev/null | grep -c "1" || echo "0")
+        local db_test=$(timeout 10 bash -c "echo 'SELECT 1 FROM DUAL; EXIT;' | sql -S system/${SANDBOX_DB_PASS}@${SANDBOX_DB_HOST}:${SANDBOX_DB_PORT}/${SANDBOX_DB_SERVICE}" 2>/dev/null | grep -c "1" || echo "0")
         
         if [ "$db_test" -gt 0 ]; then
             echo -e " - Database Connectivity: ${GREEN}✓ OK${NC}"

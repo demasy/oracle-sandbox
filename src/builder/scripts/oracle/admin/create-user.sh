@@ -10,8 +10,8 @@
 #
 # PARAMETERS:
 #   username  (required) - The local user to create in the PDB
-#   password  (optional) - User password (defaults to DEMASYLABS_DB_PASSWORD)
-#   pdb_name  (optional) - Target PDB name (defaults to DEMASYLABS_PDB)
+#   password  (optional) - User password (defaults to SANDBOX_DB_PASSWORD)
+#   pdb_name  (optional) - Target PDB name (defaults to SANDBOX_PDB)
 #
 # EXAMPLES:
 #   create_user.sh myuser
@@ -40,8 +40,8 @@ if [ $# -eq 0 ]; then
     echo "Usage: $(basename "$0") <username> [password] [pdb_name]"
     echo ""
     echo "  username   (required) Local user to create in the PDB"
-    echo "  password   (optional) User password (defaults to DEMASYLABS_DB_PASSWORD)"
-    echo "  pdb_name   (optional) Target PDB name (defaults to DEMASYLABS_PDB)"
+    echo "  password   (optional) User password (defaults to SANDBOX_DB_PASSWORD)"
+    echo "  pdb_name   (optional) Target PDB name (defaults to SANDBOX_PDB)"
     echo ""
     echo "Examples:"
     echo "  $(basename "$0") myuser"
@@ -75,25 +75,25 @@ print_demasy_banner "Oracle User Creation: $INPUT_USER"
 ################################################################################
 log_info "Reading configuration from environment variables..."
 
-DB_HOST="${DEMASYLABS_DB_HOST}"
-DB_PORT="${DEMASYLABS_DB_PORT}"
-DB_PASSWORD="${DEMASYLABS_DB_PASSWORD}"
-DB_SID="${DEMASYLABS_DB_SID}"
+DB_HOST="${SANDBOX_DB_HOST}"
+DB_PORT="${SANDBOX_DB_PORT}"
+DB_PASSWORD="${SANDBOX_DB_PASSWORD}"
+DB_SID="${SANDBOX_DB_SID}"
 
 # Apply parameter overrides
 NEW_USER="${INPUT_USER}"
 NEW_USER_PASSWORD="${INPUT_PASSWORD:-$DB_PASSWORD}"
-PDB_NAME="${INPUT_PDB:-DEMASYLABS_PDB}"
+PDB_NAME="${INPUT_PDB:-SANDBOX_PDB}"
 COMMON_USER="c##${NEW_USER}"
 
 # Validate required environment variables
 log_step "Validating environment variables..."
 MISSING_VARS=()
 
-[[ -z "$DB_HOST" ]]     && MISSING_VARS+=("DEMASYLABS_DB_HOST")
-[[ -z "$DB_PORT" ]]     && MISSING_VARS+=("DEMASYLABS_DB_PORT")
-[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("DEMASYLABS_DB_PASSWORD")
-[[ -z "$DB_SID" ]]      && MISSING_VARS+=("DEMASYLABS_DB_SID")
+[[ -z "$DB_HOST" ]]     && MISSING_VARS+=("SANDBOX_DB_HOST")
+[[ -z "$DB_PORT" ]]     && MISSING_VARS+=("SANDBOX_DB_PORT")
+[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("SANDBOX_DB_PASSWORD")
+[[ -z "$DB_SID" ]]      && MISSING_VARS+=("SANDBOX_DB_SID")
 
 if [ ${#MISSING_VARS[@]} -ne 0 ]; then
     log_error "Missing required environment variables:"

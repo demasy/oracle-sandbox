@@ -87,18 +87,18 @@ case "$RESOURCE" in
             exit ${EXIT_USAGE:-1}
         fi
 
-        CONN_PASS="${SQLCL_PASS:-${DEMASYLABS_DB_PASSWORD}}"
-        CONN_HOST="${DEMASYLABS_DB_HOST}"
-        CONN_PORT="${DEMASYLABS_DB_PORT}"
+        CONN_PASS="${SQLCL_PASS:-${SANDBOX_DB_PASSWORD}}"
+        CONN_HOST="${SANDBOX_DB_HOST}"
+        CONN_PORT="${SANDBOX_DB_PORT}"
 
         case "$SQLCL_USER" in
             sys)
-                CONN_PDB="${SQLCL_PDB:-${DEMASYLABS_DB_SERVICE}}"
+                CONN_PDB="${SQLCL_PDB:-${SANDBOX_DB_SERVICE}}"
                 log_step "Connecting as SYS (sysdba) @ ${CONN_PDB}..."
                 sql "sys/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}" as sysdba
                 ;;
             system)
-                CONN_PDB="${SQLCL_PDB:-${DEMASYLABS_DB_SERVICE}}"
+                CONN_PDB="${SQLCL_PDB:-${SANDBOX_DB_SERVICE}}"
                 log_step "Connecting as SYSTEM @ ${CONN_PDB}..."
                 sql "system/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
@@ -113,14 +113,14 @@ case "$RESOURCE" in
                 sql "sandbox_ai/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
             demasy)
-                CONN_PDB="${SQLCL_PDB:-DEMASYLABS_PDB}"
+                CONN_PDB="${SQLCL_PDB:-SANDBOX_PDB}"
                 log_step "Connecting as DEMASY @ ${CONN_PDB}..."
                 sql "demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
             demasy_ai)
-                CONN_PDB="${SQLCL_PDB:-DEMASYLABS_PDB}"
-                log_step "Connecting as ${DEMASYLABS_DB_MCP_USER} (AI/MCP user) @ ${CONN_PDB}..."
-                sql "${DEMASYLABS_DB_MCP_USER}/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
+                CONN_PDB="${SQLCL_PDB:-SANDBOX_PDB}"
+                log_step "Connecting as ${SANDBOX_DB_MCP_USER} (AI/MCP user) @ ${CONN_PDB}..."
+                sql "${SANDBOX_DB_MCP_USER}/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
         esac
         ;;

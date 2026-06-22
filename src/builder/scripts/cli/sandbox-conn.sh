@@ -80,9 +80,9 @@ _conn_do_add() {
                 echo -e "    ${CYAN}--name${NC}  <name>       Required. Connection name"
                 echo -e "    ${CYAN}--user${NC}  <user>       Required. Database user"
                 echo -e "    ${CYAN}--pass${NC}  <password>   Optional. Default: env password"
-                echo -e "    ${CYAN}--host${NC}  <host>       Optional. Default: ${DEMASYLABS_DB_HOST}"
-                echo -e "    ${CYAN}--port${NC}  <port>       Optional. Default: ${DEMASYLABS_DB_PORT}"
-                echo -e "    ${CYAN}--pdb${NC}   <PDB name>   Optional. Default: ${DEMASYLABS_DB_SERVICE}"
+                echo -e "    ${CYAN}--host${NC}  <host>       Optional. Default: ${SANDBOX_DB_HOST}"
+                echo -e "    ${CYAN}--port${NC}  <port>       Optional. Default: ${SANDBOX_DB_PORT}"
+                echo -e "    ${CYAN}--pdb${NC}   <PDB name>   Optional. Default: ${SANDBOX_DB_SERVICE}"
                 echo ""
                 exit ${EXIT_USAGE:-1} ;;
         esac
@@ -91,10 +91,10 @@ _conn_do_add() {
     [[ -z "$CONN_NAME" ]] && { log_error "sandbox conn add requires --name <name>"; exit ${EXIT_USAGE:-1}; }
     [[ -z "$CONN_USER" ]] && { log_error "sandbox conn add requires --user <user>"; exit ${EXIT_USAGE:-1}; }
 
-    CONN_PASS="${CONN_PASS:-${DEMASYLABS_DB_PASSWORD}}"
-    CONN_HOST="${CONN_HOST:-${DEMASYLABS_DB_HOST}}"
-    CONN_PORT="${CONN_PORT:-${DEMASYLABS_DB_PORT}}"
-    CONN_PDB="${CONN_PDB:-${DEMASYLABS_DB_SERVICE}}"
+    CONN_PASS="${CONN_PASS:-${SANDBOX_DB_PASSWORD}}"
+    CONN_HOST="${CONN_HOST:-${SANDBOX_DB_HOST}}"
+    CONN_PORT="${CONN_PORT:-${SANDBOX_DB_PORT}}"
+    CONN_PDB="${CONN_PDB:-${SANDBOX_DB_SERVICE}}"
 
     if [[ "${SANDBOX_DRY_RUN:-0}" == "1" ]]; then
         log_info "[dry-run] Would save connection: ${CONN_NAME} → ${CONN_USER}@${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"

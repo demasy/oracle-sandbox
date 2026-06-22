@@ -1,5 +1,5 @@
 # Stage 1: Build Stage
-FROM node:20-bookworm-slim AS demasylabs-builder
+FROM node:20-bookworm-slim AS sandbox-builder
 
 RUN apt-get update && \
   apt-get upgrade -y && \
@@ -138,9 +138,9 @@ ENV PATH="/usr/sandbox/app/bin:${PATH}"
 ARG INSTALL_APEX
 ENV INSTALL_APEX=${INSTALL_APEX}
 
-COPY --from=demasylabs-builder package*.json ./
-COPY --from=demasylabs-builder /usr/sandbox/app /usr/sandbox/app
-COPY --from=demasylabs-builder /opt/oracle /opt/oracle
+COPY --from=sandbox-builder package*.json ./
+COPY --from=sandbox-builder /usr/sandbox/app /usr/sandbox/app
+COPY --from=sandbox-builder /opt/oracle /opt/oracle
 
 RUN npm install oracledb --build-from-source --unsafe-perm
 

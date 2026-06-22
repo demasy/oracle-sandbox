@@ -12,7 +12,7 @@
 #   pdb_name  (required) - Name of the PDB to create
 #
 # EXAMPLES:
-#   create-pdb.sh DEMASYLABS_PDB
+#   create-pdb.sh SANDBOX_PDB
 #   create-pdb.sh ROKETTO_PDB
 #   create-pdb.sh MY_APP_PDB
 ################################################################################
@@ -39,7 +39,7 @@ if [ $# -eq 0 ]; then
     echo "  pdb_name  (required) Name of the PDB to create"
     echo ""
     echo "Examples:"
-    echo "  $(basename "$0") DEMASYLABS_PDB"
+    echo "  $(basename "$0") SANDBOX_PDB"
     echo "  $(basename "$0") ROKETTO_PDB"
     echo ""
     exit 1
@@ -68,19 +68,19 @@ print_demasy_banner "Oracle PDB Setup: $PDB_NAME"
 ################################################################################
 log_info "Reading configuration from environment variables..."
 
-DB_HOST="${DEMASYLABS_DB_HOST}"
-DB_PORT="${DEMASYLABS_DB_PORT}"
-DB_PASSWORD="${DEMASYLABS_DB_PASSWORD}"
-DB_SID="${DEMASYLABS_DB_SID}"
+DB_HOST="${SANDBOX_DB_HOST}"
+DB_PORT="${SANDBOX_DB_PORT}"
+DB_PASSWORD="${SANDBOX_DB_PASSWORD}"
+DB_SID="${SANDBOX_DB_SID}"
 
 # Validate required environment variables
 log_step "Validating environment variables..."
 MISSING_VARS=()
 
-[[ -z "$DB_HOST" ]]     && MISSING_VARS+=("DEMASYLABS_DB_HOST")
-[[ -z "$DB_PORT" ]]     && MISSING_VARS+=("DEMASYLABS_DB_PORT")
-[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("DEMASYLABS_DB_PASSWORD")
-[[ -z "$DB_SID" ]]      && MISSING_VARS+=("DEMASYLABS_DB_SID")
+[[ -z "$DB_HOST" ]]     && MISSING_VARS+=("SANDBOX_DB_HOST")
+[[ -z "$DB_PORT" ]]     && MISSING_VARS+=("SANDBOX_DB_PORT")
+[[ -z "$DB_PASSWORD" ]] && MISSING_VARS+=("SANDBOX_DB_PASSWORD")
+[[ -z "$DB_SID" ]]      && MISSING_VARS+=("SANDBOX_DB_SID")
 
 if [ ${#MISSING_VARS[@]} -ne 0 ]; then
     log_error "Missing required environment variables:"
@@ -132,7 +132,7 @@ EOF
         echo ""
         log_info "Please verify:"
         echo "  • Database is running: docker ps"
-        echo "  • Database password is correct (DEMASYLABS_DB_PASSWORD)"
+        echo "  • Database password is correct (SANDBOX_DB_PASSWORD)"
         echo "  • Listener is ready: docker logs demasylabs-oracle-database"
         exit 1
     fi
