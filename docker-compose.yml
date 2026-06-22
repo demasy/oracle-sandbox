@@ -4,8 +4,8 @@ services:
     container_name: sandbox-oracle-database
     ports:
       - "127.0.0.1:${ENV_DB_PORT_LISTENER}:1521"
-      - "127.0.0.1:${ENV_DB_PORT_EM}:5500"
-      - "127.0.0.1:9090:9090"  # APEX EPG
+      # Note: Enterprise Manager (5500) not available in Database Free Edition
+      # APEX is accessed via ORDS on port 8080 from the app server
     environment:
       - TZ=${ENV_TIME_ZONE}
       - ORACLE_SID=${ENV_DB_SID}
@@ -30,7 +30,7 @@ services:
       retries: 5
       start_period: 120s
     networks:
-      demasylabs_network:
+      sandbox_network:
         ipv4_address: ${ENV_IP_DB_SERVER}
     restart: unless-stopped
     deploy:
@@ -43,7 +43,7 @@ services:
           memory: "2g"
 
   sandbox-oracle-server:
-    image: demasylabs-oracle-sandbox:latest
+    image: sandbox-oracle-sandbox:latest
     build:
       context: ./
       args:
@@ -121,7 +121,7 @@ services:
       start_period: 40s
     restart: unless-stopped
     networks:
-      demasylabs_network:
+      sandbox_network:
         ipv4_address: ${ENV_IP_APP_SERVER}
     deploy:
       resources:
@@ -133,8 +133,8 @@ services:
           memory: "256M"
 
 networks:
-  demasylabs_network:
-    name: demasylabs_network
+  sandbox_network:
+    name: sandbox_network
     driver: bridge
     driver_opts:
       com.docker.network.bridge.enable_icc: "true"
