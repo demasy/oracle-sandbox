@@ -168,6 +168,23 @@ _parse_output_format() {
     return 0
 }
 
+# Parse a single flag value from PARAMS string
+# Usage: _parse_param_value "--name" $PARAMS
+# Returns: The value after the flag, or empty string if not found
+_parse_param_value() {
+    local flag="$1"
+    shift  # Remove flag from args, rest is PARAMS
+    
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "$flag" ]]; then
+            echo "${2:-}"
+            return 0
+        fi
+        shift
+    done
+    return 1
+}
+
 # Validate output format is set correctly
 # Usage: _require_format_flag
 _require_format_flag() {

@@ -73,12 +73,22 @@ print_usage() {
     echo -e "    ${CYAN}install${NC}    apex"
     echo -e "    ${CYAN}uninstall${NC}  apex"
     echo -e "    ${CYAN}download${NC}   apex | ords"
+    echo -e "    ${CYAN}export${NC}     config | connections | all"
+    echo -e "    ${CYAN}import${NC}     config | connections | all"
+    echo -e "    ${CYAN}batch${NC}      apply-connections | apply-commands | execute"
+    echo -e "    ${CYAN}monitor${NC}    system | database | apex | all"
+    echo -e "    ${CYAN}audit${NC}      list | show | search | export | stats | rollback"
+    echo -e "    ${CYAN}template${NC}   save | load | list | delete | export | import"
     echo ""
     echo -e "  ${YELLOW}Examples:${NC}"
     echo -e "    sandbox run sqlcl -u system"
-    echo -e "    sandbox run monitor active-connections"
     echo -e "    sandbox status apex"
-    echo -e "    sandbox logs startup"
+    echo -e "    sandbox monitor --export json"
+    echo -e "    sandbox audit list"
+    echo -e "    sandbox template save --name production"
+    echo -e "    sandbox batch execute --file commands.txt"
+    echo -e "    sandbox export config"
+    echo -e "    sandbox import connections --file conns.json"
     echo -e "    sandbox conn list"
     echo -e "    sandbox install apex"
     echo ""
@@ -132,7 +142,7 @@ _did_you_mean() {
 
 # ─── Validation ──────────────────────────────────────────────────────────────
 
-VALID_ACTIONS="download install uninstall start stop restart run status conn logs export help"
+VALID_ACTIONS="download install uninstall start stop restart run status conn logs export help monitor audit template import batch"
 
 validate_action() {
     local action="$1"
