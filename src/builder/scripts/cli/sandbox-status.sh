@@ -21,7 +21,6 @@ _STATUS_RESOURCE_CHECKED=""
 
 # Check oracle database status
 _check_oracle_status() {
-    _STATUS_RESOURCE_CHECKED="database"
     local host="${SANDBOX_DB_HOST:-192.168.1.110}"
     local port="${SANDBOX_DB_PORT:-1521}"
     local service="${SANDBOX_DB_SERVICE:-FREEPDB1}"
@@ -73,7 +72,6 @@ _check_oracle_status() {
 
 # Check APEX/ORDS status
 _check_apex_status() {
-    _STATUS_RESOURCE_CHECKED="apex"
     # Check process
     local pid
     pid=$(netstat -tulpn 2>/dev/null | grep ":8080.*LISTEN" | awk '{print $NF}' | cut -d'/' -f1 || true)
@@ -101,7 +99,6 @@ _check_apex_status() {
 
 # Check MCP server status
 _check_mcp_status() {
-    _STATUS_RESOURCE_CHECKED="mcp"
     local pid
     pid=$(pgrep -f "sql.*-mcp" 2>/dev/null | head -1 || true)
     
@@ -279,18 +276,25 @@ _status_output_csv() {
 _parse_output_format $PARAMS
 
 # Collect all status data
-case "$RESOURCE" in
-    database|"")
-        _check_oracle_status
-        [[ -z "$RESOURCE" ]] && _check_apex_status && _check_mcp_status
-        ;;
-    apex)
-        _check_apex_status
-        ;;
-    mcp)
-        _check_mcp_status
-        ;;
-esac
+if [[ -z "$RESOURCE" || "$RESOURCE" == "all" ]]; then
+    _STATUS_RESOURCE_CHECKED="all"
+    _check_oracle_status
+    _check_apex_status
+    _check_mcp_status
+else
+    _STATUS_RESOURCE_CHECKED="$RESOURCE"
+    case "$RESOURCE" in
+        database)
+            _check_oracle_status
+            ;;
+        apex)
+            _check_apex_status
+            ;;
+        mcp)
+            _check_mcp_status
+            ;;
+    esac
+fi
 
 # Output based on format
 case "$OUTPUT_FORMAT" in
