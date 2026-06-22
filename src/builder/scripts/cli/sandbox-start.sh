@@ -15,20 +15,12 @@ case "$RESOURCE" in
                     shift
                     ;;
                 -c|--conn)
-                    if [[ -z "${2:-}" ]]; then
-                        echo ""
-                        log_error "--conn requires a connection name"
-                        echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox start mcp --conn sandbox-mcp-conn${NC}"
-                        echo ""
-                        exit ${EXIT_USAGE:-1}
-                    fi
-                    MCP_CONN="$2"
+                    _parse_flag_with_value "$1" "${2:-}" MCP_CONN || exit ${EXIT_USAGE:-1}
                     shift 2
                     ;;
                 *)
                     echo ""
                     log_error "Unknown parameter '${1}' for sandbox start mcp"
-                    echo -e "  ${YELLOW}Parameters:${NC}"
                     _show_param_help "-d" "--default" "Start with default connection"
                     _show_param_help "-c" "--conn <name>" "Start with specific connection"
                     echo ""
@@ -40,7 +32,6 @@ case "$RESOURCE" in
         if ! $MCP_DEFAULT && [[ -z "$MCP_CONN" ]]; then
             echo ""
             log_error "sandbox start mcp requires: --default or --conn <name>"
-            echo -e "  ${YELLOW}Parameters:${NC}"
             _show_param_help "-d" "--default" "Start MCP with default connection (demasylabs-ai-conn)"
             _show_param_help "-c" "--conn <name>" "Start MCP with specified connection"
             echo ""
