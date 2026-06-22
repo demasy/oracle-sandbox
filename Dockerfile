@@ -7,14 +7,10 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 ARG SRC_ORACLE_SQLCL
-ARG SRC_ORACLE_SQLPLUS
 ARG SRC_ORACLE_APEX
-ARG SRC_ORACLE_ORDS
 ARG INSTALL_APEX
 ENV SRC_ORACLE_SQLCL=$SRC_ORACLE_SQLCL
-ENV SRC_ORACLE_SQLPLUS=$SRC_ORACLE_SQLPLUS
 ENV SRC_ORACLE_APEX=$SRC_ORACLE_APEX
-ENV SRC_ORACLE_ORDS=$SRC_ORACLE_ORDS
 ENV INSTALL_APEX=$INSTALL_APEX
 
 RUN mkdir -p /usr/sandbox/app/cli
@@ -34,7 +30,6 @@ COPY package*.json ./
 WORKDIR /usr/sandbox/app
 
 COPY ./app.js ./app.js
-# COPY ./src ./src
 COPY ["LICENSE", "./"]
 
 # Copy scripts to organized structure
@@ -45,6 +40,7 @@ COPY ./src/builder/scripts/system/admin/*.sh        /usr/sandbox/app/system/admi
 COPY ./src/builder/scripts/system/download/*.sh     /usr/sandbox/app/system/download/
 COPY ./src/builder/scripts/system/install/*.sh      /usr/sandbox/app/system/install/
 COPY ./src/builder/scripts/oracle/admin/*.sh        /usr/sandbox/app/oracle/admin/
+COPY ./src/builder/scripts/oracle/admin/monitoring/*.sql /usr/sandbox/app/oracle/admin/monitoring/
 COPY ./src/builder/scripts/oracle/apex/*.sh         /usr/sandbox/app/oracle/apex/
 COPY ./src/builder/scripts/oracle/mcp/*.sh          /usr/sandbox/app/oracle/mcp/
 COPY ./src/builder/scripts/oracle/sqlcl/*.sh        /usr/sandbox/app/oracle/sqlcl/
@@ -83,20 +79,6 @@ RUN if [ "$INSTALL_APEX" = "true" ]; then \
       echo "Skipping APEX/ORDS download (INSTALL_APEX=$INSTALL_APEX)"; \
     fi
 
-# # Download and install SQL*Plus
-# # Updated by demasy on November 11, 2025
-# # Added SQL*Plus support alongside SQLcl for enhanced Oracle client compatibility
-# # Note: Automatically detects architecture and provides appropriate solution
-# RUN ARCH=$(uname -m) && \
-#   if [ "$ARCH" = "x86_64" ]; then \
-#     curl -L -o /tmp/sqlplus.zip "$SRC_ORACLE_SQLPLUS" && \
-#     unzip -q /tmp/sqlplus.zip -d /opt/oracle && \
-#     cp -r /opt/oracle/instantclient_*/* /opt/oracle/instantclient/ && \
-#     rm -f /tmp/sqlplus.zip; \
-#   else \
-#     echo "Note: SQL*Plus not available for $ARCH architecture - SQLcl will be used as fallback"; \
-#   fi
-
 FROM node:20-bookworm-slim
 
 RUN apt-get update && \
@@ -119,7 +101,6 @@ RUN apt-get update && \
   htop \
   jq \
   openssl \
-  && npm install -g nodemon \
   && rm -rf /var/lib/apt/lists/*
 
 # Find and set Java home dynamically for both AMD64 and ARM64
@@ -176,15 +157,8 @@ RUN ln -s /usr/sandbox/app/system/download/download.sh /usr/local/bin/download-o
 RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/demasy
 RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/sandbox
 RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/sb
-# RUN ln -s /usr/sandbox/app/oracle/sqlplus/sqlplus-connect.sh /usr/local/bin/sqlplus
-# RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/sqlcl
-# RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/oracle
-
-# -------------------------------------------- [Admin & Diagnostics]
-# RUN ln -s /usr/sandbox/app/system/admin/healthcheck.sh /usr/local/bin/healthcheck
-# RUN ln -s /usr/sandbox/app/oracle/admin/create-pdb.sh /usr/local/bin/create-pdb
-# RUN ln -s /usr/sandbox/app/oracle/admin/create-demasy-user.sh /usr/local/bin/create-demasy-user
-# RUN ln -s /usr/sandbox/app/oracle/admin/rollback-demasy-user.sh /usr/local/bin/rollback-demasy-user
+RUN ln -s /usr/sandbox/app/oracle/sqlplus/sqlplus-connect.sh /usr/local/bin/sqlplus
+RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/sqlcl
 
 # -------------------------------------------- [MCP Tools]
 RUN ln -s /usr/sandbox/app/oracle/mcp/start.sh /usr/local/bin/start-mcp
@@ -211,20 +185,6 @@ RUN groupadd --gid 10001 sandbox && \
   useradd --uid 10001 --gid sandbox --create-home --shell /bin/bash sandbox && \
   mkdir -p /home/sandbox/.dbtools /home/oracle/logs && \
   chown -R sandbox:sandbox /usr/sandbox/app /opt/oracle /home/sandbox/.dbtools /home/oracle/logs
-
-# Verify installation and test SQLcl
-# Updated by demasy on November 11, 2025
-# Enhanced verification to test both SQLcl and SQL*Plus installations
-# RUN echo "Testing Java installation..." && \
-#     java -version && \
-#     DETECTED_JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::') && \
-#     echo "Detected Java home: $DETECTED_JAVA_HOME" && \
-#     echo "Testing SQLcl..." && \
-#     cd /opt/oracle/sqlcl/bin && \
-#     JAVA_HOME="$DETECTED_JAVA_HOME" ./sql -version && \
-#     echo "Testing SQLPlus..." && \
-#     (sqlplus -version || echo "SQLPlus not available - using Instant Client bundled version")
-
 
 EXPOSE 3000
 EXPOSE 3001
