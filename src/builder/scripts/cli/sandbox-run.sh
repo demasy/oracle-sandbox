@@ -33,7 +33,9 @@ case "$RESOURCE" in
             echo ""
             echo -e "  ${YELLOW}Select a user:${NC}"
             echo ""
-            local _idx=1 _u _choice
+            _idx=1
+            _u=""
+            _choice=""
             for _u in $VALID_SQLCL_USERS; do
                 echo -e "    ${CYAN}${_idx})${NC} ${_u}"
                 _idx=$(( _idx + 1 ))
@@ -54,8 +56,8 @@ case "$RESOURCE" in
         fi
 
         # Validate user is in allowed list
-        local -a users=($VALID_SQLCL_USERS)
-        local valid_user=false
+        declare -a users=($VALID_SQLCL_USERS)
+        valid_user=false
         for u in "${users[@]}"; do
             [[ "$u" == "$SQLCL_USER" ]] && valid_user=true && break
         done
