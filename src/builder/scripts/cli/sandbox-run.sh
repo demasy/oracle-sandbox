@@ -100,8 +100,8 @@ case "$RESOURCE" in
                 ;;
             demasy_ai)
                 CONN_PDB="${SQLCL_PDB:-SANDBOX_PDB}"
-                log_step "Connecting as ${SANDBOX_DB_MCP_USER} (AI/MCP user) @ ${CONN_PDB}..."
-                sql "${SANDBOX_DB_MCP_USER}/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
+                log_step "Connecting as DEMASY_AI (AI/MCP user) @ ${CONN_PDB}..."
+                sql "demasy_ai/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
         esac
         ;;
