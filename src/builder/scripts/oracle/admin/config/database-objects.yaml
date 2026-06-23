@@ -1,0 +1,262 @@
+version: "1.0.0"
+description: "Oracle Sandbox AI Database - Database Objects & Configuration"
+owner: "Demasy Labs"
+contact: "founder@demasy.io"
+repository: "https://github.com/demasy/oracle-sandbox"
+created: "2026-06-23"
+last_updated: "2026-06-23"
+
+# ─── DATABASES ────────────────────────────────────────────────────────────────
+databases:
+  # ─── Primary Sandbox PDB ────────────────────────────────────────────────────
+  - name: SANDBOX_PDB
+    description: "Primary Pluggable Database for sandbox workloads"
+    type: "production"
+    admin_user: "system"
+
+    # Database configuration
+    config:
+      db_sid: "SANDBOX"
+      db_password: "${SANDBOX_DB_PASSWORD}"
+      character_set: "AL32UTF8"
+      national_character_set: "UTF8"
+      datafile_dest: "${ORACLE_BASE}/oradata"
+      redo_log_size: "512M"
+      undo_tablespace: "UNDOTBS1"
+      temp_tablespace: "TEMP"
+
+    # Tablespaces to create
+    tablespaces:
+      - name: "SANDBOX_AI_TS"
+        size: "1G"
+        autoextend: true
+        description: "Sandbox AI/MCP data storage"
+      - name: "SANDBOX_TS"
+        size: "1G"
+        autoextend: true
+        description: "Sandbox development and application data storage"
+      - name: "SANDBOX_APEX_TS"
+        size: "500M"
+        autoextend: true
+        description: "Sandbox APEX application data storage"
+
+    # Users to create in this PDB
+    users:
+      # ─── SANDBOX User (minimal dev access) ──────────────────────────────
+      - username: "sandbox"
+        enabled: true
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "SANDBOX_TS"
+        quota: "UNLIMITED"
+        description: "Sandbox development user with limited privileges"
+        privileges:
+          level: "admin"
+
+      # ─── SANDBOX_AI User (AI/MCP service account) ──────────────────────
+      - username: "sandbox_ai"
+        enabled: true
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "SANDBOX_AI_TS"
+        quota: "UNLIMITED"
+        description: "AI/MCP service account for automated operations"
+        privileges:
+          level: "minimal"
+
+      # ─── APEX_APP User (APEX application schema) ──────────────────────
+      - username: "apex_app"
+        enabled: true
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "SANDBOX_APEX_TS"
+        quota: "UNLIMITED"
+        description: "APEX application schema for web application data"
+        privileges:
+          level: "normal"
+
+    # Roles to create in this PDB
+    roles:
+      - name: "SANDBOX_APP_DEVELOPER"
+        description: "Application Developer role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+          object_privs: []
+
+      - name: "SANDBOX_APP_ADMIN"
+        description: "Application Administrator role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+            - "ALTER USER"
+            - "GRANT ANY OBJECT PRIVILEGE"
+          object_privs: []
+
+      - name: "SANDBOX_APEX_DEVELOPER"
+        description: "APEX Developer role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+            - "CREATE SEQUENCE"
+            - "CREATE TRIGGER"
+          object_privs: []
+
+  # ─── Demasy Labs Development PDB ────────────────────────────────────────────
+  - name: DEMASY_PDB
+    description: "Demasy Labs Development Pluggable Database"
+    type: "development"
+    admin_user: "system"
+
+    # Database configuration
+    config:
+      db_sid: "DEMASY"
+      db_password: "${SANDBOX_DB_PASSWORD}"
+      character_set: "AL32UTF8"
+      national_character_set: "UTF8"
+      datafile_dest: "${ORACLE_BASE}/oradata"
+      redo_log_size: "512M"
+      undo_tablespace: "UNDOTBS1"
+      temp_tablespace: "TEMP"
+
+    # Tablespaces to create
+    tablespaces:
+      - name: "DEMASY_TS"
+        size: "1G"
+        autoextend: true
+        description: "Demasy development application and testing data storage"
+
+    # Users to create in this PDB
+    users:
+      - username: "demasy"
+        enabled: true
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "DEMASY_TS"
+        quota: "UNLIMITED"
+        description: "Demasy Labs developer"
+        privileges:
+          level: "admin"
+
+      - username: "demasy_ai"
+        enabled: true
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "DEMASY_TS"
+        quota: "UNLIMITED"
+        description: "Demasy AI/MCP advanced user"
+        privileges:
+          level: "minimal"
+
+    # Roles to create in this PDB
+    roles:
+      - name: "DEMASY_DEVELOPER"
+        description: "Demasy developer role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+            - "ANALYZE ANY"
+          object_privs: []
+
+      - name: "DEMASY_QA_TESTER"
+        description: "QA and testing role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "SELECT ANY TABLE"
+            - "INSERT ANY TABLE"
+            - "UPDATE ANY TABLE"
+            - "DELETE ANY TABLE"
+          object_privs: []
+
+  # ─── Demasy Labs Production PDB ─────────────────────────────────────────────
+  - name: DEMASYLABS_PDB
+    description: "Demasy Labs Production Pluggable Database"
+    type: "production"
+    admin_user: "system"
+
+    # Database configuration
+    config:
+      db_sid: "DEMASYLABS"
+      db_password: "${SANDBOX_DB_PASSWORD}"
+      character_set: "AL32UTF8"
+      national_character_set: "UTF8"
+      datafile_dest: "${ORACLE_BASE}/oradata"
+      redo_log_size: "1G"
+      undo_tablespace: "UNDOTBS1"
+      temp_tablespace: "TEMP"
+
+    # Tablespaces to create
+    tablespaces:
+      - name: "DEMASYLABS_TS"
+        size: "12G"
+        autoextend: true
+        description: "Production application, index, and archive data storage"
+
+    # Users to create in this PDB
+    users:
+      - username: "demasylabs"
+        enabled: true
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "DEMASYLABS_TS"
+        quota: "UNLIMITED"
+        description: "Demasylabs production developer"
+        privileges:
+          level: "admin"
+
+      - username: "demasylabs_ai"
+        enabled: true
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "DEMASYLABS_TS"
+        quota: "UNLIMITED"
+        description: "Production AI/MCP advanced operations"
+        privileges:
+          level: "minimal"
+
+    # Roles to create in this PDB
+    roles:
+      - name: "DEMASYLABS_APPLICATION"
+        description: "Production application role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "SELECT ANY TABLE"
+            - "INSERT ANY TABLE"
+            - "UPDATE ANY TABLE"
+            - "DELETE ANY TABLE"
+            - "EXECUTE ANY PROCEDURE"
+          object_privs: []
+
+      - name: "DEMASYLABS_ADMIN"
+        description: "Production administration role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "ALTER SYSTEM"
+            - "BACKUP ANY TABLE"
+            - "ANALYZE ANY"
+            - "GRANT ANY PRIVILEGE"
+          object_privs: []
+
+      - name: "DEMASYLABS_REPORTING"
+        description: "Reporting and analytics role (read-only)"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "SELECT ANY TABLE"
+            - "SELECT ANY DICTIONARY"
+          object_privs: []

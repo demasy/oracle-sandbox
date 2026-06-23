@@ -1,0 +1,133 @@
+version: "1.0.0"
+description: "Configuration Instructions for Oracle Sandbox Database Setup"
+created: "2026-06-23"
+contact: "founder@demasy.io"
+repository: "https://github.com/demasy/oracle-sandbox"
+last_updated: "2026-06-23"
+
+# ─── OVERVIEW ──────────────────────────────────────────────────────────────────
+overview:
+  purpose: "Declarative configuration for Oracle Sandbox AI Database initialization"
+  scope: "Container Database (CDB) with 3 Pluggable Databases (PDBs), users, roles, tablespaces"
+  format_version: "1.0.0"
+  automation: "Parsed by database-init.sh during Docker build phase"
+
+# ─── FILES IN THIS DIRECTORY ───────────────────────────────────────────────────
+files:
+  database-objects.yaml:
+    description: "Primary configuration file for PDBs, users, roles, and tablespaces"
+    scope: "Declarative schema structure"
+    sections:
+      - "metadata (version, description, contact)"
+      - "pdb_definitions (SANDBOX_PDB, DEMASY_PDB, DEMASYLABS_PDB)"
+      - "initialization_sequence (ordered steps for creation)"
+    usage: "Read by database-init.sh to generate CREATE statements"
+    
+  privilege-levels.yaml:
+    description: "Reference definitions for Oracle privilege levels"
+    scope: "Security policy and role mappings"
+    sections:
+      - "metadata (version, description, contact)"
+      - "privilege_levels (minimal, normal, admin definitions)"
+      - "system_privileges (Oracle grants per level)"
+      - "object_privileges (object-level permissions)"
+    usage: "Referenced by database-objects.yaml for user privilege assignments"
+    
+  post-pdb-init.sql:
+    description: "SQL script executed after PDB creation"
+    scope: "Post-initialization setup and customization"
+    execution_phase: "After users and roles created"
+    
+  enable-ai-features.sql:
+    description: "SQL script for Oracle 26ai feature enablement"
+    scope: "AI/ML capabilities initialization"
+    execution_phase: "Final initialization step"
+
+
+# ─── CONFIGURATION STRUCTURE ───────────────────────────────────────────────────
+configuration:
+  pdb_definitions:
+    template: |
+      pdb_name:
+        type: "production|development"
+        description: "Human-readable description"
+        
+        tablespaces:
+          - name: "TABLESPACE_NAME"
+            size: "10G"
+            autoextend: true
+            datafile_path: "/u01/oradata/..."
+        
+        users:
+          - name: "username"
+            default_tablespace: "TABLESPACE_NAME"
+            quota: "UNLIMITED"
+            privileges:
+              level: "minimal|normal|admin"
+        
+        roles:
+          - name: "ROLE_NAME"
+            description: "Role description"
+    
+    pdb_count: 3
+    pdbs:
+      - name: "SANDBOX_PDB"
+        type: "development"
+        tablespaces: 3
+        users: 3
+        roles: 3
+        
+      - name: "DEMASY_PDB"
+        type: "development"
+        tablespaces: 1
+        users: 2
+        roles: 2
+        
+      - name: "DEMASYLABS_PDB"
+        type: "development"
+        tablespaces: 1
+        users: 4
+        roles: 3
+
+  privilege_levels:
+    minimal:
+      purpose: "Basic connectivity and own-schema DDL/DML"
+      roles: ["CONNECT", "RESOURCE"]
+      system_privileges_count: 16
+      cross_schema_access: false
+      
+    normal:
+      purpose: "Enhanced access with cross-schema operations"
+      roles: ["CONNECT", "RESOURCE", "SELECT_CATALOG_ROLE"]
+      system_privileges_count: 37
+      cross_schema_access: true
+      
+    admin:
+      purpose: "Full DBA administrative control"
+      roles: ["DBA"]
+      system_privileges_count: 42
+      cross_schema_access: true
+      tablespace_management: true
+      user_management: true
+
+# ─── INITIALIZATION SEQUENCE ───────────────────────────────────────────────────
+initialization:
+  order:
+    1: "Create PDBs"
+    2: "Create tablespaces"
+    3: "Create roles"
+    4: "Create users"
+    5: "Grant privileges"
+
+  # Retry configuration for failed operations
+  retry:
+    max_attempts: 3
+    wait_seconds: 5
+    on_failure: "log_and_continue"
+
+  # Post-initialization validations
+  validations:
+    - "Verify all PDBs are open"
+    - "Verify all users are created"
+    - "Verify all privileges are granted"
+    - "Verify all tablespaces are accessible"
