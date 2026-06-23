@@ -127,10 +127,10 @@ tramp
 # ===========================================
 # Build & Distribution
 # ===========================================
-dist/
-build/
-out/
-coverage/
+/dist/
+/build/
+/out/
+/coverage/
 *.tsbuildinfo
 .cache/
 .parcel-cache/
@@ -192,6 +192,14 @@ f*.sql
 # ORDS configuration (if sensitive)
 ords/config/
 ords/secrets/
+
+# ===========================================
+# Project Directories
+# ===========================================
+
+# Root-level builder directory (backup/experimental scripts)
+# NOTE: src/builder/ is tracked and should NOT be ignored
+/builder/
 
 # ===========================================
 # Logs & Temporary Files
@@ -362,7 +370,6 @@ password.env
 
 
 .github
-builder/
 libs
 logs
 *.log
