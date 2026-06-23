@@ -154,9 +154,11 @@ junit.xml
 # ===========================================
 # Docker & Containers
 # ===========================================
-*.log
 docker-compose.override.yml
+docker-compose.override.yml.local
 .dockerignore.local
+.docker/config.json
+.docker/trust/
 
 
 # ===========================================
@@ -164,12 +166,15 @@ docker-compose.override.yml
 # ===========================================
 
 # Oracle binaries/libs (if not custom code)
-libs/
-libsXX/
+libs/instantclient_*/
+libs/*.so*
+libs/adrci
+libs/genezi
 
-# Oracle Instant Client archives
+# Oracle Instant Client archives (but KEEP structured Instant Client)
 *.zip
-!instantclient*.zip
+!libs/oracle/clients/instantclient_*/
+!libs/oracle/clients/instantclient_*/**
 
 # Database dumps and exports
 *.dmp
@@ -191,8 +196,8 @@ ords/secrets/
 # ===========================================
 # Logs & Temporary Files
 # ===========================================
-*.log
-logs/
+logs/*.log
+!logs/.gitkeep
 tmp/
 temp/
 *.tmp
@@ -207,6 +212,8 @@ pid
 *.seed
 *.pid.lock
 pids/
+*.out
+*.trace
 
 # ===========================================
 # Archives & Compressed Files
@@ -278,21 +285,84 @@ scratch/
 .yarn/install-state.gz
 .pnp.*
 
-CONTRIBUTING.md
-CODE_OF_CONDUCT.md
+# ===========================================
+# Project-Specific Files to Ignore
+# ===========================================
 
-Dockerfile copy
+# Temporary documentation templates
+CONTRIBUTING.md.bak
+CODE_OF_CONDUCT.md.bak
 
-.github/copilot-instructions.md
+# Backup/copy files
+Dockerfile.bak
+Dockerfile.copy
+Dockerfile.old
 
-
-#Ignore vscode AI rules
-.github/instructions/codacy.instructions.md
-
+# Lock files (keep package.json tracking)
 package-lock.json
+yarn.lock.local
+pnpm-lock.yaml.local
 
-builder
+# Optional: Local override files
+*.local.js
+*.local.json
+*.local.yml
+*.local.yaml
 
-logs
+# Performance and profiling
+*.prof
+*.cpuprofile
+*.heapdump
+
+# IDE specific caches
+.idea/workspace.xml
+.idea/tasks.xml
+.vscode/.history
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.venv/
+venv/
+env/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+
+# Credentials and secrets
+.aws/
+.azure/
+.gcloud/
+credentials.json
+~/.ssh/
+
+# Oracle-specific outputs
+*.awrhtml
+*.awrtext
+*.trace
+*.aud
+password.txt
+password.env
+
+
 
 .github
+builder/
+libs
+logs
+*.log
