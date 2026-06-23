@@ -43,25 +43,16 @@ COPY ./src/builder/scripts/system/build/*.sh        /usr/sandbox/app/system/buil
 COPY ./src/builder/scripts/system/admin/*.sh        /usr/sandbox/app/system/admin/
 COPY ./src/builder/scripts/system/download/*.sh     /usr/sandbox/app/system/download/
 COPY ./src/builder/scripts/system/install/*.sh      /usr/sandbox/app/system/install/
-COPY ./src/builder/scripts/oracle/admin/*.sh        /usr/sandbox/app/oracle/admin/
+COPY ./src/builder/scripts/oracle/admin/ddl/*.sh    /usr/sandbox/app/oracle/admin/ddl/
+COPY ./src/builder/scripts/oracle/admin/config/*.yaml /usr/sandbox/app/oracle/admin/config/
 COPY ./src/builder/scripts/oracle/admin/monitoring/*.sql /usr/sandbox/app/oracle/admin/monitoring/
 COPY ./src/builder/scripts/oracle/apex/*.sh         /usr/sandbox/app/oracle/apex/
 COPY ./src/builder/scripts/oracle/mcp/*.sh          /usr/sandbox/app/oracle/mcp/
 COPY ./src/builder/scripts/oracle/sqlcl/*.sh        /usr/sandbox/app/oracle/sqlcl/
 COPY ./src/builder/scripts/oracle/sqlplus/*.sh      /usr/sandbox/app/oracle/sqlplus/
 
-# Set permissions for all scripts
-RUN chmod +x /usr/sandbox/app/cli/*.sh && \
-    chmod +x /usr/sandbox/app/system/utils/*.sh && \
-    chmod +x /usr/sandbox/app/system/build/*.sh && \
-    chmod +x /usr/sandbox/app/system/admin/*.sh && \
-    chmod +x /usr/sandbox/app/system/download/*.sh && \
-    chmod +x /usr/sandbox/app/system/install/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/admin/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/apex/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/mcp/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/sqlcl/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/sqlplus/*.sh
+# Set permissions for all scripts (recursively find all .sh files)
+RUN find /usr/sandbox/app -type f -name '*.sh' -exec chmod +x {} \;
 
 WORKDIR /usr/sandbox/app
 RUN mkdir -p /opt/oracle
@@ -130,18 +121,8 @@ COPY --from=sandbox-builder /opt/oracle /opt/oracle
 
 RUN npm install oracledb --build-from-source --unsafe-perm
 
-# Set permissions for all scripts in runtime stage
-RUN chmod +x /usr/sandbox/app/cli/*.sh && \
-    chmod +x /usr/sandbox/app/system/utils/*.sh && \
-    chmod +x /usr/sandbox/app/system/build/*.sh && \
-    chmod +x /usr/sandbox/app/system/admin/*.sh && \
-    chmod +x /usr/sandbox/app/system/download/*.sh && \
-    chmod +x /usr/sandbox/app/system/install/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/admin/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/apex/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/mcp/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/sqlcl/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/sqlplus/*.sh
+# Set permissions for all scripts in runtime stage (recursively find all .sh files)
+RUN find /usr/sandbox/app -type f -name '*.sh' -exec chmod +x {} \;
 
 # Create a wrapper for SQLcl that detects Java path dynamically for any architecture
 # Updated by demasy on November 11, 2025
