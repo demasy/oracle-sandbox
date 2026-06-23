@@ -30,9 +30,9 @@ services:
           "echo 'SELECT 1 FROM DUAL;' | sqlplus -s ${ENV_DB_USER}/${ENV_DB_PASSWORD}@localhost:1521/${ENV_DB_SID} | grep -q 1",
         ]
       interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
+      timeout: 20s
+      retries: 10
+      start_period: 240s
     networks:
       sandbox_network:
         ipv4_address: ${ENV_IP_DB_SERVER}
@@ -77,7 +77,7 @@ services:
       - "127.0.0.1:${ENV_MCP_PORT:-3001}:3001"   # Claude Code MCP server
     depends_on:
       sandbox-oracle-database:
-        condition: service_healthy
+        condition: service_started
     environment:
       - COMPOSE_FILE=docker-compose.yml
       - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-sandbox}
