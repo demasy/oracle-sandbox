@@ -88,22 +88,6 @@ if [[ -n "$SANDBOX_DB_HOST" && -n "$SANDBOX_DB_PORT" && -n "$SANDBOX_DB_SERVICE"
     log_info "Service: $SANDBOX_DB_SERVICE"
     log_info "User: $SANDBOX_DB_USER"
     echo ""
-    
-    # Test database connectivity (optional - uncomment if needed)
-    # log_step "Testing database connection..."
-    # if sqlcl -S /nolog <<EOF > /dev/null 2>&1
-# CONNECT ${SANDBOX_DB_USER}/${SANDBOX_DB_PASS}@${SANDBOX_DB_HOST}:${SANDBOX_DB_PORT}/${SANDBOX_DB_SERVICE}
-# SELECT 1 FROM DUAL;
-# EXIT;
-# EOF
-    # then
-    #     log_success "Database connection successful"
-    #     echo ""
-    # else
-    #     log_warn "Database connection failed (database may still be starting)"
-    #     log_info "You can test later with: ${CYAN}sqlcl${RESET}"
-    #     echo ""
-    # fi
 else
     log_warn "Database connection not configured"
     log_info "Missing environment variables:"
@@ -159,76 +143,6 @@ EOF
             fi
         fi
         
-        # Check if APEX schema exists in database
-        APEX_INSTALLED=$(sql -S ${SANDBOX_DB_USER}/${SANDBOX_DB_PASS}@${SANDBOX_DB_HOST}:${SANDBOX_DB_PORT}/${SANDBOX_DB_SERVICE} <<EOF 2>/dev/null | grep -E "^[0-9]+$" | tail -1
-SET HEADING OFF
-SET FEEDBACK OFF
-SET PAGESIZE 0
-SELECT COUNT(*) FROM dba_users WHERE username LIKE 'APEX_%';
-EXIT;
-EOF
-)
-        
-        # Trim whitespace and check if it's a number greater than 0
-        APEX_INSTALLED=$(echo "$APEX_INSTALLED" | tr -d '[:space:]')
-        
-        # if [[ "$APEX_INSTALLED" =~ ^[0-9]+$ ]] && [[ "$APEX_INSTALLED" -gt 0 ]]; then
-        #     log_success "APEX already installed in database"
-        #     echo ""
-        # else
-        #     log_info "APEX not yet installed in database"
-            
-        #     # Check if automatic installation is enabled
-        #     if [ "${SANDBOX_AUTO_INSTALL_APEX_ON_STARTUP:-true}" = "true" ]; then
-        #         log_info "Auto-install enabled (SANDBOX_AUTO_INSTALL_APEX_ON_STARTUP=true)"
-        #         log_info "Installing APEX automatically (this takes 3-5 minutes)..."
-                
-        #         # Determine if we should show logs inline
-        #         if [ "${SANDBOX_SHOW_APEX_INSTALL_LOGS:-true}" = "true" ]; then
-        #             log_info "Installation logs will appear below..."
-        #             echo ""
-        #             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-                    
-        #             # Run installation with visible output
-        #             set +e  # Don't exit on error
-        #             timeout ${SANDBOX_APEX_INSTALL_TIMEOUT:-600} bash /usr/sandbox/app/oracle/apex/install.sh 2>&1 | tee /tmp/apex-startup-install.log
-        #             INSTALL_EXIT_CODE=${PIPESTATUS[0]}
-        #             set -e  # Re-enable exit on error
-                    
-        #             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        #         else
-        #             log_info "Running installation in background (logs saved to /tmp/apex-startup-install.log)"
-        #             log_info "Monitor progress: docker exec -it sandbox-oracle-server tail -f /tmp/apex-startup-install.log"
-        #             echo ""
-                    
-        #             # Run installation in background
-        #             set +e
-        #             timeout ${SANDBOX_APEX_INSTALL_TIMEOUT:-600} bash /usr/sandbox/app/oracle/apex/install.sh > /tmp/apex-startup-install.log 2>&1 &
-        #             INSTALL_PID=$!
-                    
-        #             # Wait for installation to complete
-        #             wait $INSTALL_PID
-        #             INSTALL_EXIT_CODE=$?
-        #             set -e
-        #         fi
-                
-        #         # Check installation result
-        #         if [ $INSTALL_EXIT_CODE -eq 0 ]; then
-        #             log_success "APEX installation completed successfully!"
-        #         elif [ $INSTALL_EXIT_CODE -eq 124 ]; then
-        #             log_error "APEX installation timed out after ${SANDBOX_APEX_INSTALL_TIMEOUT:-600} seconds"
-        #             log_info "Increase timeout with: SANDBOX_APEX_INSTALL_TIMEOUT=900"
-        #         else
-        #             log_error "APEX installation failed with exit code: $INSTALL_EXIT_CODE"
-        #             log_info "Full logs saved to: /tmp/apex-startup-install.log"
-        #             log_info "Or run manually: ${CYAN}install-apex${RESET}"
-        #         fi
-        #     else
-        #         log_info "Auto-install disabled (SANDBOX_AUTO_INSTALL_APEX_ON_STARTUP=false)"
-        #         log_info "To install APEX, run: ${CYAN}install-apex${RESET}"
-        #     fi
-        #     echo ""
-        # fi
     else
         log_warn "Cannot check APEX installation (database not accessible)"
         log_info "Once database is ready, run: ${CYAN}install-apex${RESET}"
@@ -278,12 +192,12 @@ EOF
         # Create PDBs — idempotent (skips if already exists)
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating PDBs..." >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/create-pdb.sh SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/create-pdb.sh SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] SANDBOX_PDB ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] SANDBOX_PDB creation failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/create-pdb.sh SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/create-pdb.sh SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] SANDBOX_PDB ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] SANDBOX_PDB creation failed" >> "$AUTO_USER_LOG"
@@ -291,22 +205,22 @@ EOF
         # Create default users — idempotent (skips if already exists)
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating default database users..." >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/create-user.sh sandbox ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/create-user.sh sandbox ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox user setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh sandbox all SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/grant-privileges.sh sandbox all SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox privileges granted" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox privilege grant failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/create-user.sh sandbox_ai ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/create-user.sh sandbox_ai ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox_ai user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox_ai user setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh sandbox_ai minimal SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/grant-privileges.sh sandbox_ai minimal SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox_ai privileges granted" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox_ai privilege grant failed" >> "$AUTO_USER_LOG"
@@ -321,22 +235,22 @@ EOF
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] MCP saved connection ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] MCP saved connection setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/create-user.sh demasy ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/create-user.sh demasy ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy user setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh demasy all SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/grant-privileges.sh demasy all SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy privileges granted" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy privilege grant failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/create-user.sh demasylabs ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/create-user.sh demasylabs ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasylabs user ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasylabs user setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/grant-privileges.sh demasylabs minimal SANDBOX_PDB \
+        bash /usr/sandbox/app/oracle/admin/ddl/grant-privileges.sh demasylabs minimal SANDBOX_PDB \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasylabs privileges granted" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasylabs privilege grant failed" >> "$AUTO_USER_LOG"
