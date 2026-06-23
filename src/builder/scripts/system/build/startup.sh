@@ -189,43 +189,36 @@ EOF
             exit 1
         fi
 
-        # Create PDBs — idempotent (skips if already exists)
+        # ─── Create PDBs (idempotent) ─────────────────────────────────────────────
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating PDBs..." >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/ddl/create-pdb.sh SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] SANDBOX_PDB ready" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] SANDBOX_PDB creation failed" >> "$AUTO_USER_LOG"
+        for pdb in SANDBOX_PDB DEMASY_PDB DEMASYLABS_PDB; do
+            bash /usr/sandbox/app/oracle/admin/ddl/create-pdb.sh "$pdb" \
+                >> "$AUTO_USER_LOG" 2>&1 \
+                && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] $pdb ready" >> "$AUTO_USER_LOG" \
+                || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] $pdb creation failed" >> "$AUTO_USER_LOG"
+        done
 
-        bash /usr/sandbox/app/oracle/admin/ddl/create-pdb.sh SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] SANDBOX_PDB ready" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] SANDBOX_PDB creation failed" >> "$AUTO_USER_LOG"
+        # ─── Provision users dynamically from YAML config ──────────────────────────
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating database users from configuration..." >> "$AUTO_USER_LOG"
+        echo "" >> "$AUTO_USER_LOG"
 
-        # Create default users — idempotent (skips if already exists)
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating default database users..." >> "$AUTO_USER_LOG"
+        for pdb in SANDBOX_PDB DEMASY_PDB DEMASYLABS_PDB; do
+            bash /usr/sandbox/app/oracle/admin/ddl/provision-users-from-config.sh "$pdb" \
+                /usr/sandbox/app/oracle/admin/config/database-objects.yaml \
+                "$AUTO_USER_LOG" \
+                2>&1
+            
+            if [[ $? -eq 0 ]]; then
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] Users provisioned for $pdb" >> "$AUTO_USER_LOG"
+            else
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] User provisioning failed for $pdb" >> "$AUTO_USER_LOG"
+            fi
+            
+            echo "" >> "$AUTO_USER_LOG"
+        done
 
-        bash /usr/sandbox/app/oracle/admin/ddl/create-user.sh sandbox ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox user ready" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox user setup failed" >> "$AUTO_USER_LOG"
-
-        bash /usr/sandbox/app/oracle/admin/ddl/grant-privileges.sh sandbox all SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox privileges granted" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox privilege grant failed" >> "$AUTO_USER_LOG"
-
-        bash /usr/sandbox/app/oracle/admin/ddl/create-user.sh sandbox_ai ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox_ai user ready" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox_ai user setup failed" >> "$AUTO_USER_LOG"
-
-        bash /usr/sandbox/app/oracle/admin/ddl/grant-privileges.sh sandbox_ai minimal SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] sandbox_ai privileges granted" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] sandbox_ai privilege grant failed" >> "$AUTO_USER_LOG"
-
-        # Set up MCP saved connection immediately after sandbox_ai is ready
+        # ─── Set up MCP saved connection (after SANDBOX_PDB users ready) ──────────
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setting up MCP saved connection..." >> "$AUTO_USER_LOG"
         SANDBOX_DB_MCP_USER="${SANDBOX_DB_MCP_USER:-${SANDBOX_DB_USER}}" \
         SANDBOX_DB_MCP_SERVICE="${SANDBOX_DB_MCP_SERVICE}" \
@@ -235,26 +228,7 @@ EOF
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] MCP saved connection ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] MCP saved connection setup failed" >> "$AUTO_USER_LOG"
 
-        bash /usr/sandbox/app/oracle/admin/ddl/create-user.sh demasy ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy user ready" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy user setup failed" >> "$AUTO_USER_LOG"
-
-        bash /usr/sandbox/app/oracle/admin/ddl/grant-privileges.sh demasy all SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasy privileges granted" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasy privilege grant failed" >> "$AUTO_USER_LOG"
-
-        bash /usr/sandbox/app/oracle/admin/ddl/create-user.sh demasylabs ${SANDBOX_DB_PASSWORD} SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasylabs user ready" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasylabs user setup failed" >> "$AUTO_USER_LOG"
-
-        bash /usr/sandbox/app/oracle/admin/ddl/grant-privileges.sh demasylabs minimal SANDBOX_PDB \
-            >> "$AUTO_USER_LOG" 2>&1 \
-            && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] demasylabs privileges granted" >> "$AUTO_USER_LOG" \
-            || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] demasylabs privilege grant failed" >> "$AUTO_USER_LOG"
-
+        echo "" >> "$AUTO_USER_LOG"
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Auto-user setup complete" >> "$AUTO_USER_LOG"
     ) &
 
