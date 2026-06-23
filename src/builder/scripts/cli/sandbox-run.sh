@@ -69,7 +69,7 @@ case "$RESOURCE" in
         fi
 
         CONN_PASS="${SQLCL_PASS:-${SANDBOX_DB_PASSWORD}}"
-        CONN_HOST="${SANDBOX_DB_HOST}"
+        CONN_HOST="oracle-database"
         CONN_PORT="${SANDBOX_DB_PORT}"
 
         case "$SQLCL_USER" in
@@ -94,12 +94,12 @@ case "$RESOURCE" in
                 sql "sandbox_ai/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
             demasy)
-                CONN_PDB="${SQLCL_PDB:-SANDBOX_PDB}"
+                CONN_PDB="${SQLCL_PDB:-DEMASY_PDB}"
                 log_step "Connecting as DEMASY @ ${CONN_PDB}..."
                 sql "demasy/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
             demasy_ai)
-                CONN_PDB="${SQLCL_PDB:-SANDBOX_PDB}"
+                CONN_PDB="${SQLCL_PDB:-DEMASY_PDB}"
                 log_step "Connecting as DEMASY_AI (AI/MCP user) @ ${CONN_PDB}..."
                 sql "demasy_ai/${CONN_PASS}@//${CONN_HOST}:${CONN_PORT}/${CONN_PDB}"
                 ;;
@@ -156,7 +156,7 @@ case "$RESOURCE" in
             
             # Execute as SYSTEM user
             CONN_PASS="${SANDBOX_DB_PASSWORD}"
-            CONN_HOST="${SANDBOX_DB_HOST}"
+            CONN_HOST="oracle-database"
             CONN_PORT="${SANDBOX_DB_PORT}"
             CONN_PDB="${SANDBOX_DB_SERVICE}"
             
