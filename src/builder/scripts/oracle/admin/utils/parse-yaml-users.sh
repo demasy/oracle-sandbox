@@ -15,7 +15,6 @@
 # Exit codes:
 #   0 = Success (one or more users found and output)
 #   1 = Error (missing parameters, invalid PDB, file not found)
-#   2 = No enabled users found for PDB (not an error)
 # ============================================
 
 set -o pipefail
@@ -42,116 +41,107 @@ if [[ ! -f "$YAML_FILE" ]]; then
     exit 1
 fi
 
-# ─── Parse YAML using bash-native tools ─────────────────────────────────────
-# Strategy:
-# 1. Extract PDB block (from "- name: PDB_NAME" to next "- name:" or EOF)
-# 2. Extract users section
-# 3. For each user where "enabled: true", extract username, password, privilege level
-# 4. Output pipe-separated format
-
-parse_pdb_users() {
-    local pdb="$1"
-    local yaml_file="$2"
-    local in_pdb=0
-    local in_users=0
-    local in_user=0
-    local current_username=""
-    local current_password=""
-    local current_enabled=""
-    local current_privilege_level=""
-    local user_count=0
-    
-    while IFS= read -r line; do
-        # Skip comments and empty lines
-        [[ "$line" =~ ^[[:space:]]*# ]] && continue
-        [[ -z "${line// }" ]] && continue
-        
-        # Detect PDB entry start: "- name: PDB_NAME"
-        if [[ "$line" =~ ^[[:space:]]*-[[:space:]]+name:[[:space:]]+\"?${pdb}\"? ]]; then
-            in_pdb=1
-            in_users=0
-            continue
-        fi
-        
-        # Detect PDB entry end: another "- name:" at the same indentation (databases array item)
-        if [[ "$in_pdb" == 1 ]] && [[ "$line" =~ ^[[:space:]]*-[[:space:]]+name: ]] && ! [[ "$line" =~ ${pdb} ]]; then
-            in_pdb=0
-        fi
-        
-        # If not in target PDB, skip
-        [[ "$in_pdb" != 1 ]] && continue
-        
-        # Detect users section: "users:"
-        if [[ "$line" =~ ^[[:space:]]+users: ]]; then
-            in_users=1
-            continue
-        fi
-        
-        # Exit users section when we hit another top-level key (indentation = 4 spaces)
-        if [[ "$in_users" == 1 ]] && [[ "$line" =~ ^[[:space:]]{0,4}[a-zA-Z_]+: ]] && ! [[ "$line" =~ ^[[:space:]]+# ]]; then
-            in_users=0
-        fi
-        
-        # If not in users section, skip
-        [[ "$in_users" != 1 ]] && continue
-        
-        # Detect user entry start: "- username:" (6+ spaces indent)
-        if [[ "$line" =~ ^[[:space:]]{6,}-[[:space:]]+username: ]]; then
-            # If we have a previous user, output it (if enabled)
-            if [[ -n "$current_username" ]] && [[ "$current_enabled" == "true" ]]; then
-                echo "${pdb}|${current_username}|${current_password}|${current_privilege_level}"
-                ((user_count++))
-            fi
-            
-            # Start new user
-            current_username=""
-            current_password=""
-            current_enabled=""
-            current_privilege_level=""
-            in_user=1
-            
-            # Extract username from "- username: "value""
-            current_username=$(echo "$line" | sed -E 's/.*username:[[:space:]]*"?([^"]+)"?.*/\1/')
-            continue
-        fi
-        
-        # Parse user properties (if in_user == 1)
-        if [[ "$in_user" == 1 ]]; then
-            # enabled: true/false
-            if [[ "$line" =~ enabled: ]]; then
-                current_enabled=$(echo "$line" | sed -E 's/.*enabled:[[:space:]]*([a-z]+).*/\1/')
-            fi
-            
-            # password: "${VAR}" or "literal"
-            if [[ "$line" =~ password: ]]; then
-                current_password=$(echo "$line" | sed -E 's/.*password:[[:space:]]*([^ ]*).*/\1/' | tr -d '"')
-            fi
-            
-            # privileges: level: <level>
-            if [[ "$line" =~ level: ]]; then
-                current_privilege_level=$(echo "$line" | sed -E 's/.*level:[[:space:]]*"?([^ "]+)"?.*/\1/')
-            fi
-        fi
-        
-    done < "$yaml_file"
-    
-    # Output last user if enabled
-    if [[ -n "$current_username" ]] && [[ "$current_enabled" == "true" ]]; then
-        echo "${pdb}|${current_username}|${current_password}|${current_privilege_level}"
-        ((user_count++))
-    fi
-    
-    return $([[ $user_count -gt 0 ]] && echo 0 || echo 2)
+# ─── Parse using AWK for reliable YAML structure handling ──────────────────
+# AWK handles complex state transitions more reliably than bash
+awk -v target_pdb="$PDB_NAME" '
+BEGIN {
+    pdb_found = 0
+    in_users = 0
+    in_user = 0
+    user_count = 0
 }
 
-# Execute parsing and capture result
-parse_pdb_users "$PDB_NAME" "$YAML_FILE"
+# Detect PDB entry start: "  - name: PDB_NAME"
+/^  - name: / && !pdb_found {
+    name = $0
+    gsub(/.*name:[[:space:]]*"?/, "", name)
+    gsub(/"?[[:space:]]*$/, "", name)
+    if (name == target_pdb) {
+        pdb_found = 1
+    }
+    next
+}
+
+# Detect end of target PDB section (another "  - name:" or different top-level key)
+/^  - name: / && pdb_found {
+    exit
+}
+
+/^  [a-z]/ && /^  [^-]/ && pdb_found {
+    exit
+}
+
+# Detect start of users section
+pdb_found && /^    users:/ {
+    in_users = 1
+    next
+}
+
+# Detect end of users section (another top-level key under PDB)
+pdb_found && in_users && /^    [a-z]/ && !/^    users:/ && !/^      / {
+    in_users = 0
+}
+
+# Detect user entry: "      - username: ..."
+in_users && /^      - username:/ {
+    # Output previous user if it was enabled
+    if (in_user && enabled == "true") {
+        printf "%s|%s|%s|%s\n", target_pdb, username, password, level
+        user_count++
+    }
+    
+    # Extract and store new user
+    username = $0
+    gsub(/.*username:[[:space:]]*"?/, "", username)
+    gsub(/"?[[:space:]]*$/, "", username)
+    enabled = ""
+    password = ""
+    level = ""
+    in_user = 1
+    next
+}
+
+# Parse user properties
+in_user && /^        enabled:/ {
+    enabled = $0
+    gsub(/.*enabled:[[:space:]]*/, "", enabled)
+    gsub(/[[:space:]]*$/, "", enabled)
+    next
+}
+
+in_user && /^        password:/ {
+    password = $0
+    gsub(/.*password:[[:space:]]*/, "", password)
+    gsub(/[[:space:]]*$/, "", password)
+    gsub(/"/, "", password)
+    next
+}
+
+in_user && /^          level:/ {
+    level = $0
+    gsub(/.*level:[[:space:]]*"?/, "", level)
+    gsub(/"?[[:space:]]*$/, "", level)
+    next
+}
+
+END {
+    # Output last user if enabled
+    if (in_user && enabled == "true") {
+        printf "%s|%s|%s|%s\n", target_pdb, username, password, level
+        user_count++
+    }
+    
+    # Exit with appropriate code
+    exit (user_count > 0 ? 0 : 2)
+}
+' "$YAML_FILE"
+
 exit_code=$?
 
-# If no users found, warn but don't fail
+# If no users found, warn but don't fail the provisioning process
 if [[ $exit_code -eq 2 ]]; then
     echo "WARN: No enabled users found for PDB '$PDB_NAME' in $YAML_FILE" >&2
     exit 0  # Return success but empty output (caller should handle)
 fi
 
-exit $exit_code
+exit 0
