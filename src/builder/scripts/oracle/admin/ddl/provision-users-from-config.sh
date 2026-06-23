@@ -117,8 +117,15 @@ for user_entry in "${users_array[@]}"; do
     # Parse pipe-separated entry: PDB|USERNAME|PASSWORD_VAR|PRIVILEGE_LEVEL
     IFS='|' read -r pdb username password_var privilege_level <<< "$user_entry"
     
-    # Expand password variable (e.g., ${SANDBOX_DB_PASSWORD} → actual password)
-    password="${!password_var:-${password_var}}"
+    # Expand password variable: extract VAR_NAME from ${VAR_NAME} format, then indirect-reference
+    # password_var comes in as "${SANDBOX_DB_PASSWORD}", need to extract SANDBOX_DB_PASSWORD
+    if [[ "$password_var" =~ \$\{([A-Z_][A-Z_0-9]*)\} ]]; then
+        var_name="${BASH_REMATCH[1]}"
+        password="${!var_name}"
+    else
+        # Fallback: if password_var doesn't match the pattern, use it as-is
+        password="$password_var"
+    fi
     
     if [[ -z "$username" ]] || [[ -z "$password" ]] || [[ -z "$privilege_level" ]]; then
         log_error "Invalid user entry: $user_entry (missing username, password, or privilege level)"
