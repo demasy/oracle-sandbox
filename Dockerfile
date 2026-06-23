@@ -44,6 +44,7 @@ COPY ./src/builder/scripts/system/admin/*.sh        /usr/sandbox/app/system/admi
 COPY ./src/builder/scripts/system/download/*.sh     /usr/sandbox/app/system/download/
 COPY ./src/builder/scripts/system/install/*.sh      /usr/sandbox/app/system/install/
 COPY ./src/builder/scripts/oracle/admin/ddl/*.sh    /usr/sandbox/app/oracle/admin/ddl/
+COPY ./src/builder/scripts/oracle/admin/utils/*.sh  /usr/sandbox/app/oracle/admin/utils/
 COPY ./src/builder/scripts/oracle/admin/config/*.yaml /usr/sandbox/app/oracle/admin/config/
 COPY ./src/builder/scripts/oracle/admin/monitoring/*.sql /usr/sandbox/app/oracle/admin/monitoring/
 COPY ./src/builder/scripts/oracle/apex/*.sh         /usr/sandbox/app/oracle/apex/
