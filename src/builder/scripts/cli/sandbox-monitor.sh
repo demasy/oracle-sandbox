@@ -354,15 +354,24 @@ _monitor_menu() {
 
 # ─── Dispatch ─────────────────────────────────────────────────────────────────
 
-# Check for menu flag
+# Parse parameters first to check for export format
+_export_format=$(_parse_param_value "--export" $PARAMS)
+
+# Check for menu flag or if no resource specified and no export format
 if [[ "$PARAMS" =~ --menu ]]; then
+    _monitor_menu
+    if [[ $? -ne 0 ]]; then
+        exit 1
+    fi
+elif [[ -z "$RESOURCE" && -z "$_export_format" ]]; then
+    # No resource and no export format = show interactive menu
     _monitor_menu
     if [[ $? -ne 0 ]]; then
         exit 1
     fi
 fi
 
-# Default resource to "all" if not specified
+# Default resource to "all" if still not specified (for scripts using --export)
 RESOURCE="${RESOURCE:-all}"
 
 # Validate resource
@@ -376,9 +385,6 @@ case "$RESOURCE" in
         exit 1
         ;;
 esac
-
-# Parse parameters
-_export_format=$(_parse_param_value "--export" $PARAMS)
 
 log_info "Collecting monitoring metrics..."
 
