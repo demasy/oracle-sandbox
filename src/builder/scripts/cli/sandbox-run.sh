@@ -69,7 +69,7 @@ case "$RESOURCE" in
         fi
 
         CONN_PASS="${SQLCL_PASS:-${SANDBOX_DB_PASSWORD}}"
-        CONN_HOST="oracle-database"
+        CONN_HOST="sandbox-oracle-database"
         CONN_PORT="${SANDBOX_DB_PORT}"
 
         case "$SQLCL_USER" in
@@ -156,7 +156,7 @@ case "$RESOURCE" in
             
             # Execute as SYSTEM user
             CONN_PASS="${SANDBOX_DB_PASSWORD}"
-            CONN_HOST="oracle-database"
+            CONN_HOST="sandbox-oracle-database"
             CONN_PORT="${SANDBOX_DB_PORT}"
             CONN_PDB="${SANDBOX_DB_SERVICE}"
             
