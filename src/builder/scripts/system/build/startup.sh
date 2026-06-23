@@ -189,10 +189,24 @@ EOF
             exit 1
         fi
 
-        # ─── Create PDBs (idempotent) ─────────────────────────────────────────────
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating PDBs..." >> "$AUTO_USER_LOG"
+        # ─── Extract PDB list from YAML (dynamic, no hardcoding) ────────────────────
+        YAML_CONFIG="/usr/sandbox/app/oracle/admin/config/database-objects.yaml"
+        PDBS_ARRAY=()
+        
+        while IFS= read -r pdb_name; do
+            [[ -z "$pdb_name" ]] && continue
+            PDBS_ARRAY+=("$pdb_name")
+        done < <(bash /usr/sandbox/app/oracle/admin/utils/parse-yaml-pdbs.sh "$YAML_CONFIG" 2>/dev/null)
+        
+        if [[ ${#PDBS_ARRAY[@]} -eq 0 ]]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: No PDBs found in YAML configuration" >> "$AUTO_USER_LOG"
+            exit 1
+        fi
 
-        for pdb in SANDBOX_PDB DEMASY_PDB DEMASYLABS_PDB; do
+        # ─── Create PDBs (idempotent) ─────────────────────────────────────────────
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating PDBs: ${PDBS_ARRAY[*]}" >> "$AUTO_USER_LOG"
+
+        for pdb in "${PDBS_ARRAY[@]}"; do
             bash /usr/sandbox/app/oracle/admin/ddl/create-pdb.sh "$pdb" \
                 >> "$AUTO_USER_LOG" 2>&1 \
                 && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] $pdb ready" >> "$AUTO_USER_LOG" \
@@ -203,9 +217,9 @@ EOF
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Creating database users from configuration..." >> "$AUTO_USER_LOG"
         echo "" >> "$AUTO_USER_LOG"
 
-        for pdb in SANDBOX_PDB DEMASY_PDB DEMASYLABS_PDB; do
+        for pdb in "${PDBS_ARRAY[@]}"; do
             bash /usr/sandbox/app/oracle/admin/ddl/provision-users-from-config.sh "$pdb" \
-                /usr/sandbox/app/oracle/admin/config/database-objects.yaml \
+                "$YAML_CONFIG" \
                 "$AUTO_USER_LOG" \
                 2>&1
             
