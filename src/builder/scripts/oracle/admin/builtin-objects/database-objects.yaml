@@ -1,0 +1,350 @@
+# ─── Database Objects Configuration ───────────────────────────────────────────
+# This YAML file defines all database objects to be created during Docker build
+# 
+# USAGE:
+#   This file is parsed by database-init.sh to automatically create:
+#   • Pluggable Databases (PDBs)
+#   • Database Users with specific privileges
+#   • Role assignments and grants
+#
+# ARCHITECTURE:
+#   Root level: databases (array)
+#   Level 1: Each database definition (PDB)
+#   Level 2: users, roles, objects within that database
+#   Level 3: Specific user/role/object configuration
+#
+# PRIVILEGE LEVELS:
+#   • minimal   - Basic connectivity + own-schema DDL/DML only
+#   • normal    - Everything in minimal, plus SELECT_CATALOG_ROLE and cross-schema operations
+#   • all       - Full DBA role and administrative privileges
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: "1.0.0"
+description: "Oracle Sandbox AI Database - Builtin Objects Configuration"
+created: "2026-06-23"
+organization: "Demasy Labs"
+
+# ─── DATABASES ────────────────────────────────────────────────────────────────
+databases:
+
+  # ─── Primary Sandbox PDB ────────────────────────────────────────────────────
+  - name: SANDBOX_PDB
+    description: "Primary Pluggable Database for sandbox workloads"
+    type: "production"
+    admin_user: "system"
+    
+    # Database configuration
+    config:
+      character_set: "AL32UTF8"
+      national_character_set: "UTF8"
+      datafile_dest: "${ORACLE_BASE}/oradata"
+      redo_log_size: "512M"
+      undo_tablespace: "UNDOTBS1"
+      temp_tablespace: "TEMP"
+
+    # Tablespaces to create
+    tablespaces:
+      - name: "USERS"
+        size: "1G"
+        autoextend: true
+        description: "Default tablespace for user objects"
+      - name: "APEX_DATA"
+        size: "500M"
+        autoextend: true
+        description: "Dedicated tablespace for APEX application data"
+      - name: "APP_DATA"
+        size: "2G"
+        autoextend: true
+        description: "Application data and schema storage"
+
+    # Users to create in this PDB
+    users:
+
+      # ─── SANDBOX User (minimal dev access) ──────────────────────────────
+      - username: "sandbox"
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "USERS"
+        quota: "UNLIMITED"
+        description: "Sandbox development user with limited privileges"
+        privileges:
+          level: "minimal"
+          roles:
+            - "CONNECT"
+            - "RESOURCE"
+          system_privs:
+            - "CREATE SESSION"
+            - "ALTER SESSION"
+            - "UNLIMITED TABLESPACE"
+          object_privs: []
+
+      # ─── SANDBOX_AI User (AI/MCP service account) ──────────────────────
+      - username: "sandbox_ai"
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "USERS"
+        quota: "UNLIMITED"
+        description: "AI/MCP service account for automated operations"
+        privileges:
+          level: "normal"
+          roles:
+            - "CONNECT"
+            - "RESOURCE"
+            - "SELECT_CATALOG_ROLE"
+          system_privs:
+            - "CREATE SESSION"
+            - "ALTER SESSION"
+            - "UNLIMITED TABLESPACE"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+            - "CREATE SEQUENCE"
+            - "CREATE SYNONYM"
+            - "CREATE DATABASE LINK"
+          object_privs:
+            - "target": "ALL TABLES"
+              permissions: ["SELECT", "INSERT", "UPDATE", "DELETE"]
+            - "target": "ALL PROCEDURES"
+              permissions: ["EXECUTE"]
+
+      # ─── DEMASY User (full dev access) ────────────────────────────────
+      - username: "demasy"
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "USERS"
+        quota: "UNLIMITED"
+        description: "Demasy Labs developer user with extended privileges"
+        privileges:
+          level: "normal"
+          roles:
+            - "CONNECT"
+            - "RESOURCE"
+            - "SELECT_CATALOG_ROLE"
+          system_privs:
+            - "CREATE SESSION"
+            - "ALTER SESSION"
+            - "UNLIMITED TABLESPACE"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+            - "CREATE SEQUENCE"
+            - "CREATE SYNONYM"
+            - "CREATE DATABASE LINK"
+            - "CREATE MATERIALIZED VIEW"
+            - "CREATE TRIGGER"
+            - "ANALYZE ANY"
+            - "LOCK ANY TABLE"
+            - "COMMENT ANY TABLE"
+            - "FLASHBACK ANY TABLE"
+          object_privs:
+            - "target": "ALL TABLES"
+              permissions: ["SELECT", "INSERT", "UPDATE", "DELETE"]
+            - "target": "ALL PROCEDURES"
+              permissions: ["EXECUTE"]
+            - "target": "ALL VIEWS"
+              permissions: ["SELECT"]
+
+      # ─── DEMASY_AI User (AI/MCP advanced operations) ──────────────────
+      - username: "demasy_ai"
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "USERS"
+        quota: "UNLIMITED"
+        description: "Advanced AI/MCP user for Demasy Labs operations"
+        privileges:
+          level: "all"
+          roles:
+            - "CONNECT"
+            - "RESOURCE"
+            - "SELECT_CATALOG_ROLE"
+            - "DBA"
+          system_privs:
+            - "CREATE SESSION"
+            - "ALTER SESSION"
+            - "UNLIMITED TABLESPACE"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+            - "CREATE SEQUENCE"
+            - "CREATE SYNONYM"
+            - "CREATE DATABASE LINK"
+            - "CREATE MATERIALIZED VIEW"
+            - "CREATE TRIGGER"
+            - "CREATE TYPE"
+            - "ANALYZE ANY"
+            - "LOCK ANY TABLE"
+            - "COMMENT ANY TABLE"
+            - "FLASHBACK ANY TABLE"
+            - "QUERY REWRITE"
+            - "GRANT ANY PRIVILEGE"
+            - "GRANT ANY OBJECT PRIVILEGE"
+            - "CREATE ANY ROLE"
+            - "DROP ANY ROLE"
+            - "CREATE ANY USER"
+            - "DROP ANY USER"
+            - "ALTER ANY USER"
+          object_privs:
+            - "target": "ALL TABLES"
+              permissions: ["SELECT", "INSERT", "UPDATE", "DELETE", "REFERENCES", "EXECUTE"]
+            - "target": "ALL PROCEDURES"
+              permissions: ["EXECUTE"]
+            - "target": "ALL VIEWS"
+              permissions: ["SELECT", "REFERENCES"]
+            - "target": "ALL SEQUENCES"
+              permissions: ["SELECT", "ALTER"]
+
+      # ─── APEX_APP User (APEX application schema) ──────────────────────
+      - username: "apex_app"
+        password: "${SANDBOX_DB_PASSWORD}"
+        account_status: "OPEN"
+        default_tablespace: "APEX_DATA"
+        quota: "2G"
+        description: "APEX application schema for web application data"
+        privileges:
+          level: "normal"
+          roles:
+            - "CONNECT"
+            - "RESOURCE"
+          system_privs:
+            - "CREATE SESSION"
+            - "ALTER SESSION"
+            - "UNLIMITED TABLESPACE"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+            - "CREATE SEQUENCE"
+            - "CREATE SYNONYM"
+            - "CREATE TRIGGER"
+          object_privs:
+            - "target": "ALL TABLES"
+              permissions: ["SELECT", "INSERT", "UPDATE", "DELETE"]
+            - "target": "ALL PROCEDURES"
+              permissions: ["EXECUTE"]
+
+    # Roles to create in this PDB
+    roles:
+      - name: "APP_DEVELOPER"
+        description: "Application Developer role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+          object_privs: []
+
+      - name: "APP_ADMIN"
+        description: "Application Administrator role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+            - "ALTER USER"
+            - "GRANT ANY OBJECT PRIVILEGE"
+          object_privs: []
+
+      - name: "APEX_DEVELOPER"
+        description: "APEX Developer role"
+        privileges:
+          system_privs:
+            - "CREATE SESSION"
+            - "CREATE TABLE"
+            - "CREATE VIEW"
+            - "CREATE PROCEDURE"
+            - "CREATE SEQUENCE"
+            - "CREATE TRIGGER"
+          object_privs: []
+
+    # Initialization scripts to run after PDB creation
+    scripts:
+      - path: "src/builder/scripts/oracle/admin/builtin-objects/post-pdb-init.sql"
+        description: "Post-PDB initialization scripts (indexes, synonyms, etc.)"
+        runAs: "system"
+      - path: "src/builder/scripts/oracle/admin/builtin-objects/enable-ai-features.sql"
+        description: "Enable Oracle AI 26ai features (Vector, Graph, JSON Search)"
+        runAs: "system"
+
+# ─── ROOT CONTAINER DATABASE USERS ────────────────────────────────────────────
+# These are created in the CDB (root) for administrative purposes
+root_users:
+  - username: "c##demasy_admin"
+    description: "Common user for Demasy Labs container administration"
+    privileges:
+      roles:
+        - "CDB_DBA"
+  - username: "c##demasy_monitor"
+    description: "Common user for monitoring and diagnostics"
+    privileges:
+      roles:
+        - "SELECT_CATALOG_ROLE"
+
+# ─── INITIALIZATION SEQUENCE ────────────────────────────────────────────────
+initialization:
+  order:
+    1: "Create PDBs"
+    2: "Create tablespaces"
+    3: "Create users"
+    4: "Create roles"
+    5: "Grant privileges"
+    6: "Run post-initialization scripts"
+    7: "Run AI feature enablement scripts"
+  
+  # Retry configuration for failed operations
+  retry:
+    max_attempts: 3
+    wait_seconds: 5
+    on_failure: "log_and_continue"
+
+  # Post-initialization validations
+  validations:
+    - "Verify all PDBs are open"
+    - "Verify all users are created"
+    - "Verify all privileges are granted"
+    - "Verify all tablespaces are accessible"
+
+# ─── DOCUMENTATION ────────────────────────────────────────────────────────────
+documentation:
+  description: |
+    This YAML file defines the complete database object hierarchy for Oracle Sandbox.
+    
+    Key Features:
+    • Declarative PDB and user definitions
+    • Privilege-level management (minimal, normal, all)
+    • Role and system privilege mappings
+    • Tablespace configuration
+    • Post-initialization scripts
+    • AI feature enablement (Oracle 26ai)
+    
+    Database Structure:
+    • CDB (Container Database) - managed by Oracle Free
+    • FREEPDB1 - Oracle free default PDB (system, sys already exist)
+    • SANDBOX_PDB - custom PDB for sandbox workloads
+    
+    User Accounts:
+    • sandbox - minimal access developer
+    • sandbox_ai - AI/MCP service account (normal access)
+    • demasy - developer with extended access (normal access)
+    • demasy_ai - advanced AI operations (all access)
+    • apex_app - APEX application schema
+    
+  usage_notes: |
+    1. Environment variables are resolved at runtime:
+       ${SANDBOX_DB_PASSWORD} - replaced with SANDBOX_DB_PASSWORD env var
+       ${ORACLE_BASE} - replaced with ORACLE_BASE env var
+    
+    2. Scripts in the 'scripts' section are executed after PDB creation:
+       - SQL scripts for indexes, views, and other DDL
+       - Feature enablement scripts for Oracle 26ai
+    
+    3. Privileges are cumulative by level:
+       - minimal: basic CONNECT + RESOURCE roles
+       - normal: minimal + SELECT_CATALOG_ROLE + cross-schema operations
+       - all: normal + DBA + administrative grants
+    
+    4. This file is versioned with the project and tracked in Git.
+
+  contact: "founder@demasy.io"
+  repository: "https://github.com/demasy/oracle-sandbox"
