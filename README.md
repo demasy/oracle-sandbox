@@ -240,7 +240,7 @@ ENV_SRC_ORACLE_ORDS=https://download.oracle.com/otn_software/java/ords/ords-late
 ENV_APEX_ADMIN_PASSWORD=YourAPEXPassword123
 ENV_APEX_ADMIN_USERNAME=ADMIN
 ENV_APEX_EMAIL=your-email@example.com
-ENV_APEX_DEFAULT_WORKSPACE=INTERNAL
+ENV_APEX_DEFAULT_WORKSPACE=SANDBOX
 ```
 
 > **Security Best Practices:**
@@ -417,37 +417,39 @@ Once your Oracle Sandbox is running and APEX is installed, access these manageme
 
 ### APEX Access Credentials
 
-#### APEX Admin (INTERNAL Workspace)
+> **Passwords are set in your `.env` file** (`ENV_APEX_ADMIN_PASSWORD`, `ENV_DB_PASSWORD`). The values below show the variable name — replace with your configured password.
+
+#### APEX Admin
 | Property | Value |
 |----------|-------|
+| **URL** | `http://localhost:8080/ords/apex_admin` |
 | **Workspace** | `INTERNAL` |
 | **Username** | `ADMIN` |
-| **Password** | `Demasy1986` |
-| **URL** | `http://localhost:8080/ords/apex_admin` |
+| **Password** | See `ENV_APEX_ADMIN_PASSWORD` in `.env` |
 
-#### APEX Developer Workspace (SANDBOX)
+#### APEX Developer Workspace
 | Property | Value |
 |----------|-------|
+| **URL** | `http://localhost:8080/ords/f?p=4550:1` |
 | **Workspace** | `SANDBOX` |
 | **Username** | `ADMIN` |
-| **Password** | `Demasy1986` |
-| **Email** | `founder@demasy.io` |
-| **URL** | `http://localhost:8080/ords/f?p=4550:1` |
+| **Password** | See `ENV_APEX_ADMIN_PASSWORD` in `.env` |
 
-#### SQL Developer Web (Schema: SANDBOX)
+#### SQL Developer Web
 | Property | Value |
 |----------|-------|
-| **Username** | `SANDBOX` |
-| **Password** | `Demasy1986` |
 | **URL** | `http://localhost:8080/ords/sandbox/_sdw/` |
+| **Username** | `SANDBOX` |
+| **Password** | See `ENV_DB_PASSWORD` in `.env` |
 
 #### Database Connection
 | Property | Value |
 |----------|-------|
-| **Database User** | `system` |
-| **Database Password** | `Demasy1986` |
-| **PDB Name** | `FREEPDB1` |
-| **TNS Port** | `1521` |
+| **Host** | `localhost` |
+| **Port** | `1521` |
+| **Service / PDB** | `FREEPDB1` |
+| **User** | `system` |
+| **Password** | See `ENV_DB_PASSWORD` in `.env` |
 
 ### APEX Management Commands
 
@@ -507,7 +509,7 @@ Connect from your local machine using:
 - **Port:** 1521
 - **Service Name:** FREEPDB1
 - **Username:** system
-- **Password:** Demasy1986
+- **Password:** See `ENV_DB_PASSWORD` in `.env`
 
 ### APEX Troubleshooting
 
@@ -815,24 +817,43 @@ SANDBOX_AI
 
 ## 📚 Documentation
 
-For comprehensive guides, see the [docs](docs) directory:
+Comprehensive guides are in the [docs/](docs/) directory, organized by topic:
 
-- **[Sandbox CLI User Guide](docs/sandbox-cli-user-guide.md)** ⭐ **START HERE** - Complete reference for the 6-phase CLI framework (beginner & advanced)
-- **[Phase 7: Testing & Quality Assurance](docs/sandbox-cli-phase-7-testing.md)** 🧪 NEW - Comprehensive testing framework, performance monitoring, and CI/CD integration
-- [Service Management](docs/service-management.md) - Container operations, logs, and diagnostics
-- [Oracle APEX Installation](docs/oracle-apex-installation.md) - APEX setup, ORDS configuration, and endpoints
-- [Database Connectivity](docs/database-connectivity.md) - Connection methods, parameters, and examples
-- [Monitoring & Logs](docs/monitoring.md) - Health checks, logging, and resource monitoring
-- [Configuration Reference](docs/configuration-reference.md) - Environment variables and settings
-- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
-- [Security Audit](docs/security-audit.md) - Security assessment and findings
-- [Security Guide](docs/security.md) - Security best practices and hardening
-- [Deployment Guide](docs/deployment-guide.md) - Production deployment procedures
-- [Production Hardening](docs/production-hardening.md) - Enterprise security hardening
-- [Docker Publishing](docs/docker-publishing.md) - Docker image publishing and versioning
-- [Tools Reference](docs/tools-reference.md) - Complete tools and utilities reference
-- [Startup Configuration](docs/startup-configuration.md) - Container startup options
-- [External Database Access](docs/external-database-access.md) - Remote connectivity setup
+### CLI & Operations
+
+| Document | Description |
+|----------|-------------|
+| **[Sandbox CLI User Guide](docs/sandbox-cli-user-guide.md)** ⭐ | Complete reference for all `sandbox` commands, aliases, flags, and workflows |
+| [CLI Testing Guide](docs/cli-testing-complete.md) | Test procedures, performance monitoring, and CI/CD integration |
+| [Service Management](docs/service-management.md) | Container start/stop/restart, logs, and diagnostics |
+| [Startup Configuration](docs/startup-configuration.md) | APEX auto-install, startup timeouts, and boot behavior |
+| [Deployment Guide](docs/deployment-guide.md) | Build, deploy, and operate the sandbox environment |
+
+### Database & Connectivity
+
+| Document | Description |
+|----------|-------------|
+| [Database Connectivity](docs/database-connectivity.md) | SQLcl, SQL*Plus, and connection string formats |
+| [External Database Access](docs/external-database-access.md) | Connecting from host tools (SQL Developer, DBeaver, DataGrip) |
+| [Oracle APEX Installation](docs/oracle-apex-installation.md) | APEX + ORDS setup, endpoints, and management commands |
+
+### Configuration & Reference
+
+| Document | Description |
+|----------|-------------|
+| [Configuration Reference](docs/configuration-reference.md) | All `ENV_*` variables, resource limits, volumes, and port mapping |
+| [Tools Reference](docs/tools-reference.md) | Built-in scripts and utilities reference |
+| [Monitoring & Logs](docs/monitoring.md) | Health checks, log management, and resource monitoring |
+| [Troubleshooting](docs/troubleshooting.md) | Common issues and solutions |
+
+### Security
+
+| Document | Description |
+|----------|-------------|
+| [Security Guide](docs/security.md) | Security best practices for this environment |
+| [Security Audit](docs/security-audit.md) | Security assessment and findings |
+| [Production Hardening](docs/production-hardening.md) | Enterprise hardening checklist |
+| [Docker Publishing](docs/docker-publishing.md) | Docker image publishing and versioning |
 
 <br>
 
