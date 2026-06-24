@@ -818,6 +818,7 @@ SANDBOX_AI
 For comprehensive guides, see the [docs](docs) directory:
 
 - **[Sandbox CLI User Guide](docs/SANDBOX_CLI_USER_GUIDE.md)** ⭐ **START HERE** - Complete reference for the 6-phase CLI framework (beginner & advanced)
+- **[Phase 7: Testing & Quality Assurance](docs/SANDBOX_CLI_PHASE_7_TESTING.md)** 🧪 NEW - Comprehensive testing framework, performance monitoring, and CI/CD integration
 - [Service Management](docs/service-management.md) - Container operations, logs, and diagnostics
 - [Oracle APEX Installation](docs/oracle-apex-installation.md) - APEX setup, ORDS configuration, and endpoints
 - [Database Connectivity](docs/database-connectivity.md) - Connection methods, parameters, and examples

@@ -264,15 +264,20 @@ known_hosts
 # Project Specific Exclusions
 # ===========================================
 
+# Documentation patterns
+# Track: docs/SANDBOX_CLI_USER_GUIDE.md, docs/*.md (committed guides)
+# Ignore: docs/generated/, docs/*.html, docs/*.pdf (generated only)
+docs/generated/
+docs/*.html
+docs/*.pdf
+docs/*.docx
 
-# Documentation (if generated)
-docs/
-
-# Personal notes
+# Personal notes & drafts (not tracked)
 notes/
 TODO.md
 NOTES.md
 scratch/
+draft/
 
 
 # ===========================================
@@ -369,7 +374,12 @@ password.env
 
 
 
-.github
-libs
-logs
+# Tracked directories (allow commits)
+!.github/
+!docs/*.md
+!libs/oracle/clients/
+
+# Generated files
+libs/instantclient_*/
+logs/
 *.log
