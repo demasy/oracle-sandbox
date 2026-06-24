@@ -1,4 +1,4 @@
-# 📋 Sandbox CLI User Guide
+# Sandbox CLI User Guide
 
 <div align="center">
 
@@ -6,966 +6,783 @@
 
 Master the unified command-line toolkit for managing Oracle Sandbox operations, connections, and configurations.
 
-[Quick Start](#quick-start-5-minutes) • [Beginner Guide](#beginner-guide) • [Advanced Features](#advanced-features) • [Reference](#quick-command-reference) • [Troubleshooting](#troubleshooting)
+[Quick Start](#quick-start) • [Command Reference](#command-reference) • [Global Flags](#global-flags) • [Aliases](#aliases) • [Workflows](#real-world-workflows) • [Troubleshooting](#troubleshooting)
 
 </div>
 
 <br>
 
-## 📑 Table of Contents
+## Table of Contents
 
 1. [Overview](#overview)
-2. [Quick Start (5 minutes)](#quick-start-5-minutes)
-3. [Beginner Guide](#beginner-guide)
-   - [① Aliases & Shortcuts](#-aliases--shortcuts)
-   - [② Help System](#-help-system)
-   - [③ Common Commands](#-common-commands)
-4. [Advanced Features](#advanced-features)
-   - [④ Output Formatting](#-output-formatting)
-   - [⑤ Batch Operations & State Diff](#-batch-operations--state-diff)
-   - [⑥ Interactive Shell & Completions](#-interactive-shell--completions)
-5. [Quick Command Reference](#quick-command-reference)
-6. [Real-World Workflows](#real-world-workflows)
-7. [Troubleshooting](#troubleshooting)
-8. [Getting Help](#getting-help)
+2. [Quick Start](#quick-start)
+3. [Syntax](#syntax)
+4. [Global Flags](#global-flags)
+5. [Command Reference](#command-reference)
+   - [run](#run--execute-tools)
+   - [status](#status--check-health)
+   - [conn](#conn--manage-connections)
+   - [logs](#logs--view-logs)
+   - [start / stop / restart](#start--stop--restart--service-control)
+   - [install / uninstall / download](#install--uninstall--download)
+   - [monitor](#monitor--metrics-dashboard)
+   - [audit](#audit--operation-history)
+   - [template](#template--configuration-snapshots)
+   - [batch](#batch--bulk-operations)
+   - [export / import](#export--import--configurationbackup)
+   - [help](#help--discovery)
+6. [Output Formats](#output-formats)
+7. [Aliases & Shortcuts](#aliases--shortcuts)
+8. [Tab Completion](#tab-completion)
+9. [Real-World Workflows](#real-world-workflows)
+10. [Troubleshooting](#troubleshooting)
 
 <br>
 
 ## Overview
 
-The **Sandbox CLI** is a unified command-line toolkit that simplifies all aspects of managing your Oracle Sandbox environment. Instead of remembering complex Docker commands, you can use simple, intuitive commands:
+The **Sandbox CLI** (`sandbox`) is the unified command-line interface for managing your Oracle Sandbox environment — APEX, ORDS, MCP, database connections, logs, and metrics — from a single entrypoint.
 
 ```bash
-sb status          # Check health of all services
-sb shell          # Enter interactive mode
-sb help           # Get help on any command
+sandbox <action> <resource> [parameters]
+sandbox <action> -h | --help
+sandbox help search <keyword>
 ```
 
-### Key Features
-
-| Feature | What It Does |
-|---------|-------------|
-| **Unified Interface** | One command (`sandbox`) for all operations |
-| **Smart Aliases** | 20+ shortcuts (sb, sr, sc, sl, etc.) |
-| **3-Level Help** | Top-level, action-level, resource-level help |
-| **Multiple Formats** | JSON, CSV, table, or quiet modes |
-| **Batch Operations** | Run multiple commands reliably |
-| **Configuration Export** | Backup and restore setups |
-| **State Comparison** | Audit and compare configurations |
-| **Interactive Shell** | REPL mode with history and auto-completion |
-| **Tab Completion** | Smart suggestions for bash/zsh |
-
-### Architecture: 6 Phases
-
-Frame | Purpose | Benefit |
-|-------|---------|----------|
-| **① Aliases & Config** | Aliases & Config | Reduce typing with 20+ shortcuts |
-| **② Help & Discovery** | Help & Discovery | Learn features via hierarchical help |
-| **③ Code Libraries** | Code Libraries | 30% code reduction, maintainability |
-| **④ Output Formatting** | Output Formatting | JSON/CSV/table support |
-| **⑤ Batch & Diff** | Batch & Diff | Automation and audit trails |
-| **⑥ Shell & Completions** | Shell & Completions | Interactive mode with history |
+All commands are also accessible through short aliases (`sb`, `sr`, `sc`, etc.) and support `--format json|csv|table` output for scripting.
 
 <br>
 
-## Quick Start (5 minutes)
+## Quick Start
 
-### Step 1: Access the Container
+### Step 1: Enter the container
 
 ```bash
-cd /path/to/oracle-sandbox
 docker compose exec -it sandbox-oracle-server bash
 ```
 
-### Step 2: Try These Commands
+### Step 2: Try these commands
 
 ```bash
-# Check health of all services
-sb status
+sandbox status all          # Health of all services
+sandbox status database     # Oracle database only
+sandbox status apex         # APEX / ORDS only
 
-# See all available commands
-sb help
+sandbox run sqlcl           # Open interactive SQLcl session
+sandbox run healthcheck     # Run full health verification
 
-# Enter interactive shell mode
-sb shell
+sandbox conn list           # List saved database connections
+sandbox logs apex           # View APEX installation log
+sandbox logs ords           # View ORDS runtime log
 
-# List saved database connections
-sb conn list
-
-# View database logs
-sb logs database
+sandbox install apex        # Install Oracle APEX + ORDS
+sandbox start apex          # Start ORDS/APEX service
+sandbox stop apex           # Stop ORDS/APEX service
 ```
 
-### Step 3: Get Help Anytime
+### Step 3: Get help anytime
 
 ```bash
-# Help on specific topic
-sb help search database
-
-# Help for specific action
-sb run help
-
-# Full help with all commands
-sb help
+sandbox help                        # All actions and resources
+sandbox run -h                      # Help for the run action
+sandbox conn add -h                 # Help for conn add
+sandbox help search connection      # Keyword search
 ```
-
-**That's it!** You now have access to all sandbox management tools.
 
 <br>
 
-## Beginner Guide
+## Syntax
 
-### ① Aliases & Shortcuts
+```
+sandbox <action> <resource> [parameters]
+        [--dry-run] [--quiet|-q] [--verbose]
+```
 
-Typing `sandbox` every time is tedious. That's why we have shortcuts:
+| Part | Description |
+|------|-------------|
+| `action` | What to do: `run`, `status`, `conn`, `logs`, `start`, `stop`, `restart`, `install`, `uninstall`, `download`, `monitor`, `audit`, `template`, `batch`, `export`, `import`, `help` |
+| `resource` | What to act on (depends on action; see each section below) |
+| `parameters` | Flags specific to the action/resource combination |
 
-#### Common Aliases
+**Resource is optional** for: `status`, `monitor`, `audit`, `template`, `batch`, `export`, `import` — omitting it shows an interactive selection menu.
 
-| Shortcut | Full Command | Purpose |
-|----------|--------------|---------|
-| `sb` | `sandbox` | Main CLI dispatcher |
-| `sr` | `sandbox run` | Run tools (sqlcl, sqlplus, monitor) |
-| `sc` | `sandbox conn` | Manage database connections |
-| `sl` | `sandbox logs` | View service logs |
-| `ss` | `sandbox status` | Check service status |
-| `si` | `sandbox import` | Import configurations |
-| `sk` | `sandbox kill` | Stop services |
-| `sp` | `sandbox install` | Install components (APEX) |
-| `sx` | `sandbox export` | Export configurations |
+<br>
 
-#### Using Aliases
+## Global Flags
 
-Instead of:
+These flags work with every action and must appear anywhere in the command:
+
+| Flag | Effect |
+|------|--------|
+| `--dry-run` | Preview what would happen without making any changes |
+| `--quiet` / `-q` | Suppress banner; output only essential info (auto-enabled for `--format json|csv`) |
+| `--verbose` | Show extra diagnostic output |
+
 ```bash
-sandbox run sqlcl
-sandbox status all
+sandbox conn add --name myconn --user system --dry-run   # Preview only
+sandbox status all --quiet                                # No banner
+sandbox batch execute --file setup.txt --dry-run          # Preview batch
+```
+
+<br>
+
+## Command Reference
+
+---
+
+### `run` — Execute Tools
+
+```
+sandbox run <resource> [parameters]
+```
+
+| Resource | Purpose | Notes |
+|----------|---------|-------|
+| `sqlcl` | Open interactive SQLcl session | Prompts for user if `--user` omitted |
+| `mcp` | Launch MCP server (foreground) | Runs until Ctrl-C |
+| `healthcheck` | Run full sandbox health checks | Checks DB, APEX, ORDS, network |
+| `monitor` | Run a SQL monitoring script | Requires a script name as argument |
+
+#### `run sqlcl`
+
+```bash
+sandbox run sqlcl -u system            # Connect as SYSTEM
+sandbox run sqlcl -u sys               # Connect as SYS (sysdba)
+sandbox run sqlcl -u demasy            # Connect as DEMASY schema user
+sandbox run sqlcl -u demasy_ai         # Connect as AI/MCP user
+sandbox run sqlcl -u sandbox           # Connect as SANDBOX schema user
+sandbox run sqlcl -u sandbox_ai        # Connect as SANDBOX_AI user
+sandbox run sqlcl -u system --pdb MYPDB  # Override PDB
+```
+
+Valid users: `sys` `system` `sandbox` `sandbox_ai` `demasy` `demasy_ai`
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-u` / `--user` | _(interactive menu)_ | Database user to connect as |
+| `-p` / `--pass` | env password | Password override |
+| `--pdb` | service default per user | PDB/service name override |
+
+#### `run monitor`
+
+```bash
+sandbox run monitor                         # List available monitoring scripts
+sandbox run monitor active-connections      # Run a specific monitoring script
+sandbox run monitor tablespace-usage
+sandbox run monitor top-queries-cpu
+```
+
+Scripts are SQL files located at `/usr/sandbox/app/oracle/admin/monitoring/`.
+
+---
+
+### `status` — Check Health
+
+```
+sandbox status [resource] [--format table|json|csv]
+```
+
+| Resource | What it checks |
+|----------|---------------|
+| `database` | DB port reachability, SQL ping, open PDBs |
+| `apex` | ORDS process (PID), HTTP endpoint response |
+| `mcp` | MCP process status and active connection name |
+| `network` | Docker bridge, subnet, gateway, container IPs |
+| `all` | All of the above in one output |
+
+```bash
+sandbox status database                    # Database only
+sandbox status apex                        # APEX/ORDS only
+sandbox status mcp                         # MCP server only
+sandbox status network                     # Docker network
+sandbox status all                         # Everything
+sandbox status all --format json           # JSON output for scripting
+sandbox status all --format csv            # CSV output
+```
+
+When no resource is given, an interactive menu appears.
+
+---
+
+### `conn` — Manage Connections
+
+```
+sandbox conn <resource> [parameters]
+```
+
+| Resource | Purpose |
+|----------|---------|
+| `list` | Show all saved SQLcl connections |
+| `add` | Create a new saved connection |
+| `delete` | Remove a saved connection |
+| `rename` | Rename an existing connection |
+| `test` | Verify a connection works |
+
+#### `conn list`
+
+```bash
 sandbox conn list
+sandbox conn list --format json
+sandbox conn list --format csv
 ```
 
-Simply type:
+#### `conn add`
+
 ```bash
-sr sqlcl          # Much shorter!
-ss all
-sc list
+sandbox conn add --name myconn --user system
+sandbox conn add --name dev-conn --user demasy --pdb FREEPDB1
+sandbox conn add --name ai-conn --user demasy_ai --host 192.168.1.10 --port 1521 --pdb FREEPDB1 --pass mypassword
 ```
 
-#### See All Aliases
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--name` / `-n` | Yes | Connection name |
+| `--user` / `-u` | Yes | Database user |
+| `--pass` / `-p` | No | Password (defaults to env password) |
+| `--host` | No | Hostname (default: `sandbox-oracle-database`) |
+| `--port` | No | Port (default: `1521`) |
+| `--pdb` | No | PDB / service name (default: `FREEPDB1`) |
+
+#### `conn delete`
 
 ```bash
-# View all available aliases
-alias | grep -E '^alias (sb|sr|sc|sl|ss)='
+sandbox conn delete --name myconn
+```
 
-# Or enable alias expansion
-shopt -s expand_aliases
+#### `conn rename`
+
+```bash
+sandbox conn rename --from old-name --to new-name
+```
+
+| Flag | Description |
+|------|-------------|
+| `--from` / `-f` | Current connection name |
+| `--to` / `-t` | New connection name |
+
+#### `conn test`
+
+```bash
+sandbox conn test --name myconn
+```
+
+Runs `SELECT 'OK' FROM DUAL` through the saved connection and reports pass/fail.
+
+---
+
+### `logs` — View Logs
+
+```
+sandbox logs <resource> [-f] [-n <lines>]
+```
+
+| Resource | Log files shown |
+|----------|----------------|
+| `apex` | `/tmp/apex_install.log`, `/tmp/apex_rest_config.log` |
+| `install` | All APEX + ORDS installation logs |
+| `ords` | `/tmp/ords.log` |
+| `startup` | `/tmp/auto-user-setup.log` |
+| `mcp` | _(MCP writes no log file — use `sandbox run mcp` for live output)_ |
+| `all` | All log files combined |
+
+```bash
+sandbox logs apex                   # Last 50 lines of APEX install log
+sandbox logs ords -f                # Stream ORDS log live (tail -f)
+sandbox logs startup -n 100         # Last 100 lines of startup log
+sandbox logs all -f                 # Stream all logs multiplexed
+```
+
+| Flag | Description |
+|------|-------------|
+| `-f` / `--follow` | Stream output live (like `tail -f`) |
+| `-n` / `--lines` | Number of lines to show (default: 50) |
+
+---
+
+### `start` / `stop` / `restart` — Service Control
+
+```
+sandbox start|stop|restart <resource>
+```
+
+| Resource | Service |
+|----------|---------|
+| `apex` | APEX / ORDS service |
+| `mcp` | MCP server daemon |
+
+```bash
+sandbox start apex
+sandbox stop apex
+sandbox restart apex
+sandbox start mcp
+sandbox stop mcp
+sandbox restart mcp
 ```
 
 ---
 
-### ② Help System
+### `install` / `uninstall` / `download`
 
-The CLI has a **3-level help hierarchy** to help you discover features:
-
-#### Level 1: Top-Level Help
-
-See all actions and resources:
-
-```bash
-sb help
 ```
-
-**Output shows:**
-- All available actions (run, status, conn, logs, export, import, batch, etc.)
-- All available resources per action
-- Beautiful Demasy Labs banner
-
-#### Level 2: Action-Level Help
-
-Get help for a specific action:
-
-```bash
-sb run help           # Help for "run" action
-sb conn help          # Help for "conn" action
-sb logs help          # Help for "logs" action
-```
-
-#### Level 3: Keyword Search
-
-Find commands by keyword:
-
-```bash
-# Search for database-related commands
-sb help search database
-
-# Search for monitoring commands
-sb help search monitor
-
-# Search for connection commands
-sb help search connection
-```
-
-#### Examples
-
-```bash
-# Beginner: Explore what's available
-sb help
-
-# Intermediate: Find connection-related commands
-sb help search connection
-
-# Advanced: Get help for specific action
-sb run help
-sb status help
+sandbox install apex           # Install Oracle APEX + ORDS inside the container
+sandbox uninstall apex         # Remove Oracle APEX from the database
+sandbox download apex          # Download APEX installation package
+sandbox download ords          # Download ORDS installation package
 ```
 
 ---
 
-### ③ Common Commands
+### `monitor` — Metrics Dashboard
 
-Let's go through the most frequently used commands:
+```
+sandbox monitor [resource] [--export prometheus|grafana|json]
+```
 
-#### 1. Check Status
+| Resource | Metrics collected |
+|----------|-----------------|
+| `system` | CPU, memory, disk, uptime |
+| `database` | Active connections, transactions |
+| `apex` | ORDS response time, request count |
+| `all` | All of the above |
 
 ```bash
-# Status of all services
-sb status all
-
-# Status of specific service
-sb status database      # Oracle database
-sb status apex          # APEX and ORDS
-sb status mcp           # MCP connection
+sandbox monitor                         # Interactive resource selection
+sandbox monitor system                  # System metrics table
+sandbox monitor database                # Database metrics table
+sandbox monitor all                     # Full dashboard
+sandbox monitor all --export json       # JSON (Grafana-compatible)
+sandbox monitor all --export prometheus # Prometheus text format
+sandbox monitor --menu                  # Force interactive menu
 ```
-
-#### 2. Run Database Tools
-
-```bash
-# Connect with SQLcl
-sb run sqlcl
-
-# Run monitoring script
-sb run monitor active-connections
-
-# Run health check
-sb run healthcheck
-```
-
-**Inside SQLcl:**
-```sql
--- You can now run SQL
-SELECT user FROM dual;
-SELECT * FROM v$database;
-EXIT;
-```
-
-#### 3. Manage Connections
-
-```bash
-# List saved connections
-sb conn list
-
-# Test a connection
-sb conn test sandbox-ai-conn
-
-# View connection details
-sb conn describe sandbox-ai-conn
-```
-
-#### 4. View Logs
-
-```bash
-# Database logs
-sb logs database
-
-# APEX installation logs
-sb logs apex
-
-# All available logs
-sb logs help
-```
-
-#### 5. Install Components
-
-```bash
-# Install APEX and ORDS
-sb install apex
-
-# Reinstall if needed
-sb install apex --force
-```
-
-<br>
-
-## Advanced Features
-
-### ④ Output Formatting
-
-By default, CLI shows human-readable output (table format). But you can change it for different purposes:
-
-#### Supported Formats
-
-| Format | Use Case | Example |
-|--------|----------|---------|
-| `table` | Human reading (default) | `sb status all` |
-| `json` | Automation, scripting | `sb status all --format json` |
-| `csv` | Spreadsheet import | `sb status all --format csv` |
-| `quiet` | Scripts, suppress banner | `sb status all --quiet` |
-
-#### Table Format (Human-Readable)
-
-```bash
-sb status all
-```
-
-**Output:**
-```
-╔════════════════════════════════════════╗
-║        DEMASY LABS SANDBOX CLI         ║
-╚════════════════════════════════════════╝
-
-Service Status:
-┌─────────────────┬──────────┐
-│ Service         │ Status   │
-├─────────────────┼──────────┤
-│ Oracle Database │ ✓ Healthy│
-│ Management      │ ✓ Healthy│
-│ APEX/ORDS       │ ✓ Running│
-└─────────────────┴──────────┘
-```
-
-#### JSON Format (Automation)
-
-```bash
-sb status all --format json
-```
-
-**Output:**
-```json
-{
-  "timestamp": "2026-06-24T10:15:30Z",
-  "status": "healthy",
-  "services": {
-    "database": { "status": "healthy", "uptime_seconds": 3600 },
-    "apex": { "status": "running", "port": 8080 }
-  }
-}
-```
-
-**Parse with jq:**
-```bash
-# Get just the database status
-sb status all --format json | jq '.services.database.status'
-
-# Extract specific value
-sb status all --format json | jq '.services[].status'
-```
-
-#### CSV Format (Spreadsheets)
-
-```bash
-sb conn list --format csv
-```
-
-**Output:**
-```csv
-name,user,service,host,port
-sandbox-ai-conn,SANDBOX_AI,SANDBOX_PDB,192.168.1.110,1521
-```
-
-**Import to spreadsheet:**
-```bash
-sb conn list --format csv > connections.csv
-# Now open connections.csv in Excel/Google Sheets
-```
-
-#### Quiet Format (Scripts)
-
-```bash
-# Suppress banner, show only essential info
-sb status all --quiet
-```
-
-Useful when CLI output is piped to other commands or scripts.
 
 ---
 
-### ⑤ Batch Operations & State Diff
+### `audit` — Operation History
 
-For automation and configuration management:
+```
+sandbox audit [resource] [parameters]
+```
 
-#### 5A. Batch Execution
+| Resource | Purpose |
+|----------|---------|
+| `list` | Show recent audit log entries |
+| `show` | Show detail for a specific entry |
+| `search` | Filter audit log by keyword |
+| `export` | Export audit log |
+| `stats` | Audit statistics summary |
+| `rollback` | Attempt rollback of a logged operation |
 
-Run multiple commands from a file:
-
-**Create commands.txt:**
 ```bash
-cat > commands.txt << 'EOF'
-status all
+sandbox audit list
+sandbox audit list --limit 100
+sandbox audit search --filter "conn"
+sandbox audit show --id <entry-id>
+sandbox audit export
+sandbox audit stats
+sandbox audit rollback --id <entry-id>
+```
+
+Audit entries are stored in `/tmp/sandbox_audit/` as JSON files with action, resource, user, timestamp, and rollback command.
+
+---
+
+### `template` — Configuration Snapshots
+
+```
+sandbox template [resource] [parameters]
+```
+
+| Resource | Purpose |
+|----------|---------|
+| `save` | Save current env/connections as a named template |
+| `load` | Restore a previously saved template |
+| `list` | List all saved templates |
+| `delete` | Remove a template |
+| `export` | Export a template to file |
+| `import` | Import a template from file |
+
+```bash
+sandbox template save --name production
+sandbox template load --name production
+sandbox template list
+sandbox template delete --name staging
+sandbox template export --name production > prod.json
+sandbox template import --file prod.json
+```
+
+Templates are stored in `/tmp/sandbox_templates/` as JSON snapshots of environment variables and connection state.
+
+---
+
+### `batch` — Bulk Operations
+
+```
+sandbox batch <resource> --file <path> [--dry-run]
+```
+
+| Resource | Purpose |
+|----------|---------|
+| `execute` | Run a file of sandbox commands line-by-line |
+| `apply-connections` | Create multiple connections from a CSV file |
+| `apply-commands` | Apply a set of sandbox commands |
+| `apply-with-rollback` | Apply commands with rollback support |
+
+#### `batch execute`
+
+Create a plain-text file with one sandbox command per line:
+
+```
+# setup.txt
 conn list
-logs database
-EOF
+status database
+logs startup
 ```
 
-**Execute batch:**
 ```bash
-sb batch execute --file commands.txt
+sandbox batch execute --file setup.txt
+sandbox batch execute --file setup.txt --dry-run   # Preview only
 ```
 
-**Dry-run (preview without executing):**
-```bash
-sb batch execute --file commands.txt --dry-run
+#### `batch apply-connections`
+
+CSV format: `name,user,host,port,pdb,password` (use `-` for optional fields):
+
+```csv
+name,user,host,port,pdb,password
+dev-conn,system,192.168.1.10,1521,FREEPDB1,-
+ai-conn,demasy_ai,-,-,FREEPDB1,mypassword
 ```
 
-#### 5B. Configuration Export/Import
-
-**Export current configuration:**
 ```bash
-sb export config > sandbox-backup.json
-```
-
-**Import configuration to another sandbox:**
-```bash
-sb import config sandbox-backup.json
-```
-
-**Export state (detailed snapshot):**
-```bash
-sb export state > state-2026-06-24.json
-```
-
-#### 5C. State Diff (Compare Configurations)
-
-Compare two configurations to see what changed:
-
-```bash
-# Compare before and after
-sb diff state before.json after.json
-
-# Text format (unified diff)
-sb diff state before.json after.json --format text
-
-# JSON format (side-by-side)
-sb diff state before.json after.json --format json
-```
-
-**Real-world example:**
-```bash
-# Backup state before changes
-sb export state > state-before.json
-
-# Make some changes...
-# (install APEX, add connections, etc.)
-
-# See what changed
-sb diff state state-before.json state-after.json --format text
+sandbox batch apply-connections --file connections.csv
+sandbox batch apply-connections --file connections.csv --dry-run
 ```
 
 ---
 
-### ⑥ Interactive Shell & Completions
+### `export` / `import` — Configuration Backup
 
-#### Interactive Shell Mode
+```
+sandbox export [config|connections|all] [--format json|csv]
+sandbox import [config|connections|all] --file <path>
+```
 
-Enter an interactive REPL (Read-Eval-Print Loop):
+| Resource | Content |
+|----------|---------|
+| `config` | Environment variables and DB connection defaults |
+| `connections` | All saved SQLcl connections |
+| `all` | Config + connections combined |
 
 ```bash
-sb shell
+sandbox export config                             # Print config to stdout
+sandbox export config > backup.json               # Save to file
+sandbox export connections --format csv > conns.csv
+sandbox export all > full-backup.json
+
+sandbox import config --file backup.json
+sandbox import connections --file conns.json
 ```
 
-**Inside the shell:**
-```
-sandbox> help
-Available commands:
-  help           - Show this help message
-  history        - View command history
-  history clear  - Clear history
-  history search <keyword> - Search history
-  quit / exit    - Exit shell
+---
 
-sandbox> status all
-[Status output]
-
-sandbox> conn list
-[Connections]
-
-sandbox> help search database
-[Search results]
-
-sandbox> exit
-```
-
-#### Command History
+### `help` — Discovery
 
 ```bash
-# View command history
-sandbox> history
-
-# Search history
-sandbox> history search status
-
-# Clear history
-sandbox> history clear
-
-# History file location
-# ~/.sandbox_history
+sandbox help                        # Show all actions and resources
+sandbox help search <keyword>       # Keyword search across all commands
+sandbox <action> -h                 # Help for a specific action
+sandbox <action> <resource> -h      # Help for a specific resource
 ```
 
-#### Tab Completion (Bash/Zsh)
+Supported search keywords include: `sql`, `database`, `connection`, `mcp`, `apex`, `ords`, `log`, `monitor`, `install`, `health`, `debug` and more.
 
-**Dynamic action suggestions:**
 ```bash
-sb [TAB]  →  Shows: run, status, conn, logs, export, import, batch, etc.
-```
-
-**Dynamic resource suggestions:**
-```bash
-sb run [TAB]  →  Shows: sqlcl, sqlplus, monitor, healthcheck
-```
-
-**Flag suggestions:**
-```bash
-sb status [TAB]  →  Shows: --format, --help, --quiet, --dry-run
-```
-
-**Set up completions (already enabled):**
-```bash
-# Bash
-source ~/.bashrc
-
-# Zsh
-source ~/.zshrc
+sandbox help search apex
+sandbox help search connection
+sandbox help search monitor
+sandbox conn -h
+sandbox run sqlcl -h
 ```
 
 <br>
 
-## Quick Command Reference
+## Output Formats
 
-### All CLI Commands by Action
+All commands that produce data support `--format`:
 
-#### 🏃 `run` — Execute Tools
+| Format | Use case | Flag |
+|--------|----------|------|
+| `table` | Human-readable (default) | `--format table` |
+| `json` | Scripting / automation | `--format json` |
+| `csv` | Spreadsheet import | `--format csv` |
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `sqlcl` | Connect with SQLcl | `sb run sqlcl` |
-| `sqlplus` | Connect with SQL*Plus | `sb run sqlplus system@FREEPDB1` |
-| `monitor` | Run monitoring scripts | `sb run monitor active-connections` |
-| `healthcheck` | System diagnostics | `sb run healthcheck` |
+```bash
+sandbox status all --format json
+sandbox conn list --format csv
+sandbox monitor all --export prometheus   # monitor uses --export instead
+```
 
-#### 📊 `status` — Check Health
+Banner is automatically suppressed for `json` and `csv` formats. Use `--quiet` to suppress it for any format.
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `all` | All services | `sb status all` |
-| `database` | Oracle Database | `sb status database` |
-| `apex` | APEX/ORDS | `sb status apex` |
-| `mcp` | MCP connection | `sb status mcp` |
+```bash
+# Parse with jq
+sandbox status all --format json | jq '.database.port_status'
 
-#### 🔌 `conn` — Manage Connections
+# Save and import CSV
+sandbox conn list --format csv > connections.csv
+```
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `list` | List connections | `sb conn list` |
-| `test` | Test connection | `sb conn test sandbox-ai-conn` |
-| `describe` | Connection details | `sb conn describe sandbox-ai-conn` |
-| `add` | Add new connection | `sb conn add --name myconn --user user` |
-| `delete` | Delete connection | `sb conn delete myconn` |
+<br>
 
-#### 📜 `logs` — View Service Logs
+## Aliases & Shortcuts
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `database` | Database logs | `sb logs database` |
-| `apex` | APEX logs | `sb logs apex` |
-| `ords` | ORDS logs | `sb logs ords` |
-| `startup` | Startup logs | `sb logs startup` |
-| `mcp` | MCP logs | `sb logs mcp` |
-| `all` | All logs | `sb logs all` |
+Source the aliases file in your shell profile:
 
-#### 💾 `export` — Save Configuration
+```bash
+# Add to ~/.bashrc or ~/.zshrc:
+[[ -f /usr/sandbox/app/cli/sandbox-aliases.sh ]] && source /usr/sandbox/app/cli/sandbox-aliases.sh
+```
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `config` | Full configuration | `sb export config > config.json` |
-| `state` | Detailed state snapshot | `sb export state > state.json` |
-| `connections` | Connection list | `sb export connections > conns.json` |
+### Core aliases
 
-#### 📥 `import` — Load Configuration
+| Alias | Expands to |
+|-------|------------|
+| `sb` | `sandbox` |
+| `sr` | `sandbox run` |
+| `sc` | `sandbox conn` |
+| `sl` | `sandbox logs` |
+| `ss` | `sandbox status` |
+| `si` | `sandbox install` |
+| `sk` | `sandbox start` |
+| `sp` | `sandbox stop` |
+| `sx` | `sandbox restart` |
+| `sdownload` | `sandbox download` |
+| `suninstall` | `sandbox uninstall` |
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `config` | Load configuration | `sb import config config.json` |
-| `connections` | Load connections | `sb import connections conns.json` |
+### Status shortcuts
 
-#### ⚙️ `batch` — Bulk Operations
+| Alias | Expands to |
+|-------|------------|
+| `ssd` | `sandbox status database` |
+| `ssa` | `sandbox status apex` |
+| `ssm` | `sandbox status mcp` |
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `execute` | Run commands from file | `sb batch execute --file commands.txt` |
+### Log shortcuts
 
-#### 📈 `monitor` — System Monitoring
+| Alias | Expands to |
+|-------|------------|
+| `slapex` | `sandbox logs apex` |
+| `slords` | `sandbox logs ords` |
+| `slall` | `sandbox logs all` |
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `system` | System resources | `sb monitor system` |
-| `database` | Database metrics | `sb monitor database` |
-| `apex` | APEX status | `sb monitor apex` |
+### Monitor shortcuts
 
-#### 🔍 `diff` — Compare State
+| Alias | Expands to |
+|-------|------------|
+| `sm` | `sandbox run monitor` |
+| `sma` | `sandbox run monitor active-connections` |
+| `smd` | `sandbox run monitor database-size` |
+| `smt` | `sandbox run monitor tablespace-usage` |
+| `smq` | `sandbox run monitor top-queries-cpu` |
+| `sml` | `sandbox run monitor archive-log-status` |
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `state` | Compare configurations | `sb diff state before.json after.json` |
+### Usage examples
 
-#### 📥 `install` — Install Components
+```bash
+ss all              # sandbox status all
+sr sqlcl -u system  # sandbox run sqlcl -u system
+sc list             # sandbox conn list
+sl apex -f          # sandbox logs apex --follow
+sk apex             # sandbox start apex
+ssd                 # sandbox status database
+sma                 # sandbox run monitor active-connections
+```
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| `apex` | Install APEX/ORDS | `sb install apex` |
+<br>
 
-#### ❓ `help` — Get Help
+## Tab Completion
 
-| Resource | Purpose | Example |
-|----------|---------|---------|
-| (no arg) | Show all help | `sb help` |
-| `search KEYWORD` | Keyword search | `sb help search database` |
-| `ACTION` | Help for action | `sb run help` |
+Completion scripts are provided for both bash and zsh:
 
-#### 🎛️ `shell` — Interactive Mode
+```bash
+# Bash — add to ~/.bashrc:
+[[ -f /usr/sandbox/app/cli/sandbox-completion.bash ]] && source /usr/sandbox/app/cli/sandbox-completion.bash
 
-| Command | Purpose | Example |
-|---------|---------|---------|
-| (no arg) | Enter shell | `sb shell` |
+# Zsh — add to ~/.zshrc:
+[[ -f /usr/sandbox/app/cli/sandbox-completion.zsh ]] && source /usr/sandbox/app/cli/sandbox-completion.zsh
+```
+
+Tab completion covers actions, resources, and flags:
+
+```
+sandbox [TAB]           →  run  status  conn  logs  start  stop  ...
+sandbox run [TAB]       →  sqlcl  mcp  healthcheck  monitor
+sandbox conn [TAB]      →  list  add  delete  rename  test
+sandbox status [TAB]    →  database  apex  mcp  network  all
+sandbox logs [TAB]      →  apex  install  ords  startup  mcp  all
+```
 
 <br>
 
 ## Real-World Workflows
 
-### Workflow 1: Daily Health Check
-
-**Goal**: Quickly verify all services are healthy
+### Daily health check
 
 ```bash
-# Option A: Simple status check
-sb status all
+sandbox status all
 
-# Option B: JSON output for monitoring systems
-sb status all --format json | jq '.services[] | {name: .name, status: .status}'
-
-# Option C: Detailed inspection
-sb shell
-  > status all
-  > logs database | tail -20
-  > exit
+# Or individual checks:
+ssd         # database
+ssa         # APEX/ORDS
+ssm         # MCP
 ```
 
----
-
-### Workflow 2: Backup Before Changes
-
-**Goal**: Save current configuration before making changes
+### Tail APEX install log in real time
 
 ```bash
-# Export everything
-sb export config > backup-$(date +%Y%m%d-%H%M%S).json
-
-# Later: Compare what changed
-sb export state > state-after.json
-sb diff state backup-state.json state-after.json --format text
+sandbox logs apex -f
+# or from outside the container:
+docker exec sandbox-oracle-server tail -f /tmp/apex_install.log
 ```
 
----
-
-### Workflow 3: Setup Reproducible Environment
-
-**Goal**: Apply same configuration to multiple sandboxes
+### Connect to the database and run SQL
 
 ```bash
-# On Sandbox A: Export configuration
-sb export config > my-setup.json
-
-# On Sandbox B: Import configuration
-sb import config my-setup.json
-
-# Verify
-sb status all
+sandbox run sqlcl -u system
+# Inside SQLcl:
+SQL> SELECT banner FROM v$version;
+SQL> SELECT name, open_mode FROM v$pdbs;
+SQL> EXIT
 ```
 
----
-
-### Workflow 4: Interactive Exploration
-
-**Goal**: Explore database without remembering all commands
+### Add and test a connection
 
 ```bash
-# Enter shell
-sb shell
-
-# Inside shell:
-sandbox> help              # See what's available
-sandbox> help search table # Find table-related commands
-sandbox> status all        # Check health
-sandbox> conn list         # See connections
-sandbox> run sqlcl         # Connect to database
-  SQL> SELECT * FROM tab;
-  SQL> EXIT;
-sandbox> logs database     # Check for errors
-sandbox> exit
+sandbox conn add --name ai-conn --user demasy_ai --pdb FREEPDB1
+sandbox conn test --name ai-conn
+sandbox conn list
 ```
 
----
+### Batch-create connections from CSV
 
-### Workflow 5: Batch Database Setup
-
-**Goal**: Run multiple setup commands reliably
-
-**Create setup.txt:**
 ```bash
-cat > setup.txt << 'EOF'
-status all
-conn test sandbox-ai-conn
-export config
-logs startup
+cat > conns.csv << 'EOF'
+name,user,host,port,pdb,password
+dev-sys,system,-,-,FREEPDB1,-
+dev-ai,demasy_ai,-,-,FREEPDB1,-
 EOF
+sandbox batch apply-connections --file conns.csv --dry-run
+sandbox batch apply-connections --file conns.csv
 ```
 
-**Execute:**
+### Export and restore configuration
+
 ```bash
-# Dry run first (see what will happen)
-sb batch execute --file setup.txt --dry-run
+# Export
+sandbox export all > backup-$(date +%Y%m%d).json
 
-# Actual execution
-sb batch execute --file setup.txt
-
-# With specific format
-sb batch execute --file setup.txt --format json
+# Restore on another sandbox
+sandbox import config --file backup-20260617.json
+sandbox import connections --file backup-20260617.json
 ```
 
----
-
-### Workflow 6: Compare Environments
-
-**Goal**: See differences between dev and production setups
+### Save and reuse a configuration template
 
 ```bash
-# On DEV sandbox: Export state
-sb export state > dev-state.json
+sandbox template save --name dev-env
+# ... make changes ...
+sandbox template load --name dev-env     # Restore
+sandbox template list
+```
 
-# On PROD sandbox: Export state
-sb export state > prod-state.json
+### Machine-readable monitoring for CI
 
-# Compare (can run on either sandbox)
-sb diff state dev-state.json prod-state.json --format text
+```bash
+# JSON for parsing
+sandbox status all --format json | jq '.database.port_status'
+sandbox monitor all --export json
 
-# Output shows what differs
+# Prometheus scrape endpoint simulation
+sandbox monitor all --export prometheus
 ```
 
 <br>
 
 ## Troubleshooting
 
-### Issue 1: Aliases Not Working
+### `sb`: command not found
 
-**Symptom**: `sb: command not found`
-
-**Solution:**
 ```bash
-# Reload shell configuration
-source ~/.bashrc        # Bash
-# or
-source ~/.zshrc         # Zsh
+# Reload aliases
+source /usr/sandbox/app/cli/sandbox-aliases.sh
 
-# Or restart terminal
+# Or use the full command
+sandbox status all
 ```
 
----
+### `sandbox`: command not found
 
-### Issue 2: Tab Completion Not Working
-
-**Symptom**: Pressing TAB doesn't show suggestions
-
-**Solution:**
 ```bash
-# Ensure completion files are sourced
-# Check if in ~/.bashrc or ~/.zshrc:
-[[ -f /usr/sandbox/app/cli/sandbox-completion.bash ]] && source /usr/sandbox/app/cli/sandbox-completion.bash
+# Confirm you are inside the container
+docker compose exec -it sandbox-oracle-server bash
 
-# Restart your terminal or:
-exec $SHELL
-```
-
----
-
-### Issue 3: `sandbox` Command Not Found
-
-**Symptom**: Error when running `sb` or `sandbox`
-
-**Solution:**
-```bash
-# Ensure you're in the container
-docker compose ps                                    # Check if running
-docker compose exec -it sandbox-oracle-server bash  # Enter container
-
-# Inside container:
+# Check the binary is in PATH
 which sandbox
-ls -la /usr/sandbox/app/cli/sandbox.sh
-
-# If not found, rebuild
-docker compose down -v
-docker compose build --no-cache
-docker compose up -d
+ls /usr/sandbox/app/cli/sandbox.sh
 ```
 
----
+### Tab completion does nothing
 
-### Issue 4: Shell History Not Persisting
-
-**Symptom**: Command history lost after exiting shell
-
-**Solution:**
 ```bash
-# Check history file permissions
-ls -la ~/.sandbox_history
+# Verify function is loaded
+declare -f _sandbox_completion
 
-# Fix permissions if needed
-chmod 600 ~/.sandbox_history
+# Load manually if needed
+source /usr/sandbox/app/cli/sandbox-completion.bash
 
-# Recreate if missing
-touch ~/.sandbox_history
-chmod 600 ~/.sandbox_history
-```
-
----
-
-### Issue 5: Help System Returns Empty Results
-
-**Symptom**: `sb help` shows nothing or errors
-
-**Solution:**
-```bash
-# Check help file
-cat /usr/sandbox/app/cli/sandbox-help.sh | head -20
-
-# Try with verbose output
-bash -x /usr/sandbox/app/cli/sandbox.sh help 2>&1 | head -50
-
-# Check for file corruptions
-ls -la /usr/sandbox/app/cli/sandbox-*.sh
-```
-
----
-
-### Issue 6: Output Not Formatting Correctly
-
-**Symptom**: `--format json` returns table, not JSON
-
-**Solution:**
-```bash
-# Verify format is supported for that action
-sb status help
-
-# Try explicit flag placement
-sb status all --format json
-
-# Not this:
-sb --format json status all
-
-# If still failing, check format file
-cat /usr/sandbox/app/cli/sandbox-format.sh | head -30
-```
-
----
-
-### Issue 7: Batch Operations Failing Silently
-
-**Symptom**: `sb batch execute` runs but shows no output
-
-**Solution:**
-```bash
-# Use verbose/debug mode
-bash -x /usr/sandbox/app/cli/sandbox.sh batch execute --file commands.txt
-
-# Check batch file format (each command on new line)
-cat commands.txt
-
-# Try dry-run first
-sb batch execute --file commands.txt --dry-run
-
-# Check logs for errors
-sb logs startup
-```
-
----
-
-### Issue 8: Tab Completion Shows Nothing
-
-**Symptom**: Pressing TAB shows no suggestions
-
-**Solution:**
-```bash
-# Ensure completion function is loaded
-declare -f _sandbox_completion  # Should show function
-
-# If not loaded, manually source
-source /usr/sandbox/app/cli/sandbox-completion.bash  # Bash
-# or
-source /usr/sandbox/app/cli/sandbox-completion.zsh   # Zsh
-
-# Check if completion is registered
+# Check registration
 complete -p sandbox
-
-# If not, register manually (bash)
-complete -o bashdefault -o default -F _sandbox_completion sandbox sb
 ```
 
-<br>
-
-## Getting Help
-
-### In Container
+### `--format json` produces a table instead
 
 ```bash
-# Built-in help
-sb help                    # All commands
-sb help search KEYWORD     # Keyword search
-sb ACTION help             # Help for action
+# Flag must come after the resource
+sandbox status all --format json    # correct
+sandbox --format json status all    # wrong — flag is ignored
 
-# Examples
-sb help search monitor
-sb run help
-sb conn help
+# Banner suppression is automatic for json/csv; use --quiet if still showing
+sandbox status all --format json --quiet
 ```
 
-### Outside Container
+### Connection not found after `conn add`
 
 ```bash
-# Documentation
-cat docs/sandbox-cli-user-guide.md         # This file
-cat docs/oracle-apex-installation.md       # APEX-specific
-cat docs/troubleshooting.md                # General troubleshooting
+# Verify it was saved
+sandbox conn list
 
-# GitHub
-https://github.com/demasy/oracle-sandbox/issues  # Report issues
-https://github.com/demasy/oracle-sandbox         # View code
-```
-
-### Still Stuck?
-
-```bash
-# Create a test case
-docker compose exec -T sandbox-oracle-server bash << 'EOF'
-echo "=== Sandbox CLI Version ==="
-sb --version 2>/dev/null || echo "No version flag"
-
-echo "=== Help Output ==="
-sb help
-
-echo "=== Status ==="
-sb status all
-
-echo "=== Aliases ==="
-alias | grep -E '^alias (sb|sr|sc|sl|ss)='
+# If empty, SQLcl may have reported an error — run manually to see output
+/opt/oracle/sqlcl/bin/sql /nolog <<EOF
+CONN -save "myconn" -savepwd system/password@//sandbox-oracle-database:1521/FREEPDB1
+EXIT
 EOF
+```
 
-# Share output with the team
-# Email to founder@demasy.io or GitHub issue
+### APEX/ORDS not responding
+
+```bash
+sandbox status apex             # Check process and HTTP status
+sandbox logs ords -f            # Watch ORDS runtime log
+sandbox restart apex            # Restart ORDS
+sandbox logs install            # Check if installation completed successfully
+```
+
+### Batch file runs but shows no output
+
+```bash
+sandbox batch execute --file commands.txt --dry-run     # Preview
+sandbox batch execute --file commands.txt --verbose     # Verbose mode
+bash -x /usr/sandbox/app/cli/sandbox.sh batch execute --file commands.txt
 ```
 
 <br>
@@ -974,8 +791,6 @@ EOF
 
 <div align="center">
 
-**Happy CLI-ing!** 🚀
-
-For more information, see [README.md](../README.md) or the [docs/](../docs) folder.
+For more, see [README.md](../README.md) or open an issue on GitHub.
 
 </div>
