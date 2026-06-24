@@ -43,8 +43,8 @@ curl http://localhost:3000/health
 **Method 2: Docker Inspect**
 
 ```bash
-docker inspect --format='{{.State.Health.Status}}' demasy-server
-docker inspect --format='{{.State.Health.Status}}' oracle-al-database-26ai
+docker inspect --format='{{.State.Health.Status}}' sandbox-oracle-server
+docker inspect --format='{{.State.Health.Status}}' sandbox-oracle-database
 ```
 
 <br>
@@ -52,7 +52,7 @@ docker inspect --format='{{.State.Health.Status}}' oracle-al-database-26ai
 **Method 3: Built-in Command**
 
 ```bash
-docker exec demasy-server healthcheck
+docker exec sandbox-oracle-server healthcheck
 ```
 
 **Expected output:**
@@ -78,20 +78,20 @@ Server is healthy.
 
 ```bash
 # View all logs
-docker logs oracle-al-database-26ai
+docker logs sandbox-oracle-database
 
 # Follow logs in real-time
-docker logs -f oracle-al-database-26ai
+docker logs -f sandbox-oracle-database
 
 # View last 100 lines
-docker logs --tail 100 oracle-al-database-26ai
+docker logs --tail 100 sandbox-oracle-database
 
 # View with timestamps
-docker logs -t oracle-al-database-26ai
+docker logs -t sandbox-oracle-database
 
 # Filter by time
-docker logs --since 1h oracle-al-database-26ai
-docker logs --since 2025-11-25T10:00:00 oracle-al-database-26ai
+docker logs --since 1h sandbox-oracle-database
+docker logs --since 2025-11-25T10:00:00 sandbox-oracle-database
 ```
 
 <br>
@@ -100,27 +100,27 @@ docker logs --since 2025-11-25T10:00:00 oracle-al-database-26ai
 
 ```bash
 # View application logs
-docker logs demasy-server
+docker logs sandbox-oracle-server
 
 # Follow logs
-docker logs -f demasy-server
+docker logs -f sandbox-oracle-server
 
 # View with grep filter
-docker logs demasy-server 2>&1 | grep ERROR
+docker logs sandbox-oracle-server 2>&1 | grep ERROR
 ```
 
 <br>
 
 ### Application Logs Volume
 
-Persistent logs are stored in the `demasylabs_logs` volume:
+Persistent logs are stored in the `sandbox_logs_vol` volume:
 
 ```bash
 # Inspect volume
-docker volume inspect demasylabs_logs
+docker volume inspect sandbox_logs_vol
 
 # Access logs from host
-docker run --rm -v demasylabs_logs:/logs alpine ls -la /logs
+docker run --rm -v sandbox_logs_vol:/logs alpine ls -la /logs
 ```
 
 <br>
@@ -129,13 +129,13 @@ docker run --rm -v demasylabs_logs:/logs alpine ls -la /logs
 
 ```bash
 # ORDS server logs
-docker exec demasy-server tail -f /tmp/ords.log
+docker exec sandbox-oracle-server tail -f /tmp/ords.log
 
 # APEX installation logs
-docker exec demasy-server tail -f /tmp/apex_install.log
+docker exec sandbox-oracle-server tail -f /tmp/apex_install.log
 
 # ORDS configuration logs
-docker exec demasy-server cat /tmp/ords_install.log
+docker exec sandbox-oracle-server cat /tmp/ords_install.log
 ```
 
 <br>
@@ -151,7 +151,7 @@ docker exec demasy-server cat /tmp/ords_install.log
 docker stats
 
 # Monitor specific container
-docker stats oracle-al-database-26ai
+docker stats sandbox-oracle-database
 
 # One-time snapshot
 docker stats --no-stream
@@ -171,11 +171,11 @@ docker stats --no-stream
 
 ```bash
 # Full container inspection
-docker inspect oracle-al-database-26ai
+docker inspect sandbox-oracle-database
 
 # Get specific information
-docker inspect --format='{{.State.Status}}' oracle-al-database-26ai
-docker inspect --format='{{.NetworkSettings.IPAddress}}' oracle-al-database-26ai
+docker inspect --format='{{.State.Status}}' sandbox-oracle-database
+docker inspect --format='{{.NetworkSettings.IPAddress}}' sandbox-oracle-database
 ```
 
 ## Performance Monitoring
@@ -186,7 +186,7 @@ docker inspect --format='{{.NetworkSettings.IPAddress}}' oracle-al-database-26ai
 
 ```bash
 # Connect to database
-docker exec -it oracle-al-database-26ai sqlplus / as sysdba
+docker exec -it sandbox-oracle-database sqlplus / as sysdba
 
 # Run performance queries
 SELECT * FROM V$SESSION WHERE USERNAME IS NOT NULL;
@@ -200,11 +200,11 @@ SELECT * FROM V$SYSTEM_EVENT;
 
 ```bash
 # List running processes in container
-docker exec demasy-server ps aux
+docker exec sandbox-oracle-server ps aux
 
 # Check ORDS process
-docker exec demasy-server netstat -tulnp | grep :8080
+docker exec sandbox-oracle-server netstat -tulnp | grep :8080
 
 # Monitor Java processes
-docker exec demasy-server jps -v
+docker exec sandbox-oracle-server jps -v
 ```

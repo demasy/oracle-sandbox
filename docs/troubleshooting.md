@@ -29,7 +29,7 @@ docker system df
 docker system prune  # Free up space
 
 # Monitor initialization
-docker logs -f oracle-al-database-26ai
+docker logs -f sandbox-oracle-database
 ```
 
 ## Connection Refused
@@ -39,13 +39,13 @@ docker logs -f oracle-al-database-26ai
 **Solution:**
 ```bash
 # Verify database is healthy
-docker ps --filter "name=oracle-al-database-26ai"
+docker ps --filter "name=sandbox-oracle-database"
 
 # Check listener status
-docker exec oracle-al-database-26ai lsnrctl status
+docker exec sandbox-oracle-database lsnrctl status
 
 # Verify network connectivity
-docker exec demasy-server ping oracle-al-database-26ai
+docker exec sandbox-oracle-server ping sandbox-oracle-database
 
 # Check firewall rules
 sudo iptables -L
@@ -58,13 +58,13 @@ sudo iptables -L
 **Solution:**
 ```bash
 # Check database is running
-docker exec -it oracle-al-database-26ai sqlplus / as sysdba
+docker exec -it sandbox-oracle-database sqlplus / as sysdba
 
 # Review installation logs
-docker exec demasy-server cat /tmp/apex_install.log
+docker exec sandbox-oracle-server cat /tmp/apex_install.log
 
 # Verify connectivity
-docker exec demasy-server ping oracle-al-database-26ai
+docker exec sandbox-oracle-server ping sandbox-oracle-database
 ```
 
 ## Images Not Loading in APEX
@@ -74,11 +74,11 @@ docker exec demasy-server ping oracle-al-database-26ai
 **Solution:**
 ```bash
 # Verify images directory
-docker exec demasy-server ls -la /tmp/i | wc -l
+docker exec sandbox-oracle-server ls -la /tmp/i | wc -l
 
 # Should show ~27000 files
 # If empty, reinstall APEX or restart ORDS
 
-docker exec demasy-server stop-apex
-docker exec demasy-server start-apex
+docker exec sandbox-oracle-server stop-apex
+docker exec sandbox-oracle-server start-apex
 ```

@@ -8,10 +8,10 @@ Modern command-line interface with enhanced features:
 
 ```bash
 # From host machine (requires container access)
-docker exec -it demasy-server sqlcl
+docker exec -it sandbox-oracle-server sqlcl
 
 # Or use the preconfigured alias
-docker exec -it demasy-server oracle
+docker exec -it sandbox-oracle-server oracle
 ```
 
 
@@ -20,7 +20,7 @@ docker exec -it demasy-server oracle
 Direct SQL connection using the `sql` wrapper:
 
 ```bash
-docker exec -it demasy-server sql
+docker exec -it sandbox-oracle-server sql
 ```
 
 #### Method 3: Custom Connection String
@@ -29,13 +29,13 @@ For specific user connections:
 
 ```bash
 # Syntax
-docker exec -it demasy-server bash -c "sql username/password@hostname:port/service"
+docker exec -it sandbox-oracle-server bash -c "sql username/password@hostname:port/service"
 
 # Example - Connect as SYSTEM
-docker exec -it demasy-server bash -c "sql system/${ORACLE_PWD}@oracle-al-database-26ai:1521/FREE"
+docker exec -it sandbox-oracle-server bash -c "sql system/${ENV_DB_PASSWORD}@sandbox-oracle-database:1521/FREE"
 
 # Example - Connect as SYSDBA
-docker exec -it demasy-server bash -c "sql sys/${ORACLE_PWD}@oracle-al-database-26ai:1521/FREE as sysdba"
+docker exec -it sandbox-oracle-server bash -c "sql sys/${ENV_DB_PASSWORD}@sandbox-oracle-database:1521/FREE as sysdba"
 ```
 
 #### Method 4: SQL*Plus (Traditional)
@@ -43,10 +43,10 @@ docker exec -it demasy-server bash -c "sql sys/${ORACLE_PWD}@oracle-al-database-
 For compatibility with legacy scripts:
 
 ```bash
-docker exec -it demasy-server sqlplus
+docker exec -it sandbox-oracle-server sqlplus
 
 # Or with connection string
-docker exec -it oracle-al-database-26ai sqlplus / as sysdba
+docker exec -it sandbox-oracle-database sqlplus / as sysdba
 ```
 
 <br>
@@ -55,13 +55,13 @@ docker exec -it oracle-al-database-26ai sqlplus / as sysdba
 
 | Parameter | Environment Variable | Default Value | Description |
 |-----------|---------------------|---------------|-------------|
-| **Hostname** | `SANDBOX_DB_HOST` | `oracle-al-database-26ai` | Database container name |
+| **Hostname** | `SANDBOX_DB_HOST` | `sandbox-oracle-database` | Database container name |
 | **Port** | `SANDBOX_DB_PORT` | `1521` | Listener port |
 | **Service Name** | `SANDBOX_DB_SERVICE` | `FREE` | Database service |
 | **SID** | `SANDBOX_DB_SID` | `FREE` | System identifier |
 | **PDB Name** | - | `FREEPDB1` | Pluggable database |
 | **Admin User** | - | `SYS` / `SYSTEM` | Administrative accounts |
-| **Admin Password** | `ORACLE_PWD` | *from .env* | Set during setup |
+| **Admin Password** | `ENV_DB_PASSWORD` | *from .env* | Set during setup |
 
 <br>
 
@@ -82,20 +82,20 @@ For Node.js applications using the management server:
 #### EZ Connect Format
 ```
 hostname:port/service_name
-oracle-al-database-26ai:1521/FREE
+sandbox-oracle-database:1521/FREE
 ```
 
 #### TNS Format
 ```
 (DESCRIPTION=
-  (ADDRESS=(PROTOCOL=TCP)(HOST=oracle-al-database-26ai)(PORT=1521))
+  (ADDRESS=(PROTOCOL=TCP)(HOST=sandbox-oracle-database)(PORT=1521))
   (CONNECT_DATA=(SERVICE_NAME=FREE))
 )
 ```
 
 #### JDBC Format
 ```
-jdbc:oracle:thin:@oracle-al-database-26ai:1521:FREE
+jdbc:oracle:thin:@sandbox-oracle-database:1521:FREE
 ```
 
 ### External Connections
@@ -107,18 +107,18 @@ To connect from outside the Docker network:
 sql username/password@localhost:1521/FREE
 
 # Or using IP address
-sql username/password@192.168.1.10:1521/FREE
+sql username/password@192.168.1.110:1521/FREE
 ```
 
 ### Common Connection Examples
 
 ```bash
 # Connect as SYS with SYSDBA privileges
-docker exec -it demasy-server bash -c "sql sys/${ORACLE_PWD}@oracle-al-database-26ai:1521/FREE as sysdba"
+docker exec -it sandbox-oracle-server bash -c "sql sys/${ENV_DB_PASSWORD}@sandbox-oracle-database:1521/FREE as sysdba"
 
 # Connect to pluggable database
-docker exec -it demasy-server bash -c "sql system/${ORACLE_PWD}@oracle-al-database-26ai:1521/FREEPDB1"
+docker exec -it sandbox-oracle-server bash -c "sql system/${ENV_DB_PASSWORD}@sandbox-oracle-database:1521/FREEPDB1"
 
 # Connect with specific schema
-docker exec -it demasy-server bash -c "sql your_user/your_password@oracle-al-database-26ai:1521/FREE"
+docker exec -it sandbox-oracle-server bash -c "sql your_user/your_password@sandbox-oracle-database:1521/FREE"
 ```

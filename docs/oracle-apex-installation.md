@@ -7,7 +7,7 @@ Oracle Application Express (APEX) 24.2.0 is included as a low-code development p
 Run the one-time installation command:
 
 ```bash
-docker exec demasy-server install-apex
+docker exec sandbox-oracle-server install-apex
 ```
 
 **Installation includes:**
@@ -31,7 +31,7 @@ After successful installation:
 | **SQL Developer Web**   | http://localhost:8080/ords/sql-developer | 
 | **APEX Administration** | http://localhost:8080/ords/apex_admin |
 
-> Workspace: `INTERNAL`<br>Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) 
+> Workspace: `SANDBOX`<br>Username: `ADMIN`<br>Password: See `.env` (`ENV_APEX_ADMIN_PASSWORD`) 
 
 <br>
 
@@ -43,24 +43,24 @@ After successful installation:
 
 ```bash
 # Check ORDS status
-docker exec demasy-server netstat -tulnp | grep:8080
+docker exec sandbox-oracle-server netstat -tulnp | grep:8080
 
 # View ORDS logs in real-time 
-docker exec demasy-server tail -f /tmp/ords.log
+docker exec sandbox-oracle-server tail -f /tmp/ords.log
 
 # Restart ORDS service
-docker exec demasy-server stop-apex
-docker exec demasy-server start-apex
+docker exec sandbox-oracle-server stop-apex
+docker exec sandbox-oracle-server start-apex
 ```
 
 ## Available Commands
 
 | Command | Description | Usage |
 |---------|-------------|-------|
-| `install-apex` | One-time APEX + ORDS installation | `docker exec demasy-server install-apex` |
-| `start-apex` | Start ORDS listener | `docker exec demasy-server start-apex` |
-| `stop-apex` | Stop ORDS listener | `docker exec demasy-server stop-apex` |
-| `uninstall-apex` | Remove APEX installation | `docker exec demasy-server uninstall-apex` |
+| `install-apex` | One-time APEX + ORDS installation | `docker exec sandbox-oracle-server install-apex` |
+| `start-apex` | Start ORDS listener | `docker exec sandbox-oracle-server start-apex` |
+| `stop-apex` | Stop ORDS listener | `docker exec sandbox-oracle-server stop-apex` |
+| `uninstall-apex` | Remove APEX installation | `docker exec sandbox-oracle-server uninstall-apex` |
 
 ## Troubleshooting APEX
 
@@ -68,27 +68,27 @@ docker exec demasy-server start-apex
 
 ```bash
 # Check for port conflicts
-docker exec demasy-server netstat -tulnp | grep:8080
+docker exec sandbox-oracle-server netstat -tulnp | grep:8080
 
 # View detailed logs 
 
 ```bash
-docker exec demasy-server cat /tmp/ords.log
+docker exec sandbox-oracle-server cat /tmp/ords.log
 ```
 
 ### Images Not Loading
 
 ```bash
 # Verify images directory
-docker exec demasy-server ls -la /tmp/i | wc -l
+docker exec sandbox-oracle-server ls -la /tmp/i | wc -l
 # Should show ~27000 files
 
 # Restart ORDS if needed
-docker exec demasy-server stop-apex && docker exec demasy-server start-apex
+docker exec sandbox-oracle-server stop-apex && docker exec sandbox-oracle-server start-apex
 ```
 
 ### Login Issues
 
-- Verify you're using workspace: `INTERNAL` (case-sensitive)
+- Verify you're using workspace: `SANDBOX` (case-sensitive)
 - Ensure username is `ADMIN` (all uppercase)
 - Check ORDS is running on port 8080
