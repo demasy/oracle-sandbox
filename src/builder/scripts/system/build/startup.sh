@@ -242,46 +242,6 @@ EOF
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] MCP saved connection ready" >> "$AUTO_USER_LOG" \
             || echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] MCP saved connection setup failed" >> "$AUTO_USER_LOG"
 
-        # ─── Set up default SQLcl saved connections for sandbox users ────────────
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setting up default SQLcl saved connections..." >> "$AUTO_USER_LOG"
-        
-        # Define default connections: name→user→PDB mappings
-        declare -A SANDBOX_CONNS=(
-            ["sandbox-sandbox-conn"]="sandbox:SANDBOX_PDB"
-            ["sandbox-sandbox-ai-conn"]="sandbox_ai:SANDBOX_PDB"
-            ["sandbox-demasy-conn"]="demasy:DEMASY_PDB"
-            ["sandbox-demasy-ai-conn"]="demasy_ai:DEMASY_PDB"
-        )
-        
-        # For connections inside Docker containers, use the service name instead of external IP
-        # This ensures reliable inter-container communication via Docker DNS
-        DB_HOST="sandbox-oracle-database"
-        DB_PORT="${SANDBOX_DB_PORT}"
-        DB_PASS="${SANDBOX_DB_PASSWORD:-${SANDBOX_DB_PASS}}"
-        CONN_DIR="${HOME:-/home/sandbox}/.dbtools/connections"
-        mkdir -p "$CONN_DIR" 2>/dev/null
-        
-        for conn_name in "${!SANDBOX_CONNS[@]}"; do
-            IFS=':' read -r conn_user conn_pdb <<< "${SANDBOX_CONNS[$conn_name]}"
-            
-            # Skip if connection already exists
-            if grep -Rq "^name=${conn_name}$" "$CONN_DIR" 2>/dev/null; then
-                echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] Connection '${conn_name}' already exists" >> "$AUTO_USER_LOG"
-                continue
-            fi
-            
-            # Create the saved connection using SQLcl
-            if /opt/oracle/sqlcl/bin/sql /nolog <<EOSQL >> "$AUTO_USER_LOG" 2>&1
-CONN -save "${conn_name}" -savepwd ${conn_user}/${DB_PASS}@//${DB_HOST}:${DB_PORT}/${conn_pdb}
-EXIT
-EOSQL
-            then
-                echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] Saved connection '${conn_name}' ready" >> "$AUTO_USER_LOG"
-            else
-                echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] Failed to create connection '${conn_name}'" >> "$AUTO_USER_LOG"
-            fi
-        done
-        
         echo "" >> "$AUTO_USER_LOG"
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Auto-user setup complete" >> "$AUTO_USER_LOG"
     ) &
