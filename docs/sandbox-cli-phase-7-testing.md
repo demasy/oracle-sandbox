@@ -8,7 +8,7 @@
 
 ## 📋 Overview
 
-Phase 7 introduces a **comprehensive testing and quality framework** to ensure CLI reliability, performance, and maintainability. This phase complements Phases 1-6 by adding automated validation, performance monitoring, and CI/CD integration capabilities.
+This introduces a **comprehensive testing and quality framework** to ensure CLI reliability, performance, and maintainability. It complements the 6 framework components by adding automated validation, performance monitoring, and CI/CD integration capabilities.
 
 ### Key Components
 
@@ -619,7 +619,7 @@ Phase 7 provides the foundation for:
 ## 📚 Related Documentation
 
 - [CLI User Guide](../docs/sandbox-cli-user-guide.md) - Complete CLI reference
-- [Phase 1-6 Documentation](../docs/sandbox-cli-user-guide.md#overview) - Core CLI phases
+- [Framework Documentation](../docs/sandbox-cli-user-guide.md#overview) - Core CLI components
 - [Security Guide](../docs/security.md) - Security best practices
 
 ---

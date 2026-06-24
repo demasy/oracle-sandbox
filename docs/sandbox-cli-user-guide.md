@@ -17,13 +17,13 @@ Master the unified command-line toolkit for managing Oracle Sandbox operations, 
 1. [Overview](#overview)
 2. [Quick Start (5 minutes)](#quick-start-5-minutes)
 3. [Beginner Guide](#beginner-guide)
-   - [Phase 1: Aliases & Shortcuts](#phase-1-aliases--shortcuts)
-   - [Phase 2: Help System](#phase-2-help-system)
-   - [Phase 3: Common Commands](#phase-3-common-commands)
+   - [① Aliases & Shortcuts](#-aliases--shortcuts)
+   - [② Help System](#-help-system)
+   - [③ Common Commands](#-common-commands)
 4. [Advanced Features](#advanced-features)
-   - [Phase 4: Output Formatting](#phase-4-output-formatting)
-   - [Phase 5: Batch Operations & State Diff](#phase-5-batch-operations--state-diff)
-   - [Phase 6: Interactive Shell & Completions](#phase-6-interactive-shell--completions)
+   - [④ Output Formatting](#-output-formatting)
+   - [⑤ Batch Operations & State Diff](#-batch-operations--state-diff)
+   - [⑥ Interactive Shell & Completions](#-interactive-shell--completions)
 5. [Quick Command Reference](#quick-command-reference)
 6. [Real-World Workflows](#real-world-workflows)
 7. [Troubleshooting](#troubleshooting)
@@ -57,14 +57,14 @@ sb help           # Get help on any command
 
 ### Architecture: 6 Phases
 
-| Phase | Purpose | Benefit |
-|-------|---------|---------|
-| **Phase 1** | Aliases & Config | Reduce typing with 20+ shortcuts |
-| **Phase 2** | Help & Discovery | Learn features via hierarchical help |
-| **Phase 3** | Code Libraries | 30% code reduction, maintainability |
-| **Phase 4** | Output Formatting | JSON/CSV/table support |
-| **Phase 5** | Batch & Diff | Automation and audit trails |
-| **Phase 6** | Shell & Completions | Interactive mode with history |
+Frame | Purpose | Benefit |
+|-------|---------|----------|
+| **① Aliases & Config** | Aliases & Config | Reduce typing with 20+ shortcuts |
+| **② Help & Discovery** | Help & Discovery | Learn features via hierarchical help |
+| **③ Code Libraries** | Code Libraries | 30% code reduction, maintainability |
+| **④ Output Formatting** | Output Formatting | JSON/CSV/table support |
+| **⑤ Batch & Diff** | Batch & Diff | Automation and audit trails |
+| **⑥ Shell & Completions** | Shell & Completions | Interactive mode with history |
 
 <br>
 
@@ -115,7 +115,7 @@ sb help
 
 ## Beginner Guide
 
-### Phase 1: Aliases & Shortcuts
+### ① Aliases & Shortcuts
 
 Typing `sandbox` every time is tedious. That's why we have shortcuts:
 
@@ -161,7 +161,7 @@ shopt -s expand_aliases
 
 ---
 
-### Phase 2: Help System
+### ② Help System
 
 The CLI has a **3-level help hierarchy** to help you discover features:
 
@@ -219,7 +219,7 @@ sb status help
 
 ---
 
-### Phase 3: Common Commands
+### ③ Common Commands
 
 Let's go through the most frequently used commands:
 
@@ -296,7 +296,7 @@ sb install apex --force
 
 ## Advanced Features
 
-### Phase 4: Output Formatting
+### ④ Output Formatting
 
 By default, CLI shows human-readable output (table format). But you can change it for different purposes:
 
@@ -387,7 +387,7 @@ Useful when CLI output is piped to other commands or scripts.
 
 ---
 
-### Phase 5: Batch Operations & State Diff
+### ⑤ Batch Operations & State Diff
 
 For automation and configuration management:
 
@@ -460,7 +460,7 @@ sb diff state state-before.json state-after.json --format text
 
 ---
 
-### Phase 6: Interactive Shell & Completions
+### ⑥ Interactive Shell & Completions
 
 #### Interactive Shell Mode
 
