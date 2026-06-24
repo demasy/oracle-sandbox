@@ -127,60 +127,7 @@ RUN npm install oracledb --build-from-source --unsafe-perm
 # Set permissions for all scripts in runtime stage (recursively find all .sh files)
 RUN find /usr/sandbox/app -type f -name '*.sh' -exec chmod +x {} \;
 
-# Create a wrapper for SQLcl that detects Java path dynamically for any architecture
-# Updated by demasy on November 11, 2025
-# Enhanced to support both AMD64 and ARM64 architectures with dynamic Java detection
-RUN echo '#!/bin/bash' > /usr/local/bin/sql && \
-    echo 'export LD_LIBRARY_PATH=/opt/oracle/instantclient:$LD_LIBRARY_PATH' >> /usr/local/bin/sql && \
-    echo 'DETECTED_JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::")' >> /usr/local/bin/sql && \
-    echo 'export JAVA_HOME="$DETECTED_JAVA_HOME"' >> /usr/local/bin/sql && \
-    echo 'export PATH="$JAVA_HOME/bin:$PATH"' >> /usr/local/bin/sql && \
-    echo 'cd /opt/oracle/sqlcl/bin && exec ./sql "$@"' >> /usr/local/bin/sql && \
-    chmod +x /usr/local/bin/sql
-
-# Symbolic links to Oracle tools and scripts
-
-RUN ln -s /usr/sandbox/app/system/download/download.sh /usr/local/bin/download-oracle-components
-
-# -------------------------------------------- [CLI Tools]
-RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/demasy
-RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/sandbox
-RUN ln -s /usr/sandbox/app/cli/sandbox.sh /usr/local/bin/sb
-RUN ln -s /usr/sandbox/app/oracle/sqlplus/sqlplus-connect.sh /usr/local/bin/sqlplus
-RUN ln -s /usr/sandbox/app/oracle/sqlcl/sqlcl-connect.sh /usr/local/bin/sqlcl
-
-# -------------------------------------------- [MCP Tools]
-RUN ln -s /usr/sandbox/app/oracle/mcp/start.sh /usr/local/bin/start-mcp
-
-# Patch SQLcl MCP server: fix version query to match "Oracle AI Database" product name
-# The default filter 'Oracle Database%' returns no rows for Oracle AI Database Free edition,
-# causing Version(null) NPE in ConnectTool.
-RUN TMPDIR=/tmp/mcp-patch && \
-    rm -rf $TMPDIR && mkdir -p $TMPDIR && \
-    cd $TMPDIR && \
-    jar xf /opt/oracle/sqlcl/lib/dbtools-mcp.jar oracle/dbtools/extension/mcp/command/xml/McpToolsQueries.xml && \
-    sed -i "s/WHERE product LIKE 'Oracle Database%'/WHERE product LIKE 'Oracle%'/" \
-        oracle/dbtools/extension/mcp/command/xml/McpToolsQueries.xml && \
-    jar uf /opt/oracle/sqlcl/lib/dbtools-mcp.jar oracle/dbtools/extension/mcp/command/xml/McpToolsQueries.xml && \
-    rm -rf $TMPDIR
-
-RUN /usr/sandbox/app/system/admin/setup-sandbox-user.sh
-
-# Setup CLI aliases and completions automatically on container startup
-# Append alias and completion sources to root and sandbox user's .bashrc
-RUN echo '' >> /root/.bashrc && \
-    echo '# Sandbox CLI aliases (Phase 1)' >> /root/.bashrc && \
-    echo '[[ -f /usr/sandbox/app/cli/sandbox-aliases.sh ]] && source /usr/sandbox/app/cli/sandbox-aliases.sh' >> /root/.bashrc && \
-    echo '# Sandbox CLI completions (Phase 6)' >> /root/.bashrc && \
-    echo '[[ -f /usr/sandbox/app/cli/sandbox-completion.bash ]] && source /usr/sandbox/app/cli/sandbox-completion.bash' >> /root/.bashrc && \
-    echo '' >> /root/.bashrc && \
-    echo '' >> /home/sandbox/.bashrc && \
-    echo '# Sandbox CLI aliases (Phase 1)' >> /home/sandbox/.bashrc && \
-    echo '[[ -f /usr/sandbox/app/cli/sandbox-aliases.sh ]] && source /usr/sandbox/app/cli/sandbox-aliases.sh' >> /home/sandbox/.bashrc && \
-    echo '# Sandbox CLI completions (Phase 6)' >> /home/sandbox/.bashrc && \
-    echo '[[ -f /usr/sandbox/app/cli/sandbox-completion.bash ]] && source /usr/sandbox/app/cli/sandbox-completion.bash' >> /home/sandbox/.bashrc && \
-    echo '' >> /home/sandbox/.bashrc && \
-    chown sandbox:sandbox /home/sandbox/.bashrc
+RUN /usr/sandbox/app/system/admin/setup.sh
 
 EXPOSE 3000
 EXPOSE 3001
