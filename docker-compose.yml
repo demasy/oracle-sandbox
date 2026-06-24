@@ -5,9 +5,9 @@ services:
     labels:
       com.sandbox.service: "database"
       com.sandbox.description: "Oracle AI Database 26ai Free"
-      com.sandbox.version: "26ai"
       com.sandbox.owner: "demasylabs"
       com.sandbox.email: "founder@demasy.io"
+      com.sandbox.version: "26ai"
     ports:
       - "127.0.0.1:${ENV_DB_PORT_LISTENER}:1521"
       # Note: Enterprise Manager (5500) not available in Database Free Edition
@@ -72,9 +72,9 @@ services:
     labels:
       com.sandbox.service: "application"
       com.sandbox.description: "Oracle Sandbox Management Server"
-      com.sandbox.version: "1.0.0"
       com.sandbox.owner: "demasylabs"
       com.sandbox.email: "founder@demasy.io"
+      com.sandbox.version: "1.0.0"
     ports:
       - "127.0.0.1:${ENV_SERVER_PORT}:3000"      # Management server health check & API
       - "127.0.0.1:${ENV_APEX_PORT:-8080}:8080"  # APEX & ORDS web interface
