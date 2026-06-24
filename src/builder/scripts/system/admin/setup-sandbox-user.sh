@@ -9,4 +9,4 @@
 groupadd --gid 10001 sandbox
 useradd --uid 10001 --gid sandbox --create-home --shell /bin/bash sandbox
 mkdir -p /home/sandbox/.dbtools /home/oracle/logs
-chown -R sandbox:sandbox /usr/sandbox/app /opt/oracle /home/sandbox/.dbtools /home/oracle/logs
+chown -R sandbox:sandbox /usr/sandbox/app /home/sandbox/.dbtools /home/oracle/logs
