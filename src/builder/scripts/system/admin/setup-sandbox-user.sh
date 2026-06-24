@@ -1,10 +1,8 @@
 #!/bin/bash
-# Run runtime services as non-root for better container isolation.
-# Pre-create the named-volume mountpoints owned by sandbox so a freshly
-# created volume inherits sandbox ownership (Docker seeds an empty named
-# volume from the image directory's ownership/permissions). Without this,
-# Docker creates the mountpoint root-owned and the sandbox user cannot
-# write saved connections or logs into it.
+# setup-sandbox-user.sh — Create the sandbox OS user and set ownership.
+# Creates group/user with fixed GID/UID 10001 for consistent non-root isolation.
+# Pre-creates named-volume mountpoints so Docker seeds them sandbox-owned;
+# without this, volumes initialise root-owned and the sandbox user cannot write to them.
 
 groupadd --gid 10001 sandbox
 useradd --uid 10001 --gid sandbox --create-home --shell /bin/bash sandbox

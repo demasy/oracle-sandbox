@@ -1,6 +1,7 @@
 #!/bin/bash
-# Create a /usr/local/bin/sql wrapper that detects Java path dynamically,
-# supporting both AMD64 and ARM64 architectures.
+# setup-sql-wrapper.sh — Write the /usr/local/bin/sql entry point for SQLcl.
+# Detects JAVA_HOME at runtime via readlink so the same wrapper works on both
+# AMD64 and ARM64 without hardcoding an architecture-specific JVM path.
 
 cat > /usr/local/bin/sql << 'EOF'
 #!/bin/bash

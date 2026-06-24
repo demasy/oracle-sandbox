@@ -1,6 +1,7 @@
 #!/bin/bash
-# Append Sandbox CLI aliases and completions to both root and sandbox user
-# shell profiles so they are available automatically on container startup.
+# setup-shell-profile.sh — Wire CLI aliases and bash completions into shell profiles.
+# Appends lazy-load guards to /root/.bashrc and /home/sandbox/.bashrc so aliases
+# and tab-completion are available automatically in every interactive shell session.
 
 # root profile
 cat >> /root/.bashrc << 'EOF'

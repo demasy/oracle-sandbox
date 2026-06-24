@@ -1,7 +1,8 @@
 #!/bin/bash
-# Patch SQLcl MCP server: fix version query to match "Oracle AI Database" product name.
-# The default filter 'Oracle Database%' returns no rows for Oracle AI Database Free edition,
-# causing Version(null) NPE in ConnectTool.
+# patch-mcp-version-query.sh — Patch dbtools-mcp.jar to support Oracle AI Database.
+# Widens the version query filter from 'Oracle Database%' to 'Oracle%' so ConnectTool
+# can resolve the database version on Oracle AI Database Free (which returns no rows
+# with the default filter, causing a Version(null) NPE).
 
 TMPDIR=/tmp/mcp-patch
 rm -rf "$TMPDIR" && mkdir -p "$TMPDIR"
