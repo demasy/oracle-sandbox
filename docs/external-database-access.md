@@ -21,8 +21,10 @@ jdbc:oracle:thin:@127.0.0.1:1521/FREEPDB1
 ### 2. Available Services from Host
 - **Oracle Database**: `127.0.0.1:1521`
 - **APEX Web Interface**: `http://127.0.0.1:8080/ords/f?p=4550:1`
-- **Enterprise Manager**: `http://127.0.0.1:5500/em/`
 - **Management API**: `http://127.0.0.1:3000/health`
+- **MCP Server**: `127.0.0.1:3001`
+
+> **Note:** Enterprise Manager Express (port 5500) is **not available** in Oracle Database Free Edition.
 
 ### 3. Testing Connectivity
 ```bash
@@ -40,20 +42,21 @@ curl http://127.0.0.1:8080/ords/f?p=4550:1
 ## Network Architecture
 
 ```
-┌─── Host Machine (macOS) ────────────────────────────────┐
+┌─── Host Machine ────────────────────────────────────────┐
 │  127.0.0.1:1521  ←→  Port Forward  ←→  192.168.1.110:1521  │
 │  127.0.0.1:8080  ←→  Port Forward  ←→  192.168.1.120:8080  │
 │  127.0.0.1:3000  ←→  Port Forward  ←→  192.168.1.120:3000  │
-│  127.0.0.1:5500  ←→  Port Forward  ←→  192.168.1.110:5500  │
+│  127.0.0.1:3001  ←→  Port Forward  ←→  192.168.1.120:3001  │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─── Docker Bridge Network (192.168.1.0/24) ─────────────┐
-│                                                        │
-│  ┌─── Oracle Database ────┐  ┌─── Management Server ──┐│
-│  │  192.168.1.110:1521    │  │  192.168.1.120:3000    ││
-│  │  192.168.1.110:5500    │  │  192.168.1.120:8080    ││
-│  │  (APEX EPG)           │  │  (ORDS/APEX)            ││
-│  └─────────────────────────┘  └─────────────────────────┘│
+│                                                         │
+│  ┌─── Oracle Database ─────┐  ┌─── Management Server ──┐│
+│  │  192.168.1.110:1521     │  │  192.168.1.120:3000    ││
+│  │  (TNS Listener)         │  │  192.168.1.120:8080    ││
+│  └──────────────────────────┘  │  192.168.1.120:3001    ││
+│                                 │  (ORDS/APEX/MCP)      ││
+│                                 └────────────────────────┘│
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -109,7 +112,7 @@ const connection = await oracledb.getConnection({
 docker ps
 
 # Check port forwarding
-netstat -an | grep -E "1521|3000|8080|5500"
+netstat -an | grep -E "1521|3000|8080|3001"
 
 # Check network connectivity
 nc -zv 127.0.0.1 1521

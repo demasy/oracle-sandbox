@@ -824,8 +824,10 @@ Comprehensive guides are in the [docs/](docs/) directory, organized by topic:
 | Document | Description |
 |----------|-------------|
 | **[Sandbox CLI User Guide](docs/sandbox-cli-user-guide.md)** ⭐ | Complete reference for all `sandbox` commands, aliases, flags, and workflows |
+| **[Quick Reference](docs/quick-reference.md)** | One-page cheat sheet — commands, ports, URLs, connection strings |
+| **[FAQ](docs/faq.md)** | Common questions about setup, connections, APEX, MCP, and performance |
 | [CLI Testing Guide](docs/cli-testing-complete.md) | Test procedures, performance monitoring, and CI/CD integration |
-| [Service Management](docs/service-management.md) | Container start/stop/restart, logs, and diagnostics |
+| [Service Management](docs/service-management.md) | Container start/stop/restart, health checks, and diagnostics |
 | [Startup Configuration](docs/startup-configuration.md) | APEX auto-install, startup timeouts, and boot behavior |
 | [Deployment Guide](docs/deployment-guide.md) | Build, deploy, and operate the sandbox environment |
 

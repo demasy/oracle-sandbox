@@ -1,6 +1,6 @@
 # Oracle APEX Installation
 
-Oracle Application Express (APEX) 24.2.0 is included as a low-code development platform for building web applications.
+Oracle Application Express (APEX) 26.1.0 is included as a low-code development platform for building web applications.
 
 ## Installation
 
@@ -11,8 +11,8 @@ docker exec sandbox-oracle-server install-apex
 ```
 
 **Installation includes:**
-- Oracle APEX 24.2.0 core components
-- Oracle REST Data Services (ORDS) 25.3
+- Oracle APEX 26.1.0 core components
+- Oracle REST Data Services (ORDS) 26.1.2
 - SQL Developer Web interface
 - Static image serving configuration
 - Workspace and admin user setup
@@ -43,7 +43,7 @@ After successful installation:
 
 ```bash
 # Check ORDS status
-docker exec sandbox-oracle-server netstat -tulnp | grep:8080
+docker exec sandbox-oracle-server netstat -tulnp | grep :8080
 
 # View ORDS logs in real-time 
 docker exec sandbox-oracle-server tail -f /tmp/ords.log
@@ -68,11 +68,9 @@ docker exec sandbox-oracle-server start-apex
 
 ```bash
 # Check for port conflicts
-docker exec sandbox-oracle-server netstat -tulnp | grep:8080
+docker exec sandbox-oracle-server netstat -tulnp | grep :8080
 
-# View detailed logs 
-
-```bash
+# View detailed logs
 docker exec sandbox-oracle-server cat /tmp/ords.log
 ```
 

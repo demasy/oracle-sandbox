@@ -30,11 +30,11 @@ Essential tools for Oracle database management and SQL development.
 
 | # | Tool | Purpose | License | Cost |
 |---|------|---------|---------|------|
-| 1 | **Oracle Database Free** | Primary RDBMS engine (19c/21c/23c) | Oracle Free License | FREE |
+| 1 | **Oracle Database Free** | Primary RDBMS engine (Oracle AI DB 26ai) | Oracle Free License | FREE |
 | 2 | **SQLcl** | Command-line SQL client & scripting | Free Download | FREE |
 | 3 | **SQL*Plus** | Interactive SQL & PL/SQL execution | Included with Oracle | FREE |
 | 4 | **SQL Developer** | IDE for SQL/PL/SQL development | Always Free | FREE |
-| 5 | **Oracle Enterprise Manager Express** | Web-based database administration UI | Included with Oracle | FREE |
+| 5 | **Oracle Enterprise Manager Express** | Web-based DB admin UI (not available in Free Edition) | Included with Oracle | FREE |
 | 6 | **RMAN** | Database backup & recovery management | Included with Oracle | FREE |
 | 7 | **Data Pump** | High-speed data export/import | Included with Oracle | FREE |
 | 8 | **v$ & dba_* Views** | Performance & configuration data dictionary views | Included with Oracle | FREE |
