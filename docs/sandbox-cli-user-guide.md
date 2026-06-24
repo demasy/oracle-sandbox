@@ -937,7 +937,7 @@ sb conn help
 
 ```bash
 # Documentation
-cat docs/SANDBOX_CLI_USER_GUIDE.md         # This file
+cat docs/sandbox-cli-user-guide.md         # This file
 cat docs/oracle-apex-installation.md       # APEX-specific
 cat docs/troubleshooting.md                # General troubleshooting
 

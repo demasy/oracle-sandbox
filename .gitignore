@@ -383,3 +383,9 @@ password.env
 libs/instantclient_*/
 logs/
 *.log
+
+
+libs
+.github
+docs/TOOLS_REFERENCE.md
+docs/PRODUCTION-HARDENING.md

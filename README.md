@@ -41,7 +41,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - [Getting Started](#getting-started)
 - [Architecture](#architecture)
 - [Built-in Tools & Scripts](#built-in-tools--scripts)
-- [📖 Sandbox CLI User Guide](docs/SANDBOX_CLI_USER_GUIDE.md) ⭐ **START HERE FOR CLI**
+- [📖 Sandbox CLI User Guide](docs/sandbox-cli-user-guide.md) ⭐ **START HERE FOR CLI**
 - [MCP Server (Claude Code Integration)](#mcp-server-claude-code-integration)
 - [Documentation](#-documentation)
 - [Change Log / Release History](#change-log--release-history)
@@ -817,14 +817,22 @@ SANDBOX_AI
 
 For comprehensive guides, see the [docs](docs) directory:
 
-- **[Sandbox CLI User Guide](docs/SANDBOX_CLI_USER_GUIDE.md)** ⭐ **START HERE** - Complete reference for the 6-phase CLI framework (beginner & advanced)
-- **[Phase 7: Testing & Quality Assurance](docs/SANDBOX_CLI_PHASE_7_TESTING.md)** 🧪 NEW - Comprehensive testing framework, performance monitoring, and CI/CD integration
+- **[Sandbox CLI User Guide](docs/sandbox-cli-user-guide.md)** ⭐ **START HERE** - Complete reference for the 6-phase CLI framework (beginner & advanced)
+- **[Phase 7: Testing & Quality Assurance](docs/sandbox-cli-phase-7-testing.md)** 🧪 NEW - Comprehensive testing framework, performance monitoring, and CI/CD integration
 - [Service Management](docs/service-management.md) - Container operations, logs, and diagnostics
 - [Oracle APEX Installation](docs/oracle-apex-installation.md) - APEX setup, ORDS configuration, and endpoints
 - [Database Connectivity](docs/database-connectivity.md) - Connection methods, parameters, and examples
 - [Monitoring & Logs](docs/monitoring.md) - Health checks, logging, and resource monitoring
 - [Configuration Reference](docs/configuration-reference.md) - Environment variables and settings
 - [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
+- [Security Audit](docs/security-audit.md) - Security assessment and findings
+- [Security Guide](docs/security.md) - Security best practices and hardening
+- [Deployment Guide](docs/deployment-guide.md) - Production deployment procedures
+- [Production Hardening](docs/production-hardening.md) - Enterprise security hardening
+- [Docker Publishing](docs/docker-publishing.md) - Docker image publishing and versioning
+- [Tools Reference](docs/tools-reference.md) - Complete tools and utilities reference
+- [Startup Configuration](docs/startup-configuration.md) - Container startup options
+- [External Database Access](docs/external-database-access.md) - Remote connectivity setup
 
 <br>
 

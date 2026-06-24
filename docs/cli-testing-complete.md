@@ -17,8 +17,8 @@ Successfully completed comprehensive CLI implementation and testing. All 8 major
 ✓ Configuration templates (save/restore snapshots)
 
 ### Production Hardening (Session 1)
-✓ Security audit recommendations (PRODUCTION-HARDENING.md)
-✓ Deployment guide (DEPLOYMENT-GUIDE.md)
+✓ Security audit recommendations (production-hardening.md)
+✓ Deployment guide (deployment-guide.md)
 ✓ Test infrastructure (tests/test-suite.sh)
 
 ### CLI Registration & Testing (This Session)
@@ -135,7 +135,7 @@ Database: Oracle Database 26ai Free, FREEPDB1 + SANDBOX_PDB
    - Set up audit log rotation and retention
 
 2. **Security Hardening**
-   - Implement high-priority items from PRODUCTION-HARDENING.md
+   - Implement high-priority items from production-hardening.md
    - Enable SQL bind variables for injection prevention
    - Configure access control and secrets management
 

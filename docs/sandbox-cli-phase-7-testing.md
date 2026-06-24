@@ -618,9 +618,9 @@ Phase 7 provides the foundation for:
 
 ## 📚 Related Documentation
 
-- [CLI User Guide](../docs/SANDBOX_CLI_USER_GUIDE.md) - Complete CLI reference
-- [Phase 1-6 Documentation](../docs/SANDBOX_CLI_USER_GUIDE.md#overview) - Core CLI phases
-- [Security Guide](../docs/SECURITY.md) - Security best practices
+- [CLI User Guide](../docs/sandbox-cli-user-guide.md) - Complete CLI reference
+- [Phase 1-6 Documentation](../docs/sandbox-cli-user-guide.md#overview) - Core CLI phases
+- [Security Guide](../docs/security.md) - Security best practices
 
 ---
 
