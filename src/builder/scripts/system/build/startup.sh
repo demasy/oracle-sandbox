@@ -234,9 +234,11 @@ EOF
 
         # ─── Set up MCP saved connection (after SANDBOX_PDB users ready) ──────────
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setting up MCP saved connection..." >> "$AUTO_USER_LOG"
+        # Use Docker service name for internal connections, external IP is unreachable from within container
         SANDBOX_DB_MCP_USER="${SANDBOX_DB_MCP_USER:-${SANDBOX_DB_USER}}" \
         SANDBOX_DB_MCP_SERVICE="${SANDBOX_DB_MCP_SERVICE}" \
         SANDBOX_DB_PASSWORD="${SANDBOX_DB_PASSWORD:-${SANDBOX_DB_PASS}}" \
+        SANDBOX_DB_HOST="sandbox-oracle-database" \
         bash /usr/sandbox/app/oracle/mcp/setup-saved-connection.sh \
             >> "$AUTO_USER_LOG" 2>&1 \
             && echo "[$(date '+%Y-%m-%d %H:%M:%S')] [OK] MCP saved connection ready" >> "$AUTO_USER_LOG" \

@@ -38,6 +38,8 @@ COPY ["LICENSE", "./"]
 
 # Copy scripts to organized structure
 COPY ./src/builder/scripts/cli/*.sh                 /usr/sandbox/app/cli/
+COPY ./src/builder/scripts/cli/sandbox-completion.bash /usr/sandbox/app/cli/
+COPY ./src/builder/scripts/cli/sandbox-completion.zsh  /usr/sandbox/app/cli/
 COPY ./src/builder/scripts/system/utils/*.sh        /usr/sandbox/app/system/utils/
 COPY ./src/builder/scripts/system/build/*.sh        /usr/sandbox/app/system/build/
 COPY ./src/builder/scripts/system/admin/*.sh        /usr/sandbox/app/system/admin/
@@ -173,15 +175,19 @@ RUN groupadd --gid 10001 sandbox && \
   mkdir -p /home/sandbox/.dbtools /home/oracle/logs && \
   chown -R sandbox:sandbox /usr/sandbox/app /opt/oracle /home/sandbox/.dbtools /home/oracle/logs
 
-# Setup CLI aliases automatically on container startup
-# Append alias source to sandbox user's .bashrc
+# Setup CLI aliases and completions automatically on container startup
+# Append alias and completion sources to root and sandbox user's .bashrc
 RUN echo '' >> /root/.bashrc && \
     echo '# Sandbox CLI aliases (Phase 1)' >> /root/.bashrc && \
     echo '[[ -f /usr/sandbox/app/cli/sandbox-aliases.sh ]] && source /usr/sandbox/app/cli/sandbox-aliases.sh' >> /root/.bashrc && \
+    echo '# Sandbox CLI completions (Phase 6)' >> /root/.bashrc && \
+    echo '[[ -f /usr/sandbox/app/cli/sandbox-completion.bash ]] && source /usr/sandbox/app/cli/sandbox-completion.bash' >> /root/.bashrc && \
     echo '' >> /root/.bashrc && \
     echo '' >> /home/sandbox/.bashrc && \
     echo '# Sandbox CLI aliases (Phase 1)' >> /home/sandbox/.bashrc && \
     echo '[[ -f /usr/sandbox/app/cli/sandbox-aliases.sh ]] && source /usr/sandbox/app/cli/sandbox-aliases.sh' >> /home/sandbox/.bashrc && \
+    echo '# Sandbox CLI completions (Phase 6)' >> /home/sandbox/.bashrc && \
+    echo '[[ -f /usr/sandbox/app/cli/sandbox-completion.bash ]] && source /usr/sandbox/app/cli/sandbox-completion.bash' >> /home/sandbox/.bashrc && \
     echo '' >> /home/sandbox/.bashrc && \
     chown sandbox:sandbox /home/sandbox/.bashrc
 
