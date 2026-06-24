@@ -1,9 +1,9 @@
 #!/bin/bash
-# One-time image setup: run all admin configuration scripts in order.
+# setup.sh — Image build-time setup orchestrator.
+# Called once during docker build (RUN setup.sh) to configure the runtime image.
+# Runs all admin scripts in dependency order: sql wrapper → symlinks → mcp patch → user → shell profile.
 
-ADMIN=/usr/sandbox/app/system/admin
-MCP=/usr/sandbox/app/oracle/mcp/
-CLI=/usr/sandbox/app/cli
+source /usr/sandbox/app/system/utils/paths.sh
 
 $ADMIN/setup-sql-wrapper.sh
 $ADMIN/setup-symlinks.sh
