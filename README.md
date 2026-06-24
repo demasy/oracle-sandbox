@@ -817,45 +817,45 @@ SANDBOX_AI
 
 ## 📚 Documentation
 
-Comprehensive guides are in the [docs/](docs/) directory, organized by topic:
+Full documentation index: **[docs/README.md](docs/README.md)**
 
-### CLI & Operations
+### 🖥️ CLI
 
 | Document | Description |
 |----------|-------------|
 | **[Sandbox CLI User Guide](docs/cli/user-guide.md)** ⭐ | Complete reference for all `sandbox` commands, aliases, flags, and workflows |
-| **[Quick Reference](docs/quick-reference.md)** | One-page cheat sheet — commands, ports, URLs, connection strings |
-| **[FAQ](docs/faq.md)** | Common questions about setup, connections, APEX, MCP, and performance |
+| [Quick Reference](docs/quick-reference.md) | One-page cheat sheet — commands, ports, URLs, connection strings |
+| [FAQ](docs/faq.md) | Common questions about setup, connections, APEX, MCP, and performance |
 | [CLI Testing Guide](docs/cli/testing.md) | Test procedures, performance monitoring, and CI/CD integration |
-| [Service Management](docs/operations/service-management.md) | Container start/stop/restart, health checks, and diagnostics |
-| [Startup Configuration](docs/operations/startup-configuration.md) | APEX auto-install, startup timeouts, and boot behavior |
-| [Deployment Guide](docs/operations/deployment-guide.md) | Build, deploy, and operate the sandbox environment |
 
-### Database & Connectivity
+### 🗄️ Database
 
 | Document | Description |
 |----------|-------------|
+| [APEX Installation](docs/database/apex-installation.md) | APEX + ORDS setup, endpoints, and management commands |
 | [Database Connectivity](docs/database/connectivity.md) | SQLcl, SQL*Plus, and connection string formats |
-| [External Database Access](docs/database/external-access.md) | Connecting from host tools (SQL Developer, DBeaver, DataGrip) |
-| [Oracle APEX Installation](docs/database/apex-installation.md) | APEX + ORDS setup, endpoints, and management commands |
+| [External Access](docs/database/external-access.md) | Connecting from host tools (SQL Developer, DBeaver, DataGrip) |
 
-### Configuration & Reference
+### ⚙️ Operations
 
 | Document | Description |
 |----------|-------------|
 | [Configuration Reference](docs/operations/configuration-reference.md) | All `ENV_*` variables, resource limits, volumes, and port mapping |
-| [Tools Reference](docs/operations/tools-reference.md) | Built-in scripts and utilities reference |
+| [Startup Configuration](docs/operations/startup-configuration.md) | APEX auto-install, startup timeouts, and boot behavior |
+| [Service Management](docs/operations/service-management.md) | Container start/stop/restart, health checks, and diagnostics |
 | [Monitoring & Logs](docs/operations/monitoring.md) | Health checks, log management, and resource monitoring |
 | [Troubleshooting](docs/operations/troubleshooting.md) | Common issues and solutions |
+| [Deployment Guide](docs/operations/deployment-guide.md) | Build, deploy, and operate the sandbox environment |
+| [Tools Reference](docs/operations/tools-reference.md) | Built-in scripts and utilities reference |
+| [Docker Publishing](docs/operations/docker-publishing.md) | Docker image publishing and versioning |
 
-### Security
+### 🔒 Security
 
 | Document | Description |
 |----------|-------------|
 | [Security Guide](docs/security/security.md) | Security best practices for this environment |
 | [Security Audit](docs/security/security-audit.md) | Security assessment and findings |
 | [Production Hardening](docs/security/production-hardening.md) | Enterprise hardening checklist |
-| [Docker Publishing](docs/operations/docker-publishing.md) | Docker image publishing and versioning |
 
 <br>
 
