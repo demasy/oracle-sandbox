@@ -41,8 +41,9 @@ Designed to facilitate learning through practical experience, this setup allows 
 - [Getting Started](#getting-started)
 - [Architecture](#architecture)
 - [Built-in Tools & Scripts](#built-in-tools--scripts)
+- [📖 Sandbox CLI User Guide](docs/SANDBOX_CLI_USER_GUIDE.md) ⭐ **START HERE FOR CLI**
 - [MCP Server (Claude Code Integration)](#mcp-server-claude-code-integration)
-- [Documentation](https://github.com/demasy/oracle-sandbox/tree/main/docs)
+- [Documentation](#-documentation)
 - [Change Log / Release History](#change-log--release-history)
 - [Contributors](#contributors)
 - [License](#overview)
@@ -814,14 +815,15 @@ SANDBOX_AI
 
 ## 📚 Documentation
 
-For comprehensive guides, see the [src/docs](src/docs) directory:
+For comprehensive guides, see the [docs](docs) directory:
 
-- [Service Management](src/docs/service-management.md) - Container operations, logs, and diagnostics
-- [Oracle APEX Installation](src/docs/oracle-apex-installation.md) - APEX setup, ORDS configuration, and endpoints
-- [Database Connectivity](src/docs/database-connectivity.md) - Connection methods, parameters, and examples
-- [Monitoring & Logs](src/docs/monitoring.md) - Health checks, logging, and resource monitoring
-- [Configuration Reference](src/docs/configuration-reference.md) - Environment variables and settings
-- [Troubleshooting](src/docs/troubleshooting.md) - Common issues and solutions
+- **[Sandbox CLI User Guide](docs/SANDBOX_CLI_USER_GUIDE.md)** ⭐ **START HERE** - Complete reference for the 6-phase CLI framework (beginner & advanced)
+- [Service Management](docs/service-management.md) - Container operations, logs, and diagnostics
+- [Oracle APEX Installation](docs/oracle-apex-installation.md) - APEX setup, ORDS configuration, and endpoints
+- [Database Connectivity](docs/database-connectivity.md) - Connection methods, parameters, and examples
+- [Monitoring & Logs](docs/monitoring.md) - Health checks, logging, and resource monitoring
+- [Configuration Reference](docs/configuration-reference.md) - Environment variables and settings
+- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
 
 <br>
 
