@@ -485,9 +485,9 @@ install-apex
 ## Related Documentation
 
 - [Service Management Guide](./service-management.md)
-- [Database Connectivity Guide](./database-connectivity.md)
+- [Database Connectivity Guide](../database/connectivity.md)
 - [Troubleshooting Guide](./troubleshooting.md)
-- [APEX Installation Guide](./oracle-apex-installation.md)
+- [APEX Installation Guide](../database/apex-installation.md)
 
 ## Version History
 

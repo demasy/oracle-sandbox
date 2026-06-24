@@ -41,7 +41,7 @@ Designed to facilitate learning through practical experience, this setup allows 
 - [Getting Started](#getting-started)
 - [Architecture](#architecture)
 - [Built-in Tools & Scripts](#built-in-tools--scripts)
-- [📖 Sandbox CLI User Guide](docs/sandbox-cli-user-guide.md) ⭐ **START HERE FOR CLI**
+- [📖 Sandbox CLI User Guide](docs/cli/user-guide.md) ⭐ **START HERE FOR CLI**
 - [MCP Server (Claude Code Integration)](#mcp-server-claude-code-integration)
 - [Documentation](#-documentation)
 - [Change Log / Release History](#change-log--release-history)
@@ -543,8 +543,8 @@ Connect from your local machine using:
    ```
 
 **For complete APEX documentation and troubleshooting:**
-- See [Oracle APEX Installation](docs/oracle-apex-installation.md)
-- See [Troubleshooting Guide](docs/troubleshooting.md)
+- See [Oracle APEX Installation](docs/database/apex-installation.md)
+- See [Troubleshooting Guide](docs/operations/troubleshooting.md)
 
 <br>
 
@@ -823,39 +823,39 @@ Comprehensive guides are in the [docs/](docs/) directory, organized by topic:
 
 | Document | Description |
 |----------|-------------|
-| **[Sandbox CLI User Guide](docs/sandbox-cli-user-guide.md)** ⭐ | Complete reference for all `sandbox` commands, aliases, flags, and workflows |
+| **[Sandbox CLI User Guide](docs/cli/user-guide.md)** ⭐ | Complete reference for all `sandbox` commands, aliases, flags, and workflows |
 | **[Quick Reference](docs/quick-reference.md)** | One-page cheat sheet — commands, ports, URLs, connection strings |
 | **[FAQ](docs/faq.md)** | Common questions about setup, connections, APEX, MCP, and performance |
-| [CLI Testing Guide](docs/cli-testing-complete.md) | Test procedures, performance monitoring, and CI/CD integration |
-| [Service Management](docs/service-management.md) | Container start/stop/restart, health checks, and diagnostics |
-| [Startup Configuration](docs/startup-configuration.md) | APEX auto-install, startup timeouts, and boot behavior |
-| [Deployment Guide](docs/deployment-guide.md) | Build, deploy, and operate the sandbox environment |
+| [CLI Testing Guide](docs/cli/testing.md) | Test procedures, performance monitoring, and CI/CD integration |
+| [Service Management](docs/operations/service-management.md) | Container start/stop/restart, health checks, and diagnostics |
+| [Startup Configuration](docs/operations/startup-configuration.md) | APEX auto-install, startup timeouts, and boot behavior |
+| [Deployment Guide](docs/operations/deployment-guide.md) | Build, deploy, and operate the sandbox environment |
 
 ### Database & Connectivity
 
 | Document | Description |
 |----------|-------------|
-| [Database Connectivity](docs/database-connectivity.md) | SQLcl, SQL*Plus, and connection string formats |
-| [External Database Access](docs/external-database-access.md) | Connecting from host tools (SQL Developer, DBeaver, DataGrip) |
-| [Oracle APEX Installation](docs/oracle-apex-installation.md) | APEX + ORDS setup, endpoints, and management commands |
+| [Database Connectivity](docs/database/connectivity.md) | SQLcl, SQL*Plus, and connection string formats |
+| [External Database Access](docs/database/external-access.md) | Connecting from host tools (SQL Developer, DBeaver, DataGrip) |
+| [Oracle APEX Installation](docs/database/apex-installation.md) | APEX + ORDS setup, endpoints, and management commands |
 
 ### Configuration & Reference
 
 | Document | Description |
 |----------|-------------|
-| [Configuration Reference](docs/configuration-reference.md) | All `ENV_*` variables, resource limits, volumes, and port mapping |
-| [Tools Reference](docs/tools-reference.md) | Built-in scripts and utilities reference |
-| [Monitoring & Logs](docs/monitoring.md) | Health checks, log management, and resource monitoring |
-| [Troubleshooting](docs/troubleshooting.md) | Common issues and solutions |
+| [Configuration Reference](docs/operations/configuration-reference.md) | All `ENV_*` variables, resource limits, volumes, and port mapping |
+| [Tools Reference](docs/operations/tools-reference.md) | Built-in scripts and utilities reference |
+| [Monitoring & Logs](docs/operations/monitoring.md) | Health checks, log management, and resource monitoring |
+| [Troubleshooting](docs/operations/troubleshooting.md) | Common issues and solutions |
 
 ### Security
 
 | Document | Description |
 |----------|-------------|
-| [Security Guide](docs/security.md) | Security best practices for this environment |
-| [Security Audit](docs/security-audit.md) | Security assessment and findings |
-| [Production Hardening](docs/production-hardening.md) | Enterprise hardening checklist |
-| [Docker Publishing](docs/docker-publishing.md) | Docker image publishing and versioning |
+| [Security Guide](docs/security/security.md) | Security best practices for this environment |
+| [Security Audit](docs/security/security-audit.md) | Security assessment and findings |
+| [Production Hardening](docs/security/production-hardening.md) | Enterprise hardening checklist |
+| [Docker Publishing](docs/operations/docker-publishing.md) | Docker image publishing and versioning |
 
 <br>
 
