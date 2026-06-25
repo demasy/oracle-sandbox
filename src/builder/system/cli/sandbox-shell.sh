@@ -6,7 +6,7 @@
 
 source /usr/sandbox/app/system/utils/colors.sh
 source /usr/sandbox/app/system/utils/logging.sh
-source /usr/sandbox/app/cli/sandbox-config.sh
+source /usr/sandbox/app/system/cli/sandbox-config.sh
 
 HISTORY_FILE="${HOME}/.sandbox_history"
 SHELL_PROMPT="${CYAN}sandbox>${NC} "

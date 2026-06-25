@@ -37,11 +37,11 @@
 source /usr/sandbox/app/system/utils/colors.sh
 source /usr/sandbox/app/system/utils/logging.sh
 source /usr/sandbox/app/system/utils/banner.sh
-source /usr/sandbox/app/cli/sandbox-config.sh
-source /usr/sandbox/app/cli/sandbox-params.sh
-source /usr/sandbox/app/cli/sandbox-status-helpers.sh
-source /usr/sandbox/app/cli/sandbox-menu.sh
-source /usr/sandbox/app/cli/sandbox-format.sh
+source /usr/sandbox/app/system/cli/sandbox-config.sh
+source /usr/sandbox/app/system/cli/sandbox-params.sh
+source /usr/sandbox/app/system/cli/sandbox-status-helpers.sh
+source /usr/sandbox/app/system/cli/sandbox-menu.sh
+source /usr/sandbox/app/system/cli/sandbox-format.sh
 
 # ─── Resource lookup helper ───────────────────────────────────────────────────
 # Wraps centralized SANDBOX_RESOURCES map (from sandbox-config.sh)
@@ -240,17 +240,17 @@ if [[ "$ACTION" == "-h" || "$ACTION" == "--help" ]]; then
     exit 0
 fi
 if [[ "$RESOURCE" == "-h" || "$RESOURCE" == "--help" ]]; then
-    source /usr/sandbox/app/cli/sandbox-help.sh
+    source /usr/sandbox/app/system/cli/sandbox-help.sh
     exit 0
 fi
 if [[ "$PARAMS" == "-h" || "$PARAMS" == "--help" ]]; then
-    source /usr/sandbox/app/cli/sandbox-resource-help.sh
+    source /usr/sandbox/app/system/cli/sandbox-resource-help.sh
     exit 0
 fi
 
 # ─── Special handling for help action (Phase 2) ────────────────────────────────
 if [[ "$ACTION" == "help" ]]; then
-    source /usr/sandbox/app/cli/sandbox-help-search.sh "$RESOURCE" "$PARAMS"
+    source /usr/sandbox/app/system/cli/sandbox-help-search.sh "$RESOURCE" "$PARAMS"
     exit 0
 fi
 
@@ -287,6 +287,6 @@ log_step "sandbox ${ACTION} ${RESOURCE}${PARAMS:+ ${PARAMS}}"
 [[ "$SANDBOX_DRY_RUN" == "1" ]] && log_info "[dry-run] No changes will be made."
 echo ""
 
-source /usr/sandbox/app/cli/sandbox-${ACTION}.sh
+source /usr/sandbox/app/system/cli/sandbox-${ACTION}.sh
 
 echo ""

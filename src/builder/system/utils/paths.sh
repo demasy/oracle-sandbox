@@ -14,19 +14,21 @@ DEMASY_LABS=$APP/demasylabs  # Planned future use
 # ─────────────────────────────────────────────
 # System Scripts  (/usr/sandbox/app/system/*)
 # ─────────────────────────────────────────────
-ADMIN=$SYSTEM/admin       # Image setup and admin scripts
+ADMIN=$SYSTEM/admin       # Admin scripts (healthcheck)
 BUILD=$SYSTEM/build       # Startup and builder scripts
+SETUP=$SYSTEM/setup       # Image setup scripts (run once at build time)
 UTILS=$SYSTEM/utils       # Shared utilities (this file lives here)
-XX_DOWNLOAD=$SYSTEM/download # Download scripts for Oracle components
-XX_INSTALL=$SYSTEM/install   # Installation scripts
+# XX_DOWNLOAD=$SYSTEM/download # Download scripts for Oracle components
+# XX_INSTALL=$SYSTEM/install   # Installation scripts
 
-DOWNLOAD=$APP/download    # Download scripts for Oracle components
-INSTALL=$APP/install      # Installation scripts
+DOWNLOAD=$APP/download         # Download scripts for Oracle components
+INSTALL=$APP/install           # Installation scripts
+INSTALL_ORACLE=$INSTALL/oracle # Oracle component install scripts
 
 # ─────────────────────────────────────────────
 # CLI  (/usr/sandbox/app/cli/*)
 # ─────────────────────────────────────────────
-CLI=$APP/cli              # Sandbox CLI commands and completions
+CLI=$SYSTEM/cli           # Sandbox CLI commands and completions
 
 # ─────────────────────────────────────────────
 # Oracle Scripts  (/usr/sandbox/app/oracle/*)

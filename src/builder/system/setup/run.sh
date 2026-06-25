@@ -5,8 +5,8 @@
 
 source /usr/sandbox/app/system/utils/paths.sh
 
-$ADMIN/setup-sql-wrapper.sh
-$ADMIN/setup-symlinks.sh
-$MCP/patch-mcp-version-query.sh
-$ADMIN/setup-sandbox-user.sh
+$SETUP/setup-sql.sh
+$SETUP/create-symlinks.sh
+$SETUP/patch-mcp.sh
+$SETUP/create-os-user.sh
 $CLI/setup-shell-profile.sh

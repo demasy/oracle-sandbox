@@ -5,8 +5,8 @@
 #
 # Installation:
 #   - Add to ~/.bashrc or ~/.zshrc:
-#     [[ -f /usr/sandbox/app/cli/sandbox-aliases.sh ]] && source /usr/sandbox/app/cli/sandbox-aliases.sh
-#   - Or run: echo 'source /usr/sandbox/app/cli/sandbox-aliases.sh' >> ~/.bashrc
+#     [[ -f /usr/sandbox/app/system/cli/sandbox-aliases.sh ]] && source /usr/sandbox/app/system/cli/sandbox-aliases.sh
+#   - Or run: echo 'source /usr/sandbox/app/system/cli/sandbox-aliases.sh' >> ~/.bashrc
 #
 # Usage Examples:
 #   sb status database        # sandbox status database
@@ -21,7 +21,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Source config to get SANDBOX_ALIASES
-source /usr/sandbox/app/cli/sandbox-config.sh
+source /usr/sandbox/app/system/cli/sandbox-config.sh
 
 # Define command aliases from SANDBOX_ALIASES map
 alias sb='sandbox'

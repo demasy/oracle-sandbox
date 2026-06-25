@@ -247,7 +247,7 @@ fi
 if [ "$SKIP_APEX_INSTALL" = false ]; then
     # FIX: Create SQL file with absolute path and run from APEX directory
     log_info "Creating APEX installation SQL script..."
-cat > "${APEX_HOME}/install_apex.sql" << SQL_EOF
+cat > "/tmp/install_apex.sql" << SQL_EOF
 ALTER SESSION SET CONTAINER=FREEPDB1;
 @${APEX_HOME}/apexins.sql ${APEX_TABLE_SPACE} ${APEX_TABLE_SPACE_FILES} TEMP /i/
 EXIT
@@ -261,7 +261,7 @@ log_info "Running APEX installation (this takes 3-5 minutes)..."
 log_info "Monitor progress in another terminal: docker exec sandbox-oracle-server tail -f ${APEX_INSTALL_LOG}"
 
 # Run installation from APEX directory (CRITICAL: cd is required)
-(cd "${APEX_HOME}" && sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba @"${APEX_HOME}/install_apex.sql") > "${APEX_INSTALL_LOG}" 2>&1 &
+(cd "${APEX_HOME}" && sql sys/${SYS_PASSWORD}@//${DB_HOST}:${DB_PORT}/${DB_SERVICE} as sysdba @"/tmp/install_apex.sql") > "${APEX_INSTALL_LOG}" 2>&1 &
 APEX_PID=$!
 
 # Show progress dots with elapsed time while installation runs
