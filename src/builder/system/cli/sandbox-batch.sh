@@ -30,9 +30,16 @@ _execute_batch_command() {
         return 0
     fi
     
-    # Execute the command and capture result
+    # Execute the command and capture result (whitelist-only)
+    case "$cmd" in
+        sandbox\ *|sb\ *|sql\ *|sqlcl\ *|sqlplus\ *)
+            : ;;
+        *)
+            log_error "Blocked unsafe command: $cmd"
+            return 1 ;;
+    esac
     local output
-    output=$(eval "$cmd" 2>&1)
+    output=$(bash -c "$cmd" 2>&1)
     local exit_code=$?
     
     if [[ $exit_code -eq 0 ]]; then
