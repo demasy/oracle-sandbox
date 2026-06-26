@@ -153,9 +153,9 @@ _parse_output_format() {
     OUTPUT_FORMAT="table"  # Default
     
     while [[ $# -gt 0 ]]; do
-        if [[ "$1" == "--format" || "$1" == "-f" ]]; then
+        if [[ "$1" == "--format" || "$1" == "-f" || "$1" == "--export" ]]; then
             if [[ -z "${2:-}" ]]; then
-                log_error "--format requires a format (json|csv|table)"
+                log_error "--format/--export requires a format (json|csv|table)"
                 return 1
             fi
             case "${2}" in
