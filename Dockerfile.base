@@ -79,28 +79,21 @@ COPY ./app.js ./app.js
 COPY ["LICENSE", "./"]
 
 # Copy utility scripts
-COPY ./src/builder/scripts/cli/*.sh                 /usr/sandbox/app/cli/
-COPY ./src/builder/scripts/system/utils/*.sh        /usr/sandbox/app/system/utils/
-COPY ./src/builder/scripts/system/admin/*.sh        /usr/sandbox/app/system/admin/
-COPY ./src/builder/scripts/system/download/*.sh     /usr/sandbox/app/system/download/
-COPY ./src/builder/scripts/system/install/*.sh      /usr/sandbox/app/system/install/
-COPY ./src/builder/scripts/oracle/admin/*.sh        /usr/sandbox/app/oracle/admin/
+COPY ./src/builder/system/cli/*.sh                  /usr/sandbox/app/system/cli/
+COPY ./src/builder/system/utils/*.sh                /usr/sandbox/app/system/utils/
+COPY ./src/builder/system/admin/*.sh                /usr/sandbox/app/system/admin/
+COPY ./src/builder/system/build/*.sh                /usr/sandbox/app/system/build/
+COPY ./src/builder/system/setup/*.sh                /usr/sandbox/app/system/setup/
+COPY ./src/builder/scripts/download/*.sh            /usr/sandbox/app/download/
+COPY ./src/builder/scripts/install/oracle/*.sh      /usr/sandbox/app/install/oracle/
+COPY ./src/builder/scripts/oracle/admin/ddl/*.sh    /usr/sandbox/app/oracle/admin/ddl/
 COPY ./src/builder/scripts/oracle/apex/*.sh         /usr/sandbox/app/oracle/apex/
 COPY ./src/builder/scripts/oracle/mcp/*.sh          /usr/sandbox/app/oracle/mcp/
 COPY ./src/builder/scripts/oracle/sqlcl/*.sh        /usr/sandbox/app/oracle/sqlcl/
 COPY ./src/builder/scripts/oracle/sqlplus/*.sh      /usr/sandbox/app/oracle/sqlplus/
 
 # Set permissions
-RUN chmod +x /usr/sandbox/app/cli/*.sh && \
-    chmod +x /usr/sandbox/app/system/utils/*.sh && \
-    chmod +x /usr/sandbox/app/system/admin/*.sh && \
-    chmod +x /usr/sandbox/app/system/download/*.sh && \
-    chmod +x /usr/sandbox/app/system/install/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/admin/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/apex/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/mcp/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/sqlcl/*.sh && \
-    chmod +x /usr/sandbox/app/oracle/sqlplus/*.sh
+RUN find /usr/sandbox/app -type f -name '*.sh' -exec chmod +x {} \;
 
 # Symbolic links to Oracle tools and scripts
 
