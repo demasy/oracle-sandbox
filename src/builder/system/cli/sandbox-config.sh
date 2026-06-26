@@ -25,6 +25,8 @@ declare -A SANDBOX_RESOURCES=(
     [monitor]="system database apex all"
     [audit]="list show search export stats rollback"
     [template]="save load list delete export import"
+    [backup]="full connections ords config schemas list"
+    [restore]="full connections ords config schemas"
 )
 
 # Actions that allow omitting resource (run all resources as dashboard)

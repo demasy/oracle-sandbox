@@ -12,7 +12,7 @@ _sandbox_completion() {
     cword=$COMP_CWORD
 
     # Define actions and their resources
-    local actions="run status start stop restart install uninstall download conn logs export import batch monitor audit template help shell"
+    local actions="run status start stop restart install uninstall download conn logs export import batch monitor audit template backup restore help shell"
     local run_resources="sqlcl mcp healthcheck script"
     local status_resources="database apex mcp network all"
     local start_resources="apex mcp"
@@ -29,6 +29,8 @@ _sandbox_completion() {
     local monitor_resources="system database apex all"
     local audit_resources="list show search export stats rollback"
     local template_resources="save load list delete export import"
+    local backup_resources="full connections ords config schemas list"
+    local restore_resources="full connections ords config schemas"
 
     # Complete first argument (action)
     if [[ $cword -eq 1 ]]; then
@@ -58,6 +60,8 @@ _sandbox_completion() {
             monitor)  COMPREPLY=( $(compgen -W "$monitor_resources" -- "$cur") ) ;;
             audit)    COMPREPLY=( $(compgen -W "$audit_resources" -- "$cur") ) ;;
             template) COMPREPLY=( $(compgen -W "$template_resources" -- "$cur") ) ;;
+            backup)   COMPREPLY=( $(compgen -W "$backup_resources" -- "$cur") ) ;;
+            restore)  COMPREPLY=( $(compgen -W "$restore_resources" -- "$cur") ) ;;
             help)     COMPREPLY=( $(compgen -W "$actions" -- "$cur") ) ;;
             *)        COMPREPLY=() ;;
         esac

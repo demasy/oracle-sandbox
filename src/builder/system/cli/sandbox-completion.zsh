@@ -8,7 +8,7 @@ _sandbox() {
     local -a actions run_resources status_resources start_resources stop_resources
     local -a restart_resources install_resources uninstall_resources download_resources
     local -a conn_resources logs_resources export_resources import_resources
-    local -a batch_resources monitor_resources audit_resources template_resources
+    local -a batch_resources monitor_resources audit_resources template_resources backup_resources restore_resources
 
     actions=(
         'run:Execute or connect to a service'
@@ -27,6 +27,8 @@ _sandbox() {
         'monitor:Monitor services'
         'audit:Audit logging and rollback'
         'template:Manage configuration templates'
+        'backup:Backup connections, ORDS config, and schemas'
+        'restore:Restore from a backup'
         'help:Show help and search commands'
         'shell:Interactive shell mode'
     )
@@ -127,6 +129,23 @@ _sandbox() {
         'import:Import template'
     )
 
+    backup_resources=(
+        'full:Backup everything'
+        'connections:Backup saved connections'
+        'ords:Backup ORDS configuration'
+        'config:Backup sandbox environment config'
+        'schemas:Backup Oracle schemas via Data Pump'
+        'list:List available backups'
+    )
+
+    restore_resources=(
+        'full:Restore everything'
+        'connections:Restore saved connections'
+        'ords:Restore ORDS configuration'
+        'config:Restore sandbox environment config'
+        'schemas:Restore Oracle schemas via Data Pump'
+    )
+
     local context state line
     if (( CURRENT > 1 )); then
         context="${words[1]}"
@@ -149,6 +168,8 @@ _sandbox() {
         monitor)  _describe 'resource' monitor_resources ;;
         audit)    _describe 'resource' audit_resources ;;
         template) _describe 'resource' template_resources ;;
+        backup)   _describe 'resource' backup_resources ;;
+        restore)  _describe 'resource' restore_resources ;;
         help)     _describe 'action' actions ;;
         *)        _describe 'action' actions ;;
     esac

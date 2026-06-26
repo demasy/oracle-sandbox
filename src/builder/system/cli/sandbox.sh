@@ -79,6 +79,8 @@ print_usage() {
     echo -e "    ${CYAN}monitor${NC}    system | database | apex | all"
     echo -e "    ${CYAN}audit${NC}      list | show | search | export | stats | rollback"
     echo -e "    ${CYAN}template${NC}   save | load | list | delete | export | import"
+    echo -e "    ${CYAN}backup${NC}     full | connections | ords | config | schemas | list"
+    echo -e "    ${CYAN}restore${NC}    full | connections | ords | config | schemas"
     echo ""
     echo -e "  ${YELLOW}Examples:${NC}"
     echo -e "    sandbox run sqlcl -u system"
@@ -142,7 +144,7 @@ _did_you_mean() {
 
 # ─── Validation ──────────────────────────────────────────────────────────────
 
-VALID_ACTIONS="download install uninstall start stop restart run status conn logs export help monitor audit template import batch"
+VALID_ACTIONS="download install uninstall start stop restart run status conn logs export help monitor audit template import batch backup restore"
 
 validate_action() {
     local action="$1"
@@ -288,5 +290,18 @@ log_step "sandbox ${ACTION} ${RESOURCE}${PARAMS:+ ${PARAMS}}"
 echo ""
 
 source /usr/sandbox/app/system/cli/sandbox-${ACTION}.sh
+_dispatch_exit=$?
+
+# Audit every action (skip audit action itself to avoid recursion)
+if [[ "$ACTION" != "audit" && "$ACTION" != "help" ]]; then
+    source /usr/sandbox/app/system/cli/sandbox-audit.sh 2>/dev/null
+    _audit_log_operation \
+        "$ACTION" \
+        "${RESOURCE:-all}" \
+        "sandbox ${ACTION} ${RESOURCE}${PARAMS:+ ${PARAMS}}" \
+        "${USER:-sandbox}" \
+        "$([[ $_dispatch_exit -eq 0 ]] && echo success || echo failed)" \
+        2>/dev/null || true
+fi
 
 echo ""

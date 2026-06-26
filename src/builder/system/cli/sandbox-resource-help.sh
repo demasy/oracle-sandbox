@@ -233,6 +233,18 @@ case "${ACTION}/${RESOURCE}" in
         echo ""
         ;;
 
+    run/script)
+        echo ""
+        echo -e "  ${CYAN}sandbox run script${NC} — Execute an Oracle admin script"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox run script <script-name>"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox run script cleanup"
+        echo -e "    sandbox run script report"
+        echo ""
+        ;;
+
 
     # ── start ─────────────────────────────────────────────────────────────────
 
@@ -390,30 +402,14 @@ case "${ACTION}/${RESOURCE}" in
 
     download/apex)
         echo ""
-        echo -e "  ${CYAN}sandbox download apex${NC} — Download Oracle APEX"
+        echo -e "  ${CYAN}sandbox download apex${NC} — Download Oracle APEX + ORDS"
         echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox download apex <parameter>"
+        echo -e "  ${WHITE}Usage:${NC}     sandbox download apex"
         echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}-s${NC}, ${CYAN}--standalone${NC}   Download APEX only (without ORDS)"
-        echo -e "    ${CYAN}-a${NC}, ${CYAN}--all${NC}          Download APEX + ORDS together"
+        echo -e "  ${WHITE}Note:${NC}      Downloads both APEX and ORDS together."
         echo ""
         echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox download apex -s"
-        echo -e "    sandbox download apex --standalone"
-        echo -e "    sandbox download apex -a"
-        echo -e "    sandbox download apex --all"
-        echo ""
-        ;;
-
-    download/ords)
-        echo ""
-        echo -e "  ${CYAN}sandbox download ords${NC} — Download Oracle REST Data Services"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox download ords"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox download ords"
+        echo -e "    sandbox download apex"
         echo ""
         ;;
 
@@ -465,6 +461,155 @@ case "${ACTION}/${RESOURCE}" in
         echo -e "  ${YELLOW}Examples:${NC}"
         echo -e "    sandbox export all"
         echo -e "    sandbox export all --format json > config.json"
+        echo ""
+        ;;
+
+    # ── backup ───────────────────────────────────────────────────────────────
+
+    backup/full)
+        echo ""
+        echo -e "  ${CYAN}sandbox backup full${NC} — Backup everything (connections, ORDS config, env config, schemas)"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox backup full"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox backup full"
+        echo ""
+        ;;
+
+    backup/connections)
+        echo ""
+        echo -e "  ${CYAN}sandbox backup connections${NC} — Backup saved connection files"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox backup connections"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox backup connections"
+        echo ""
+        ;;
+
+    backup/ords)
+        echo ""
+        echo -e "  ${CYAN}sandbox backup ords${NC} — Backup ORDS configuration directory"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox backup ords"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox backup ords"
+        echo ""
+        ;;
+
+    backup/config)
+        echo ""
+        echo -e "  ${CYAN}sandbox backup config${NC} — Backup sandbox environment configuration"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox backup config"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox backup config"
+        echo ""
+        ;;
+
+    backup/schemas)
+        echo ""
+        echo -e "  ${CYAN}sandbox backup schemas${NC} — Backup Oracle schemas via Data Pump (expdp)"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox backup schemas"
+        echo ""
+        echo -e "  ${WHITE}Note:${NC}      Requires SANDBOX_DB_HOST and SANDBOX_DB_PASS environment variables."
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox backup schemas"
+        echo ""
+        ;;
+
+    backup/list)
+        echo ""
+        echo -e "  ${CYAN}sandbox backup list${NC} — List all available backups"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox backup list"
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox backup list"
+        echo ""
+        ;;
+
+    # ── restore ──────────────────────────────────────────────────────────────
+
+    restore/full)
+        echo ""
+        echo -e "  ${CYAN}sandbox restore full${NC} — Restore everything from a backup"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox restore full [--from <backup-id>]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID (e.g. 20260626-214354). Default: latest."
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox restore full"
+        echo -e "    sandbox restore full --from 20260626-214354"
+        echo ""
+        ;;
+
+    restore/connections)
+        echo ""
+        echo -e "  ${CYAN}sandbox restore connections${NC} — Restore saved connections from a backup"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox restore connections [--from <backup-id>]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID. Default: latest."
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox restore connections"
+        echo -e "    sandbox restore connections --from 20260626-214354"
+        echo ""
+        ;;
+
+    restore/ords)
+        echo ""
+        echo -e "  ${CYAN}sandbox restore ords${NC} — Restore ORDS configuration from a backup"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox restore ords [--from <backup-id>]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID. Default: latest."
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox restore ords"
+        echo -e "    sandbox restore ords --from 20260626-214354"
+        echo ""
+        ;;
+
+    restore/config)
+        echo ""
+        echo -e "  ${CYAN}sandbox restore config${NC} — Restore sandbox environment configuration from a backup"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox restore config [--from <backup-id>]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID. Default: latest."
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox restore config"
+        echo -e "    sandbox restore config --from 20260626-214354"
+        echo ""
+        ;;
+
+    restore/schemas)
+        echo ""
+        echo -e "  ${CYAN}sandbox restore schemas${NC} — Restore Oracle schemas via Data Pump (impdp)"
+        echo ""
+        echo -e "  ${WHITE}Usage:${NC}     sandbox restore schemas [--from <backup-id>]"
+        echo ""
+        echo -e "  ${YELLOW}Parameters:${NC}"
+        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID. Default: latest."
+        echo ""
+        echo -e "  ${WHITE}Note:${NC}      Requires SANDBOX_DB_HOST and SANDBOX_DB_PASS. TABLE_EXISTS_ACTION=REPLACE."
+        echo ""
+        echo -e "  ${YELLOW}Examples:${NC}"
+        echo -e "    sandbox restore schemas"
+        echo -e "    sandbox restore schemas --from 20260626-214354"
         echo ""
         ;;
 
