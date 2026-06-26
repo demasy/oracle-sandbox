@@ -8,7 +8,7 @@
 
 **Location:** `src/scripts/oracle/mcp/setup-saved-connection.sh`
 ```bash
-CONNECT demasylabs_ai/Demasy1986@//192.168.1.110:1521/FREEPDB1
+CONNECT <db-user>/<your-password>@//<db-host>:1521/FREEPDB1
 ```
 
 **Risk Level:** 🔴 **CRITICAL**
@@ -28,7 +28,7 @@ CONNECT ${SANDBOX_DB_MCP_USER}/${SANDBOX_DB_PASSWORD}@//${SANDBOX_DB_HOST}:${SAN
 
 **Location:** `src/scripts/oracle/mcp/start.sh` (Line 16)
 ```bash
-MCP_PASS="${SANDBOX_DB_PASSWORD:-${SANDBOX_DB_PASS:-Demasy1986}}"
+MCP_PASS="${SANDBOX_DB_PASSWORD:-${SANDBOX_DB_PASS:-<your-password>}}"
 ```
 
 **Risk Level:** 🟡 **HIGH**
@@ -51,7 +51,7 @@ fi
 
 **Location:** `src/scripts/oracle/mcp/start.sh` (Line 17)
 ```bash
-DB_CONNECTION="${MCP_USER}/${MCP_PASS}@${SANDBOX_DB_HOST:-192.168.1.110}:..."
+DB_CONNECTION="${MCP_USER}/${MCP_PASS}@${SANDBOX_DB_HOST:-<db-host>}:..."
 ```
 
 **Risk Level:** 🟡 **MEDIUM**
