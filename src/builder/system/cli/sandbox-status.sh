@@ -120,25 +120,25 @@ _check_mcp_status() {
 # Check network status
 _check_network_status() {
     local network_name="sandbox_network"
-    
+
     _STATUS_DATA[network_name]="$network_name"
     _STATUS_DATA[network_status]="OK"
     _STATUS_DATA[network_driver]="bridge"
-    
-    # Get gateway from netstat
+
+    # Gateway
     local gateway
     gateway=$(netstat -rn 2>/dev/null | grep "^0.0.0.0" | awk '{print $2}' || echo "unknown")
     _STATUS_DATA[network_gateway]="$gateway"
-    
-    # Get container IP and subnet from ifconfig
-    local container_ip
-    container_ip=$(ifconfig 2>/dev/null | grep -A1 "^eth0" | grep "inet " | awk '{print $2}' || echo "unknown")
+
+    # Container IP, netmask, MTU from ifconfig
+    local container_ip netmask mtu
+    container_ip=$(ifconfig 2>/dev/null | grep -A1 "^eth0" | grep "inet " | awk '{print $2}')
     [[ -z "$container_ip" ]] && container_ip="unknown"
-    
-    local netmask
     netmask=$(ifconfig 2>/dev/null | grep -A1 "^eth0" | grep "inet " | awk '{print $4}' || echo "255.255.255.0")
-    
-    # Format subnet as CIDR
+    mtu=$(ifconfig eth0 2>/dev/null | grep -oP 'mtu \K[0-9]+' || echo "unknown")
+    _STATUS_DATA[network_mtu]="$mtu"
+
+    # CIDR subnet
     local subnet
     if [[ "$netmask" == "255.255.255.0" ]]; then
         subnet=$(echo "$container_ip" | sed 's/\.[0-9]*$/.0\/24/')
@@ -148,42 +148,91 @@ _check_network_status() {
         subnet="$container_ip/24"
     fi
     _STATUS_DATA[network_subnet]="$subnet"
-    
-    # Get current container hostname
+
+    # Current container
     local current_hostname
-    current_hostname=$(hostname 2>/dev/null)
-    [[ -z "$current_hostname" ]] && current_hostname="$(cat /etc/hostname 2>/dev/null)"
-    
+    current_hostname=$(hostname 2>/dev/null || cat /etc/hostname 2>/dev/null)
     _STATUS_DATA[container_1_name]="$current_hostname"
     _STATUS_DATA[container_1_ip]="$container_ip"
-    
-    # Parse other containers from /etc/hosts
+    _STATUS_DATA[container_1_role]="App Server"
+
+    # Other containers from /etc/hosts
     local container_count=1
     if [[ -f /etc/hosts ]]; then
         while IFS= read -r line; do
-            # Skip comments, empty lines, and localhost entries
-            [[ "$line" =~ ^# ]] && continue
-            [[ -z "$(echo "$line" | xargs)" ]] && continue
-            [[ "$line" =~ localhost ]] && continue
-            [[ "$line" =~ "ip6-" ]] && continue
-            
+            [[ "$line" =~ ^# || -z "$(echo "$line" | xargs)" ]] && continue
+            [[ "$line" =~ localhost || "$line" =~ "ip6-" ]] && continue
             local ip_addr=$(echo "$line" | awk '{print $1}')
             local hostname_entry=$(echo "$line" | awk '{print $2}')
-            
-            # Skip our own IP
-            [[ "$ip_addr" == "$container_ip" ]] && continue
-            [[ -z "$hostname_entry" ]] && continue
-            
-            # Only count if IP looks like network (192.168.x.x, 10.x.x.x, etc)
+            [[ "$ip_addr" == "$container_ip" || -z "$hostname_entry" ]] && continue
             if [[ "$ip_addr" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
                 ((container_count++))
                 _STATUS_DATA[container_${container_count}_name]="$hostname_entry"
                 _STATUS_DATA[container_${container_count}_ip]="$ip_addr"
+                # Assign role based on hostname pattern
+                local role="Container"
+                [[ "$hostname_entry" == *database* || "$hostname_entry" == *oracle* || "$hostname_entry" == *db* ]] && role="Oracle Database"
+                [[ "$hostname_entry" == *server* || "$hostname_entry" == *app* ]] && role="App Server"
+                _STATUS_DATA[container_${container_count}_role]="$role"
             fi
         done < /etc/hosts
     fi
-    
     _STATUS_DATA[container_count]="$container_count"
+
+    # DNS resolution — check containers from /etc/hosts plus known service hostnames
+    local -a dns_hosts=()
+    for ((i=1; i<=container_count; i++)); do
+        dns_hosts+=("${_STATUS_DATA[container_${i}_name]}")
+    done
+    # Always include known Docker service hostnames (resolve via Docker DNS, not /etc/hosts)
+    local known_services=("sandbox-oracle-database" "sandbox-oracle-server")
+    for svc in "${known_services[@]}"; do
+        local already=0
+        for h in "${dns_hosts[@]}"; do [[ "$h" == "$svc" ]] && already=1; done
+        [[ $already -eq 0 ]] && dns_hosts+=("$svc")
+    done
+
+    local dns_count=0
+    for h in "${dns_hosts[@]}"; do
+        local resolved
+        resolved=$(getent hosts "$h" 2>/dev/null | awk '{print $1}')
+        ((dns_count++))
+        if [[ -n "$resolved" ]]; then
+            _STATUS_DATA[dns_${dns_count}_host]="$h"
+            _STATUS_DATA[dns_${dns_count}_resolved]="$resolved"
+            _STATUS_DATA[dns_${dns_count}_status]="OK"
+        else
+            _STATUS_DATA[dns_${dns_count}_host]="$h"
+            _STATUS_DATA[dns_${dns_count}_resolved]=""
+            _STATUS_DATA[dns_${dns_count}_status]="FAILED"
+        fi
+    done
+    _STATUS_DATA[dns_count]="$dns_count"
+
+    # Port connectivity checks for key services
+    local db_host="${SANDBOX_DB_HOST:-sandbox-oracle-database}"
+    local -A port_checks=(
+        [db_oracle]="${db_host}:1521:Oracle DB"
+        [app_http]="localhost:3000:App Server"
+        [ords_http]="localhost:8080:ORDS/APEX"
+    )
+    local port_idx=0
+    for key in db_oracle app_http ords_http; do
+        IFS=: read -r p_host p_port p_label <<< "${port_checks[$key]}"
+        local p_status="CLOSED"
+        timeout 2 bash -c "</dev/tcp/${p_host}/${p_port}" 2>/dev/null && p_status="OPEN"
+        _STATUS_DATA[port_${port_idx}_label]="$p_label"
+        _STATUS_DATA[port_${port_idx}_host]="$p_host"
+        _STATUS_DATA[port_${port_idx}_port]="$p_port"
+        _STATUS_DATA[port_${port_idx}_status]="$p_status"
+        ((port_idx++))
+    done
+    _STATUS_DATA[port_count]="$port_idx"
+
+    # Listening ports on this container
+    local listening
+    listening=$(netstat -tlnp 2>/dev/null | awk 'NR>2 {print $4}' | grep -oP ':\K[0-9]+' | sort -nu | tr '\n' ',' | sed 's/,$//')
+    _STATUS_DATA[network_listening_ports]="$listening"
 }
 
 # Output status as table (default format) - resource aware
@@ -238,12 +287,44 @@ _status_output_table() {
                 echo -e "  ${CYAN}Driver:${NC}  ${_STATUS_DATA[network_driver]}"
                 echo -e "  ${CYAN}Subnet:${NC}  ${_STATUS_DATA[network_subnet]}"
                 echo -e "  ${CYAN}Gateway:${NC} ${_STATUS_DATA[network_gateway]}"
+                [[ -n "${_STATUS_DATA[network_mtu]}" ]] && echo -e "  ${CYAN}MTU:${NC}     ${_STATUS_DATA[network_mtu]}"
+                echo ""
                 echo -e "  ${CYAN}Containers (${_STATUS_DATA[container_count]}):${NC}"
                 for ((i=1; i<=${_STATUS_DATA[container_count]:-0}; i++)); do
-                    local container_name="${_STATUS_DATA[container_${i}_name]}"
-                    local container_ip="${_STATUS_DATA[container_${i}_ip]}"
-                    [[ -n "$container_name" ]] && echo -e "    • ${CYAN}${container_name}${NC} @ ${container_ip}"
+                    local cname="${_STATUS_DATA[container_${i}_name]}"
+                    local cip="${_STATUS_DATA[container_${i}_ip]}"
+                    local crole="${_STATUS_DATA[container_${i}_role]}"
+                    [[ -n "$cname" ]] && echo -e "    ${GREEN}•${NC} ${CYAN}${cname}${NC} @ ${cip}  ${YELLOW}[${crole}]${NC}"
                 done
+                echo ""
+                echo -e "  ${CYAN}DNS Resolution:${NC}"
+                for ((i=1; i<=${_STATUS_DATA[dns_count]:-0}; i++)); do
+                    local dhost="${_STATUS_DATA[dns_${i}_host]}"
+                    local dresolved="${_STATUS_DATA[dns_${i}_resolved]}"
+                    local dstatus="${_STATUS_DATA[dns_${i}_status]}"
+                    if [[ "$dstatus" == "OK" ]]; then
+                        echo -e "    ${GREEN}✓${NC} ${dhost} → ${dresolved}"
+                    else
+                        echo -e "    ${RED}✗${NC} ${dhost} → unresolvable"
+                    fi
+                done
+                echo ""
+                echo -e "  ${CYAN}Port Connectivity:${NC}"
+                for ((i=0; i<${_STATUS_DATA[port_count]:-0}; i++)); do
+                    local plabel="${_STATUS_DATA[port_${i}_label]}"
+                    local phost="${_STATUS_DATA[port_${i}_host]}"
+                    local pport="${_STATUS_DATA[port_${i}_port]}"
+                    local pstatus="${_STATUS_DATA[port_${i}_status]}"
+                    if [[ "$pstatus" == "OPEN" ]]; then
+                        echo -e "    ${GREEN}✓${NC} ${plabel} (${phost}:${pport}) — OPEN"
+                    else
+                        echo -e "    ${YELLOW}✗${NC} ${plabel} (${phost}:${pport}) — CLOSED"
+                    fi
+                done
+                echo ""
+                if [[ -n "${_STATUS_DATA[network_listening_ports]}" ]]; then
+                    echo -e "  ${CYAN}Listening Ports:${NC} ${_STATUS_DATA[network_listening_ports]}"
+                fi
             else
                 echo -e "  ${RED}✗${NC} Network not found: ${_STATUS_DATA[network_name]}"
             fi
@@ -298,12 +379,44 @@ _status_output_table() {
                 echo -e "  ${CYAN}Driver:${NC}  ${_STATUS_DATA[network_driver]}"
                 echo -e "  ${CYAN}Subnet:${NC}  ${_STATUS_DATA[network_subnet]}"
                 echo -e "  ${CYAN}Gateway:${NC} ${_STATUS_DATA[network_gateway]}"
+                [[ -n "${_STATUS_DATA[network_mtu]}" ]] && echo -e "  ${CYAN}MTU:${NC}     ${_STATUS_DATA[network_mtu]}"
+                echo ""
                 echo -e "  ${CYAN}Containers (${_STATUS_DATA[container_count]}):${NC}"
                 for ((i=1; i<=${_STATUS_DATA[container_count]:-0}; i++)); do
-                    local container_name="${_STATUS_DATA[container_${i}_name]}"
-                    local container_ip="${_STATUS_DATA[container_${i}_ip]}"
-                    [[ -n "$container_name" ]] && echo -e "    • ${CYAN}${container_name}${NC} @ ${container_ip}"
+                    local cname="${_STATUS_DATA[container_${i}_name]}"
+                    local cip="${_STATUS_DATA[container_${i}_ip]}"
+                    local crole="${_STATUS_DATA[container_${i}_role]}"
+                    [[ -n "$cname" ]] && echo -e "    ${GREEN}•${NC} ${CYAN}${cname}${NC} @ ${cip}  ${YELLOW}[${crole}]${NC}"
                 done
+                echo ""
+                echo -e "  ${CYAN}DNS Resolution:${NC}"
+                for ((i=1; i<=${_STATUS_DATA[dns_count]:-0}; i++)); do
+                    local dhost="${_STATUS_DATA[dns_${i}_host]}"
+                    local dresolved="${_STATUS_DATA[dns_${i}_resolved]}"
+                    local dstatus="${_STATUS_DATA[dns_${i}_status]}"
+                    if [[ "$dstatus" == "OK" ]]; then
+                        echo -e "    ${GREEN}✓${NC} ${dhost} → ${dresolved}"
+                    else
+                        echo -e "    ${RED}✗${NC} ${dhost} → unresolvable"
+                    fi
+                done
+                echo ""
+                echo -e "  ${CYAN}Port Connectivity:${NC}"
+                for ((i=0; i<${_STATUS_DATA[port_count]:-0}; i++)); do
+                    local plabel="${_STATUS_DATA[port_${i}_label]}"
+                    local phost="${_STATUS_DATA[port_${i}_host]}"
+                    local pport="${_STATUS_DATA[port_${i}_port]}"
+                    local pstatus="${_STATUS_DATA[port_${i}_status]}"
+                    if [[ "$pstatus" == "OPEN" ]]; then
+                        echo -e "    ${GREEN}✓${NC} ${plabel} (${phost}:${pport}) — OPEN"
+                    else
+                        echo -e "    ${YELLOW}✗${NC} ${plabel} (${phost}:${pport}) — CLOSED"
+                    fi
+                done
+                echo ""
+                if [[ -n "${_STATUS_DATA[network_listening_ports]}" ]]; then
+                    echo -e "  ${CYAN}Listening Ports:${NC} ${_STATUS_DATA[network_listening_ports]}"
+                fi
             else
                 echo -e "  ${RED}✗${NC} Network not found: ${_STATUS_DATA[network_name]}"
             fi
@@ -351,15 +464,34 @@ _status_output_json() {
     printf "    \"driver\": \"%s\",\n" "${_STATUS_DATA[network_driver]}"
     printf "    \"subnet\": \"%s\",\n" "${_STATUS_DATA[network_subnet]}"
     printf "    \"gateway\": \"%s\",\n" "${_STATUS_DATA[network_gateway]}"
-    printf "    \"containers\": ["
-    
+    printf "    \"mtu\": \"%s\",\n" "${_STATUS_DATA[network_mtu]}"
+    printf "    \"listening_ports\": \"%s\",\n" "${_STATUS_DATA[network_listening_ports]}"
+    printf "    \"containers\": [\n"
     local container_count="${_STATUS_DATA[container_count]:-0}"
     for ((i=1; i<=container_count; i++)); do
-        [[ $i -gt 1 ]] && printf ","
-        printf "{\n"
+        [[ $i -gt 1 ]] && printf ",\n"
+        printf "      {\n"
         printf "        \"name\": \"%s\",\n" "${_STATUS_DATA[container_${i}_name]}"
-        printf "        \"ip\": \"%s\"\n" "${_STATUS_DATA[container_${i}_ip]}"
+        printf "        \"ip\": \"%s\",\n" "${_STATUS_DATA[container_${i}_ip]}"
+        printf "        \"role\": \"%s\"\n" "${_STATUS_DATA[container_${i}_role]}"
         printf "      }"
+    done
+    printf "\n    ],\n"
+    printf "    \"dns\": [\n"
+    local dns_count="${_STATUS_DATA[dns_count]:-0}"
+    for ((i=1; i<=dns_count; i++)); do
+        [[ $i -gt 1 ]] && printf ",\n"
+        printf "      { \"host\": \"%s\", \"resolved\": \"%s\", \"status\": \"%s\" }" \
+            "${_STATUS_DATA[dns_${i}_host]}" "${_STATUS_DATA[dns_${i}_resolved]}" "${_STATUS_DATA[dns_${i}_status]}"
+    done
+    printf "\n    ],\n"
+    printf "    \"ports\": [\n"
+    local port_count="${_STATUS_DATA[port_count]:-0}"
+    for ((i=0; i<port_count; i++)); do
+        [[ $i -gt 0 ]] && printf ",\n"
+        printf "      { \"label\": \"%s\", \"host\": \"%s\", \"port\": %s, \"status\": \"%s\" }" \
+            "${_STATUS_DATA[port_${i}_label]}" "${_STATUS_DATA[port_${i}_host]}" \
+            "${_STATUS_DATA[port_${i}_port]}" "${_STATUS_DATA[port_${i}_status]}"
     done
     printf "\n    ]\n"
     printf "  }\n"
@@ -395,11 +527,21 @@ _status_output_csv() {
     printf "network,driver,%s\n" "${_STATUS_DATA[network_driver]}"
     printf "network,subnet,%s\n" "${_STATUS_DATA[network_subnet]}"
     printf "network,gateway,%s\n" "${_STATUS_DATA[network_gateway]}"
-    
+    printf "network,mtu,%s\n" "${_STATUS_DATA[network_mtu]}"
+    printf "network,listening_ports,%s\n" "${_STATUS_DATA[network_listening_ports]}"
     local container_count="${_STATUS_DATA[container_count]:-0}"
     for ((i=1; i<=container_count; i++)); do
         printf "network,container_%s_name,%s\n" "$i" "${_STATUS_DATA[container_${i}_name]}"
         printf "network,container_%s_ip,%s\n" "$i" "${_STATUS_DATA[container_${i}_ip]}"
+        printf "network,container_%s_role,%s\n" "$i" "${_STATUS_DATA[container_${i}_role]}"
+    done
+    local dns_count="${_STATUS_DATA[dns_count]:-0}"
+    for ((i=1; i<=dns_count; i++)); do
+        printf "network,dns_%s,%s->%s(%s)\n" "$i" "${_STATUS_DATA[dns_${i}_host]}" "${_STATUS_DATA[dns_${i}_resolved]}" "${_STATUS_DATA[dns_${i}_status]}"
+    done
+    local port_count="${_STATUS_DATA[port_count]:-0}"
+    for ((i=0; i<port_count; i++)); do
+        printf "network,port_%s,%s:%s(%s)\n" "${_STATUS_DATA[port_${i}_label]}" "${_STATUS_DATA[port_${i}_host]}" "${_STATUS_DATA[port_${i}_port]}" "${_STATUS_DATA[port_${i}_status]}"
     done
 }
 
