@@ -181,6 +181,16 @@ check_apex_health() {
     _out "\e[1mAPEX/ORDS Status:\e[0m"
     _out "${BLUE}$(date '+%Y-%m-%d %H:%M:%S')${NC} Check Oracle APEX and ORDS availability"
 
+    # If ORDS has never been configured, skip without failing
+    local ords_config_dir="/opt/oracle/ords/config"
+    if [[ ! -d "$ords_config_dir" || -z "$(ls -A "$ords_config_dir" 2>/dev/null)" ]]; then
+        _out " - APEX/ORDS: ${YELLOW}⚠ NOT CONFIGURED${NC}"
+        _out "   ${CYAN}Tip: Run 'sandbox install apex' to configure APEX and ORDS${NC}"
+        RESULT_STATUS[apex_ords]="NOT_CONFIGURED"
+        RESULT_DETAIL[apex_ords]="ords=not_configured"
+        return 0
+    fi
+
     local ords_running=false apex_accessible=false
     local port_check=$(netstat -tulpn 2>/dev/null | grep ":8080.*LISTEN" | grep -o "LISTEN")
 
@@ -189,9 +199,9 @@ check_apex_health() {
         local ords_pid=$(netstat -tulpn 2>/dev/null | grep ":8080.*LISTEN" | awk '{print $NF}' | cut -d'/' -f1)
         _out " - ORDS Process: ${GREEN}✓ RUNNING${NC} (PID: $ords_pid)"
     else
-        _out " - ORDS Process: ${YELLOW}⚠ NOT RUNNING${NC}"
-        _out "   ${CYAN}Tip: Start with 'docker exec demasy-server start-ords'${NC}"
-        RESULT_STATUS[apex_ords]="WARN"
+        _out " - ORDS Process: ${RED}✗ NOT RUNNING${NC}"
+        _out "   ${CYAN}Tip: Start with 'sandbox run ords'${NC}"
+        RESULT_STATUS[apex_ords]="FAILED"
         RESULT_DETAIL[apex_ords]="ords=not_running"
         return 1
     fi
