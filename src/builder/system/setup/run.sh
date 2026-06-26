@@ -9,4 +9,4 @@ $SETUP/setup-sql.sh
 $SETUP/create-symlinks.sh
 $SETUP/patch-mcp.sh
 $SETUP/create-os-user.sh
-$CLI/setup-shell-profile.sh
+$SETUP/install-cli-aliases.sh
