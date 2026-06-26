@@ -111,7 +111,7 @@ case "$RESOURCE" in
         ;;
     healthcheck)
         log_step "Running healthcheck..."
-        bash /usr/sandbox/app/system/admin/healthcheck.sh
+        bash /usr/sandbox/app/system/admin/healthcheck.sh $PARAMS
         ;;
     monitor)
         # Get available monitoring scripts

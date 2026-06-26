@@ -52,6 +52,7 @@ COPY ./src/builder/system/cli/sandbox-completion.zsh     ${SANDBOX_SYSTEM}/cli/
 COPY ./src/builder/system/utils/*.sh                     ${SANDBOX_SYSTEM}/utils/
 COPY ./src/builder/system/build/*.sh                     ${SANDBOX_SYSTEM}/build/
 COPY ./src/builder/system/setup/*.sh                     ${SANDBOX_SYSTEM}/setup/
+COPY ./src/builder/system/admin/*.sh                     ${SANDBOX_SYSTEM}/admin/
 
 COPY ./src/builder/scripts/download/*.sh                 ${SANDBOX_APP}/download/
 COPY ./src/builder/scripts/install/oracle/*.sh           ${SANDBOX_APP}/install/oracle/
