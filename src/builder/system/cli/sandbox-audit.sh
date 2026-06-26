@@ -233,8 +233,12 @@ _audit_rollback() {
     
     _log "info" "Executing rollback: $rollback_cmd"
     
-    # Execute rollback command
-    if eval "$rollback_cmd"; then
+    # Execute rollback command (whitelist-only)
+    case "$rollback_cmd" in
+        sandbox\ *|sb\ *|sql\ *|sqlcl\ *|sqlplus\ *) : ;;
+        *) _log "error" "Blocked unsafe rollback command: $rollback_cmd"; return 1 ;;
+    esac
+    if bash -c "$rollback_cmd"; then
         _log "success" "Rollback completed successfully"
         _audit_log_operation "rollback" "system" "rollback_id=$entry_id" "${USER}" "success"
         return 0
