@@ -9,7 +9,7 @@ set -euo pipefail
 
 # Source configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLI_DIR="${SCRIPT_DIR%/scripts/cli}"  # Go up to CLI root
+CLI_DIR="${SCRIPT_DIR%/system/cli}"  # Go up to CLI root
 source "${CLI_DIR}/sandbox-config.sh"
 
 # Test configuration
