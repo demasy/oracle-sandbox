@@ -13,7 +13,7 @@ _sandbox_completion() {
 
     # Define actions and their resources
     local actions="run status start stop restart install uninstall download conn logs export import batch monitor audit template help shell"
-    local run_resources="sqlcl mcp healthcheck monitor"
+    local run_resources="sqlcl mcp healthcheck script"
     local status_resources="database apex mcp network all"
     local start_resources="apex mcp"
     local stop_resources="apex mcp"

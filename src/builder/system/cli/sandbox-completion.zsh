@@ -35,7 +35,7 @@ _sandbox() {
         'sqlcl:Connect to database with SQLcl'
         'mcp:Start MCP server'
         'healthcheck:Run health checks'
-        'monitor:Execute monitoring scripts'
+        'script:Execute oracle admin scripts'
     )
 
     status_resources=(

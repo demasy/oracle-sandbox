@@ -113,8 +113,8 @@ case "$RESOURCE" in
         log_step "Running healthcheck..."
         bash /usr/sandbox/app/system/admin/healthcheck.sh $PARAMS
         ;;
-    monitor)
-        # Get available monitoring scripts
+    script)
+        # Get available oracle admin scripts
         MONITOR_SCRIPT="${PARAMS%% *}"
         MONITOR_DIR="/usr/sandbox/app/oracle/admin/monitoring"
         
@@ -130,8 +130,8 @@ case "$RESOURCE" in
                     _idx=$(( _idx + 1 ))
                 done
                 echo ""
-                echo -e "  ${YELLOW}Usage:${NC} ${CYAN}sandbox run monitor <script-name>${NC}"
-                echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox run monitor active-connections${NC}"
+                echo -e "  ${YELLOW}Usage:${NC} ${CYAN}sandbox run script <script-name>${NC}"
+                echo -e "  ${YELLOW}Example:${NC} ${CYAN}sandbox run script active-connections${NC}"
                 echo ""
             else
                 log_error "Monitoring scripts directory not found: $MONITOR_DIR"

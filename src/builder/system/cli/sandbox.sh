@@ -63,7 +63,7 @@ print_usage() {
     echo -e "           sandbox <action> <resource> -h | --help"
     echo ""
     echo -e "  ${YELLOW}Actions & Resources:${NC}"
-    echo -e "    ${CYAN}run${NC}        sqlcl | mcp | healthcheck | monitor"
+    echo -e "    ${CYAN}run${NC}        sqlcl | mcp | healthcheck | script"
     echo -e "    ${CYAN}status${NC}     database | apex | mcp | all"
     echo -e "    ${CYAN}conn${NC}       list | add | delete | rename | test"
     echo -e "    ${CYAN}logs${NC}       apex | install | ords | startup | mcp | all"
