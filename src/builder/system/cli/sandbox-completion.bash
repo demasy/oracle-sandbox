@@ -20,7 +20,7 @@ _sandbox_completion() {
     local restart_resources="apex mcp"
     local install_resources="apex"
     local uninstall_resources="apex"
-    local download_resources="apex ords"
+    local download_resources="apex"
     local conn_resources="list add delete test rename"
     local logs_resources="apex install ords startup mcp all"
     local export_resources="config connections all"

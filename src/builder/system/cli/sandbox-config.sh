@@ -9,7 +9,7 @@ VALID_SQLCL_USERS="sys system sandbox sandbox_ai demasy demasy_ai"
 # ─── Action & Resource Definitions ────────────────────────────────────────────
 # Maps actions → valid resources (replaces inline resources_for() function)
 declare -A SANDBOX_RESOURCES=(
-    [download]="apex ords"
+    [download]="apex"
     [install]="apex"
     [uninstall]="apex"
     [start]="apex mcp"

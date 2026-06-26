@@ -64,8 +64,7 @@ _sandbox() {
     install_resources=('apex:Install APEX')
     uninstall_resources=('apex:Uninstall APEX')
     download_resources=(
-        'apex:Download APEX'
-        'ords:Download ORDS'
+        'apex:Download APEX + ORDS'
     )
 
     conn_resources=(

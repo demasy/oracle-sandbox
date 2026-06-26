@@ -72,7 +72,7 @@ print_usage() {
     echo -e "    ${CYAN}restart${NC}    apex | mcp"
     echo -e "    ${CYAN}install${NC}    apex"
     echo -e "    ${CYAN}uninstall${NC}  apex"
-    echo -e "    ${CYAN}download${NC}   apex | ords"
+    echo -e "    ${CYAN}download${NC}   apex"
     echo -e "    ${CYAN}export${NC}     config | connections | all"
     echo -e "    ${CYAN}import${NC}     config | connections | all"
     echo -e "    ${CYAN}batch${NC}      apply-connections | apply-commands | execute"
