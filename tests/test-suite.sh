@@ -5,7 +5,7 @@
 # Usage: bash test-suite.sh [test-name] [--verbose] [--quiet]
 # ─────────────────────────────────────────────────────────────────────────────
 
-set -euo pipefail
+set -uo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SANDBOX_SCRIPT="$TEST_DIR/../app.js"  # Adjust path to actual sandbox entry
@@ -39,13 +39,12 @@ assert_success() {
     if output=$(eval "$cmd" 2>&1); then
         ((PASS_COUNT++))
         [[ $QUIET -eq 0 ]] && echo "✓ $test_name"
-        return 0
     else
         ((FAIL_COUNT++))
         echo "✗ $test_name"
         [[ $VERBOSE -eq 1 ]] && echo "  Error: $output"
-        return 1
     fi
+    return 0
 }
 
 assert_failure() {
@@ -65,11 +64,11 @@ assert_failure() {
             return 0
         fi
     fi
-    
+
     ((FAIL_COUNT++))
     echo "✗ $test_name"
     [[ $VERBOSE -eq 1 ]] && echo "  Expected failure with: $expected_error, got: $output"
-    return 1
+    return 0
 }
 
 assert_contains() {
@@ -277,12 +276,74 @@ test_integration() {
 
 # ─── Main Test Runner ────────────────────────────────────────────────────────
 
+# ─── Container Smoke Tests ────────────────────────────────────────────────────
+# Requires sandbox-oracle-server container to be running.
+# Skipped automatically if the container is not found.
+
+_dexec() {
+    docker exec --user sandbox sandbox-oracle-server bash -c "$1" 2>/dev/null
+}
+
+test_container_smoke() {
+    echo ""
+    echo "=== Container Smoke Tests ==="
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping container tests"
+        return 0
+    fi
+
+    # CLI help
+    assert_success "sb help exits 0" \
+        "_dexec 'sb help > /dev/null'"
+
+    assert_success "sb backup -h shows resources" \
+        "_dexec 'sb backup -h' | grep -q 'connections'"
+
+    assert_success "sb restore -h shows --from param" \
+        "_dexec 'sb restore connections -h' | grep -q '\-\-from'"
+
+    # Input validation: reject bad connection names
+    assert_failure "conn add rejects path-traversal name" \
+        "_dexec 'sb conn add --name \"../../etc\" --user sys 2>&1'" \
+        "invalid characters"
+
+    assert_failure "conn rename rejects slash in --from" \
+        "_dexec 'sb conn rename --from \"a/b\" --to ok 2>&1'" \
+        "invalid characters"
+
+    # JSON export outputs valid JSON
+    local conn_json
+    conn_json=$(_dexec 'SANDBOX_QUIET=1 sb conn list --export json' 2>/dev/null || echo '{}')
+    assert_contains "conn list --export json has connections key" \
+        "$conn_json" '"connections"'
+
+    # Healthcheck JSON
+    local hc_json
+    hc_json=$(_dexec 'bash /usr/sandbox/app/system/admin/healthcheck.sh --export json' 2>/dev/null || echo '{}')
+    assert_contains "healthcheck --export json has status key" \
+        "$hc_json" '"status"'
+    assert_contains "healthcheck reports HEALTHY" \
+        "$hc_json" 'HEALTHY'
+
+    # Backup list runs without error
+    assert_success "sb backup list exits 0" \
+        "_dexec 'sb backup list'"
+
+    # Audit logging: run a command then verify it was logged
+    _dexec 'sb conn list' >/dev/null 2>&1 || true
+    local audit_out
+    audit_out=$(_dexec 'sb audit list' 2>/dev/null || echo '')
+    assert_contains "audit log records conn action" \
+        "$audit_out" 'ACTION: conn'
+}
+
 main() {
     echo ""
     echo "╔═════════════════════════════════════════════════════════════════╗"
     echo "║           SANDBOX CLI TEST SUITE - COMPREHENSIVE                 ║"
     echo "╚═════════════════════════════════════════════════════════════════╝"
-    
+
     # Run test groups
     test_parameter_parsing
     test_help_system
@@ -294,6 +355,7 @@ main() {
     test_monitoring
     test_error_handling
     test_integration
+    test_container_smoke
     
     # Print summary
     echo ""
