@@ -21,6 +21,9 @@ LOGS_INSTALL=(
 LOGS_STARTUP=(
     "/tmp/auto-user-setup.log"
 )
+LOGS_MCP=(
+    "${SANDBOX_LOG_PATHS[mcp]:-/tmp/sqlcl_mcp.log}"
+)
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -98,9 +101,8 @@ _logs_do_startup() {
 _logs_do_mcp() {
     log_step "MCP log"
     echo ""
-    log_info "MCP server does not write a log file."
-    echo -e "  ${YELLOW}Tip:${NC} Run ${CYAN}sandbox run mcp${NC} in the foreground to see output."
-    echo ""
+    local mcp_log="${SANDBOX_LOG_PATHS[mcp]:-/tmp/sqlcl_mcp.log}"
+    _logs_print_file "$mcp_log" "$LOGS_LINES" "$LOGS_FOLLOW"
 }
 
 _logs_do_all() {
@@ -109,7 +111,7 @@ _logs_do_all() {
     if [[ "$LOGS_FOLLOW" == "true" ]]; then
         # Multiplex all log files into one stream with file labels
         local _all_files=()
-        for f in "${LOGS_STARTUP[@]}" "${LOGS_INSTALL[@]}" "${LOGS_ORDS[@]}"; do
+        for f in "${LOGS_STARTUP[@]}" "${LOGS_INSTALL[@]}" "${LOGS_ORDS[@]}" "${LOGS_MCP[@]}"; do
             [[ -f "$f" ]] && _all_files+=("$f")
         done
         if [[ ${#_all_files[@]} -eq 0 ]]; then
@@ -121,7 +123,7 @@ _logs_do_all() {
             { print "  \033[36m[" file "]\033[0m " $0 }
         '
     else
-        for f in "${LOGS_STARTUP[@]}" "${LOGS_INSTALL[@]}" "${LOGS_ORDS[@]}"; do
+        for f in "${LOGS_STARTUP[@]}" "${LOGS_INSTALL[@]}" "${LOGS_ORDS[@]}" "${LOGS_MCP[@]}"; do
             _logs_print_file "$f" "$LOGS_LINES" "false"
         done
     fi

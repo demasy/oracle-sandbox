@@ -100,19 +100,23 @@ _check_apex_status() {
 # Check MCP server status
 _check_mcp_status() {
     local pid
-    pid=$(pgrep -f "sql.*-mcp" 2>/dev/null | head -1 || true)
-    
+    pid=$(pgrep -f "SqlCli.*-mcp" 2>/dev/null | head -1 || true)
+
     if [[ -n "$pid" ]]; then
         _STATUS_DATA[mcp_pid]="$pid"
         _STATUS_DATA[mcp_process_status]="OK"
-        
-        # Get connection name
-        local conn_name
-        conn_name=$(ps -p "$pid" -o args= 2>/dev/null | grep -oP '(?<=-mcp )\S+' || true)
-        [[ -n "$conn_name" ]] && _STATUS_DATA[mcp_connection]="$conn_name"
+
+        # Read connection name from state file written by sb start mcp
+        local state_file="/tmp/sandbox_mcp.state"
+        if [[ -f "$state_file" ]]; then
+            local conn_name
+            conn_name=$(sed -n '2p' "$state_file" 2>/dev/null || true)
+            [[ -n "$conn_name" ]] && _STATUS_DATA[mcp_connection]="$conn_name"
+        fi
     else
         _STATUS_DATA[mcp_process_status]="FAIL"
         _STATUS_LAST_ERROR="MCP process not running"
+        rm -f /tmp/sandbox_mcp.state
         return 1
     fi
 }

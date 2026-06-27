@@ -13,16 +13,21 @@ case "$RESOURCE" in
     mcp)
         _if_dry_run "Would stop MCP server" && exit 0
         log_step "Stopping MCP server..."
-        _mcp_pid=$(pgrep -f "sql.*-mcp" 2>/dev/null | head -1)
-        if [[ -z "$_mcp_pid" ]]; then
+        MCP_STATE="/tmp/sandbox_mcp.state"
+        _mcp_pids=$(pgrep -f "SqlCli.*-mcp" 2>/dev/null || true)
+        if [[ -z "$_mcp_pids" ]]; then
             log_info "MCP server is not running"
+            rm -f "$MCP_STATE"
         else
-            kill "$_mcp_pid" 2>/dev/null
+            for _pid in $_mcp_pids; do
+                kill "$_pid" 2>/dev/null || true
+            done
             sleep 1
-            if kill -0 "$_mcp_pid" 2>/dev/null; then
-                kill -9 "$_mcp_pid" 2>/dev/null
-            fi
-            log_success "MCP server stopped (PID: $_mcp_pid)"
+            for _pid in $_mcp_pids; do
+                kill -0 "$_pid" 2>/dev/null && kill -9 "$_pid" 2>/dev/null || true
+            done
+            rm -f "$MCP_STATE"
+            log_success "MCP server stopped (PIDs: $(echo $_mcp_pids | tr '\n' ' '))"
         fi
         ;;
 esac

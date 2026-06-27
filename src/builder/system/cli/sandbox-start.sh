@@ -38,12 +38,32 @@ case "$RESOURCE" in
             exit ${EXIT_USAGE:-1}
         fi
 
-        if $MCP_DEFAULT; then
-            log_step "Starting MCP server with default saved connection..."
-            bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh
-        elif [[ -n "$MCP_CONN" ]]; then
-            log_step "Starting MCP server with saved connection: ${MCP_CONN}..."
-            bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh "$MCP_CONN"
+        MCP_LOG="${SANDBOX_LOG_PATHS[mcp]:-/tmp/sqlcl_mcp.log}"
+        MCP_STATE="/tmp/sandbox_mcp.state"
+
+        # Reject if already running
+        if pgrep -f "SqlCli.*-mcp" >/dev/null 2>&1; then
+            log_info "MCP server is already running"
+            exit 0
+        fi
+
+        [[ -z "$MCP_CONN" ]] && MCP_CONN="sandbox-ai-conn"
+        log_step "Starting MCP server with connection: ${MCP_CONN}..."
+
+        nohup bash /usr/sandbox/app/oracle/mcp/start-mcp-with-saved-connection.sh "$MCP_CONN" \
+            >>"$MCP_LOG" 2>&1 &
+        _WRAPPER_PID=$!
+        sleep 2
+
+        # The wrapper uses `exec sql -mcp` — after exec, the Java process takes over.
+        # Find the actual Java MCP PID.
+        MCP_PID=$(pgrep -f "SqlCli.*-mcp" 2>/dev/null | head -1)
+        if [[ -n "$MCP_PID" ]]; then
+            printf '%s\n%s\n' "$MCP_PID" "$MCP_CONN" > "$MCP_STATE"
+            log_success "MCP server started (PID ${MCP_PID}, conn: ${MCP_CONN}) — logs: ${MCP_LOG}"
+        else
+            log_error "MCP server failed to start — check: ${MCP_LOG}"
+            exit ${EXIT_SERVICE:-4}
         fi
         ;;
     apex)
