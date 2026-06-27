@@ -17,16 +17,16 @@ _parse_flag_with_value() {
     if [[ -z "$value" ]]; then
         # If this is an optional parameter, allow it
         if [[ "$optional" == "optional" ]]; then
-            eval "${var_name}=\"\""
+            printf -v "$var_name" '%s' ""
             return 0
         fi
         # Otherwise fail - required parameter missing
         log_error "Flag '${flag}' requires a value"
         return 1
     fi
-    
+
     # Store the value in the variable
-    eval "${var_name}=\"${value}\""
+    printf -v "$var_name" '%s' "$value"
     return 0
 }
 
@@ -40,7 +40,7 @@ _parse_flag_standalone() {
     local param_name="$4"
     
     if [[ "$current_flag" == "$short_flag" || "$current_flag" == "$long_flag" ]]; then
-        eval "${param_name}_FLAG=true"
+        printf -v "${param_name}_FLAG" '%s' "true"
         return 0
     fi
     return 1
@@ -92,8 +92,8 @@ _if_dry_run() {
 _get_param() {
     local param_name="$1"
     local default_value="$2"
-    local param_value=$(eval echo "\${${param_name}:-}")
-    
+    local param_value="${!param_name}"
+
     if [[ -z "$param_value" ]]; then
         echo "$default_value"
     else
@@ -216,4 +216,25 @@ _show_format_help() {
     _show_param_help "-f" "--format json" "Output as JSON (machine-readable)"
     _show_param_help "" "--format csv" "Output as CSV (spreadsheet-compatible)"
     _show_param_help "" "--format table" "Output as table (human-readable, default)"
+}
+
+# Validate a connection name: only [a-zA-Z0-9_-], max 64 chars
+# Usage: _validate_conn_name "$NAME" "--name"
+_validate_conn_name() {
+    local value="$1"
+    local flag="${2:---name}"
+    if [[ -z "$value" ]]; then
+        log_error "${flag} value cannot be empty"
+        return 1
+    fi
+    if [[ ${#value} -gt 64 ]]; then
+        log_error "${flag} value too long (max 64 chars): '${value}'"
+        return 1
+    fi
+    if [[ ! "$value" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+        log_error "${flag} contains invalid characters: '${value}'"
+        echo -e "  ${YELLOW}Allowed:${NC} letters, digits, hyphens, underscores only"
+        return 1
+    fi
+    return 0
 }

@@ -129,6 +129,7 @@ _conn_do_add() {
     done
 
     _require_param_flag "$CONN_NAME" "--name" "sandbox conn add" || exit ${EXIT_USAGE:-1}
+    _validate_conn_name "$CONN_NAME" "--name" || exit ${EXIT_USAGE:-1}
     _require_param_flag "$CONN_USER" "--user" "sandbox conn add" || exit ${EXIT_USAGE:-1}
 
     CONN_PASS="${CONN_PASS:-${SANDBOX_DB_PASSWORD}}"
@@ -180,6 +181,7 @@ _conn_do_delete() {
     done
 
     _require_param_flag "$CONN_NAME" "--name" "sandbox conn delete" || exit ${EXIT_USAGE:-1}
+    _validate_conn_name "$CONN_NAME" "--name" || exit ${EXIT_USAGE:-1}
 
     local conn_dir
     conn_dir=$(_conn_find_dir "$CONN_NAME")
@@ -214,6 +216,7 @@ _conn_do_test() {
     done
 
     _require_param_flag "$CONN_NAME" "--name" "sandbox conn test" || exit ${EXIT_USAGE:-1}
+    _validate_conn_name "$CONN_NAME" "--name" || exit ${EXIT_USAGE:-1}
 
     local conn_dir
     conn_dir=$(_conn_find_dir "$CONN_NAME")
@@ -262,7 +265,9 @@ _conn_do_rename() {
     done
 
     _require_param_flag "$CONN_FROM" "--from" "sandbox conn rename" || exit ${EXIT_USAGE:-1}
+    _validate_conn_name "$CONN_FROM" "--from" || exit ${EXIT_USAGE:-1}
     _require_param_flag "$CONN_TO" "--to" "sandbox conn rename" || exit ${EXIT_USAGE:-1}
+    _validate_conn_name "$CONN_TO" "--to" || exit ${EXIT_USAGE:-1}
 
     local conn_dir
     conn_dir=$(_conn_find_dir "$CONN_FROM")
@@ -279,7 +284,10 @@ _conn_do_rename() {
     fi
 
     local props="${conn_dir}/dbtools.properties"
-    sed -i "s/^name=${CONN_FROM}$/name=${CONN_TO}/" "$props"
+    local escaped_from escaped_to
+    escaped_from=$(printf '%s' "$CONN_FROM" | sed 's/[[\.*^$()+?{}|/\\]/\\&/g')
+    escaped_to=$(printf '%s' "$CONN_TO" | sed 's/[&/\\]/\\&/g')
+    sed -i "s/^name=${escaped_from}$/name=${escaped_to}/" "$props"
     log_success "Connection renamed: '${CONN_FROM}' → '${CONN_TO}'"
 }
 
