@@ -16,19 +16,28 @@ HELP_KEYWORD="${2:-}"
 _help_search_by_keyword() {
     local keyword="$1"
     local matches=""
-    
-    # Check if keyword exists in SANDBOX_HELP_KEYWORDS
+
+    # 1. Exact keyword map hit
     if [[ -n "${SANDBOX_HELP_KEYWORDS[$keyword]:-}" ]]; then
         matches="${SANDBOX_HELP_KEYWORDS[$keyword]}"
-    else
-        # Fuzzy match against keywords (prefix match)
-        for kw in "${!SANDBOX_HELP_KEYWORDS[@]}"; do
-            if [[ "$kw" == "${keyword}"* || "$kw" == *"${keyword}"* ]]; then
-                matches="$matches ${SANDBOX_HELP_KEYWORDS[$kw]}"
+    fi
+
+    # 2. Prefix/substring match in keyword map
+    for kw in "${!SANDBOX_HELP_KEYWORDS[@]}"; do
+        if [[ "$kw" != "$keyword" && ( "$kw" == "${keyword}"* || "$kw" == *"${keyword}"* ) ]]; then
+            matches="$matches ${SANDBOX_HELP_KEYWORDS[$kw]}"
+        fi
+    done
+
+    # 3. Fallback: scan SANDBOX_HELP_SHORT keys for action:resource containing the keyword
+    if [[ -z "${matches// /}" ]]; then
+        for cmd in "${!SANDBOX_HELP_SHORT[@]}"; do
+            if [[ "$cmd" == *"$keyword"* ]]; then
+                matches="$matches $cmd"
             fi
         done
     fi
-    
+
     echo "$matches"
 }
 
@@ -62,33 +71,40 @@ fi
 # ─── Display help ─────────────────────────────────────────────────────────────
 
 if [[ -z "$search_term" ]]; then
-    # No search term — show all categories
     echo ""
-    echo -e "  ${WHITE}Sandbox CLI Help${NC} — Commands by category"
+    echo -e "  ${WHITE}Oracle Sandbox CLI${NC} — Command Reference"
+    echo -e "  ${WHITE}─────────────────────────────────────────────────${NC}"
     echo ""
-    
+
     for category_line in "${SANDBOX_HELP_CATEGORIES[@]}"; do
-        category_name="${category_line%%:*}"
-        commands="${category_line##*:}"
-        
+        category_name="${category_line%%:  *}"
+        commands="${category_line#*:  }"
+
         echo -e "  ${YELLOW}${category_name}${NC}"
         for cmd in $commands; do
-            _help_display_command "$cmd"
+            action="${cmd%%:*}"
+            resource="${cmd##*:}"
+            desc="${SANDBOX_HELP_SHORT[$cmd]:-}"
+            [[ -z "$desc" ]] && desc="${SANDBOX_HELP_SHORT[$action]:-}"
+            if [[ "$resource" == "$action" ]]; then
+                printf "    ${CYAN}%-18s${NC}  %s\n" "sb ${action}" "$desc"
+            else
+                printf "    ${CYAN}%-18s${NC}  %s\n" "sb ${action} ${resource}" "$desc"
+            fi
         done
         echo ""
     done
-    
-    echo -e "  ${WHITE}Aliases:${NC}"
-    for alias in "${!SANDBOX_ALIASES[@]}"; do
-        target="${SANDBOX_ALIASES[$alias]}"
-        echo -e "    ${CYAN}${alias}${NC} → ${target}"
+
+    echo -e "  ${WHITE}Aliases${NC}"
+    for alias in sb sr sc sl ss si sk sp sx; do
+        target="${SANDBOX_ALIASES[$alias]:-}"
+        [[ -n "$target" ]] && printf "    ${CYAN}%-4s${NC}  →  %s\n" "$alias" "$target"
     done
     echo ""
-    echo -e "  ${WHITE}Usage:${NC}"
-    echo -e "    ${CYAN}sandbox help${NC}                        Show this help"
-    echo -e "    ${CYAN}sandbox help search <keyword>${NC}        Find commands by keyword"
-    echo -e "    ${CYAN}sandbox <action> -h${NC}                  Show action help"
-    echo -e "    ${CYAN}sandbox <action> <resource> -h${NC}       Show resource help"
+    echo -e "  ${WHITE}Tips${NC}"
+    echo -e "    ${CYAN}sb help search <keyword>${NC}      Find commands by keyword"
+    echo -e "    ${CYAN}sb <action> -h${NC}                Action-level help"
+    echo -e "    ${CYAN}sb <action> <resource> -h${NC}     Resource-level help"
     echo ""
     
 else
@@ -103,11 +119,15 @@ else
         echo -e "  ${YELLOW}No commands found for '${search_term}'${NC}"
         echo ""
         echo -e "  ${WHITE}Try searching for:${NC}"
-        echo -e "    sql, database, connection, connect, mcp, apex, ords"
-        echo -e "    web, http, start, stop, restart, service"
-        echo -e "    status, health, monitor, dashboard, performance"
-        echo -e "    log, logs, debug, error, trace"
-        echo -e "    install, setup, deploy"
+        echo -e "    ${CYAN}Connections:${NC}   sqlcl, conn, connection, mcp"
+        echo -e "    ${CYAN}Services:${NC}      apex, ords, start, stop, restart"
+        echo -e "    ${CYAN}Status:${NC}        status, health, healthcheck, network"
+        echo -e "    ${CYAN}Logs:${NC}          logs, startup, debug, error"
+        echo -e "    ${CYAN}Install:${NC}       install, download, deploy, setup"
+        echo -e "    ${CYAN}Backup:${NC}        backup, restore, schemas, full"
+        echo -e "    ${CYAN}Data:${NC}          export, import"
+        echo -e "    ${CYAN}Audit:${NC}         audit, rollback"
+        echo -e "    ${CYAN}Automation:${NC}    batch, template, monitor, script"
         echo ""
     else
         # Display results (deduplicate by checking if cmd already printed)
