@@ -54,23 +54,23 @@ RUN apt-get update -o Acquire::AllowDownsideGradedSecurityCertificates=true -o A
     openssl \
     git && \
   npm install -g nodemon && \
-  rm -rf /var/lib/apt/lists/*
-
-# Create application directories
-RUN mkdir -p /usr/sandbox/app \
-  /usr/sandbox/app/cli \
-  /usr/sandbox/app/system/utils \
-  /usr/sandbox/app/system/admin \
-  /usr/sandbox/app/system/download \
-  /usr/sandbox/app/system/install \
-  /usr/sandbox/app/oracle/admin \
-  /usr/sandbox/app/oracle/mcp \
-  /usr/sandbox/app/oracle/apex \
-  /usr/sandbox/app/oracle/sqlcl \
-  /usr/sandbox/app/oracle/sqlplus \
-  /opt/oracle/instantclient \
-  /opt/oracle/apex \
-  /opt/oracle/ords
+  rm -rf /var/lib/apt/lists/* && \
+  groupadd -g 10001 sandbox && \
+  useradd -u 10001 -g 10001 -m -s /bin/bash sandbox && \
+  mkdir -p /usr/sandbox/app \
+      /usr/sandbox/app/cli \
+      /usr/sandbox/app/system/utils \
+      /usr/sandbox/app/system/admin \
+      /usr/sandbox/app/system/download \
+      /usr/sandbox/app/system/install \
+      /usr/sandbox/app/oracle/admin \
+      /usr/sandbox/app/oracle/mcp \
+      /usr/sandbox/app/oracle/apex \
+      /usr/sandbox/app/oracle/sqlcl \
+      /usr/sandbox/app/oracle/sqlplus \
+      /opt/oracle/instantclient \
+      /opt/oracle/apex \
+      /opt/oracle/ords
 
 # Copy application files
 WORKDIR /usr/sandbox/app
@@ -141,6 +141,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
 WORKDIR /usr/sandbox/app
+
+USER sandbox
 
 # Start the management server
 CMD ["node", "app.js"]

@@ -12,5 +12,5 @@ chown -R sandbox:sandbox /usr/sandbox/app /home/sandbox/.dbtools /home/oracle/lo
 chmod -R o+r /opt/oracle/sqlcl/lib
 chmod o+x /opt/oracle/sqlcl/bin/sql
 chmod -R o+rX /opt/oracle/apex
-# Grant write access to ORDS config directory so sandbox user can install/configure ORDS
-chmod -R o+rwX /opt/oracle/ords
+# Transfer ORDS directory ownership to sandbox so it can install/configure ORDS
+chown -R sandbox:sandbox /opt/oracle/ords
