@@ -278,6 +278,10 @@ _audit_stats() {
 }
 
 # ─── Dispatch ─────────────────────────────────────────────────────────────────
+# Guard: only dispatch when this script is the intended action, not when sourced
+# by sandbox.sh's audit hook to access _audit_log_operation.
+
+[[ "${ACTION:-}" != "audit" ]] && return 0
 
 # Parse parameters
 _search_criteria=$(_parse_param_value "--search" $PARAMS)
