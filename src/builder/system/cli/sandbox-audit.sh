@@ -70,14 +70,14 @@ _audit_list() {
 _audit_show() {
     local entry_id="$1"
     
-    [[ -z "$entry_id" ]] && _log "error" "Entry ID required" && return 1
+    [[ -z "$entry_id" ]] && log_error "Entry ID required" && return 1
     
     local action_file="$AUDIT_ACTIONS_DIR/${entry_id}.action"
     
     if [[ -f "$action_file" ]]; then
         cat "$action_file"
     else
-        _log "error" "Audit entry not found: $entry_id"
+        log_error "Audit entry not found: $entry_id"
         return 1
     fi
 }
@@ -214,12 +214,12 @@ _audit_export() {
 _audit_rollback() {
     local entry_id="$1"
     
-    [[ -z "$entry_id" ]] && _log "error" "Entry ID required for rollback" && return 1
+    [[ -z "$entry_id" ]] && log_error "Entry ID required for rollback" && return 1
     
     local action_file="$AUDIT_ACTIONS_DIR/${entry_id}.action"
     
     if [[ ! -f "$action_file" ]]; then
-        _log "error" "Rollback file not found for entry: $entry_id"
+        log_error "Rollback file not found for entry: $entry_id"
         return 1
     fi
     
@@ -227,23 +227,23 @@ _audit_rollback() {
     local rollback_cmd=$(grep -oP '(?<="rollback_cmd": ")[^"]+' "$action_file")
     
     if [[ -z "$rollback_cmd" ]]; then
-        _log "warn" "No rollback command available for entry: $entry_id"
+        log_warn "No rollback command available for entry: $entry_id"
         return 1
     fi
     
-    _log "info" "Executing rollback: $rollback_cmd"
+    log_info "Executing rollback: $rollback_cmd"
     
     # Execute rollback command (whitelist-only)
     case "$rollback_cmd" in
         sandbox\ *|sb\ *|sql\ *|sqlcl\ *|sqlplus\ *) : ;;
-        *) _log "error" "Blocked unsafe rollback command: $rollback_cmd"; return 1 ;;
+        *) log_error "Blocked unsafe rollback command: $rollback_cmd"; return 1 ;;
     esac
     if bash -c "$rollback_cmd"; then
-        _log "success" "Rollback completed successfully"
+        log_success "Rollback completed successfully"
         _audit_log_operation "rollback" "system" "rollback_id=$entry_id" "${USER}" "success"
         return 0
     else
-        _log "error" "Rollback failed"
+        log_error "Rollback failed"
         _audit_log_operation "rollback" "system" "rollback_id=$entry_id" "${USER}" "failed"
         return 1
     fi
@@ -288,18 +288,18 @@ _search_criteria=$(_parse_param_value "--search" $PARAMS)
 _export_format=$(_parse_param_value "--export" $PARAMS)
 _limit=$(_parse_param_value "--limit" $PARAMS)
 
-_log "info" "Audit operation: $RESOURCE"
+log_info "Audit operation: $RESOURCE"
 
 case "$RESOURCE" in
     list)
         _audit_list "$_limit" "$_search_criteria"
         ;;
     show)
-        [[ -z "$_search_criteria" ]] && _log "error" "Entry ID required" && exit 1
+        [[ -z "$_search_criteria" ]] && log_error "Entry ID required" && exit 1
         _audit_show "$_search_criteria"
         ;;
     search)
-        [[ -z "$_search_criteria" ]] && _log "error" "Search criteria required" && exit 1
+        [[ -z "$_search_criteria" ]] && log_error "Search criteria required" && exit 1
         _audit_search "$_search_criteria" "$_export_format"
         ;;
     export)
@@ -309,12 +309,12 @@ case "$RESOURCE" in
         _audit_stats
         ;;
     rollback)
-        [[ -z "$_search_criteria" ]] && _log "error" "Entry ID required" && exit 1
+        [[ -z "$_search_criteria" ]] && log_error "Entry ID required" && exit 1
         _audit_rollback "$_search_criteria"
         ;;
     *)
-        _log "error" "Unknown audit operation: $RESOURCE"
-        _log "info" "Use: list|show|search|export|stats|rollback"
+        log_error "Unknown audit operation: $RESOURCE"
+        log_info "Use: list|show|search|export|stats|rollback"
         exit 1
         ;;
 esac

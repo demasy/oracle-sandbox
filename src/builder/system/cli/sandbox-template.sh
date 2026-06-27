@@ -59,30 +59,13 @@ _template_save() {
 }
 EOF
     
-    # Export current connections to template
-    local connections_json=$(sandbox export connections --format json 2>/dev/null || echo '[]')
-    
-    # Merge connections into template
-    local temp_file="$template_file.tmp"
-    python3 << PYTHON_SCRIPT 2>/dev/null || log_warning "Could not merge connections (Python required)"
-import json
-try:
-    with open('$template_file', 'r') as f:
-        template = json.load(f)
-    
-    # Try to load connections
-    try:
-        connections = json.loads('$connections_json')
-        if isinstance(connections, list):
-            template['connections'] = connections
-    except:
-        pass
-    
-    with open('$template_file', 'w') as f:
-        json.dump(template, f, indent=2)
-except:
-    pass
-PYTHON_SCRIPT
+    # Export current connections and merge into template
+    local connections_json
+    connections_json=$(sandbox conn list --export json 2>/dev/null | jq '.connections // []' 2>/dev/null || echo '[]')
+    local _tmp="${template_file}.tmp"
+    jq --argjson conns "$connections_json" '.connections = $conns' "$template_file" > "$_tmp" \
+        && mv "$_tmp" "$template_file" \
+        || { rm -f "$_tmp"; log_warning "Could not merge connections (jq required)"; }
     
     log_success "Template saved: $template_name"
     log_info "Location: $template_file"
@@ -110,12 +93,14 @@ _template_load() {
         log_info "Applying template configuration..."
         
         # Extract and apply environment variables
-        local env_vars=$(cat "$template_file" | python3 -c "import sys, json; d=json.load(sys.stdin); print(' '.join([f'{k}={v}' for k,v in d.get('environment',{}).items() if v]))" 2>/dev/null)
-        [[ -n "$env_vars" ]] && export $env_vars
-        
+        while IFS='=' read -r k v; do
+            [[ -n "$k" && -n "$v" ]] && export "$k=$v"
+        done < <(jq -r '.environment // {} | to_entries[] | select(.value != "") | "\(.key)=\(.value)"' "$template_file" 2>/dev/null)
+
         # Apply connections if available
-        local has_connections=$(cat "$template_file" | python3 -c "import sys, json; d=json.load(sys.stdin); print(len(d.get('connections',[])) > 0)" 2>/dev/null)
-        if [[ "$has_connections" == "True" ]]; then
+        local has_connections
+        has_connections=$(jq '.connections | length > 0' "$template_file" 2>/dev/null || echo "false")
+        if [[ "$has_connections" == "true" ]]; then
             log_info "Applying saved connections..."
             # Connections would be applied via batch import mechanism
         fi
@@ -144,47 +129,46 @@ _template_list() {
             echo "{"
             echo '  "templates": ['
             
-            find "$TEMPLATE_DIR" -name "*.template" -type f | sort | while read template_file; do
-                local name=$(basename "$template_file" .template)
-                local created=$(python3 -c "import json; d=json.load(open('$template_file')); print(d.get('metadata',{}).get('created',''))" 2>/dev/null)
-                local description=$(python3 -c "import json; d=json.load(open('$template_file')); print(d.get('metadata',{}).get('description',''))" 2>/dev/null)
-                
+            find "$TEMPLATE_DIR" -name "*.template" -type f | sort | while read -r template_file; do
+                local name created description
+                name=$(basename "$template_file" .template)
+                created=$(jq -r '.metadata.created // ""' "$template_file" 2>/dev/null)
+                description=$(jq -r '.metadata.description // ""' "$template_file" 2>/dev/null)
                 echo "    {"
                 echo "      \"name\": \"$name\","
                 echo "      \"created\": \"$created\","
                 echo "      \"description\": \"$description\""
                 echo "    },"
             done | sed '$ s/,$//'
-            
+
             echo "  ]"
             echo "}"
             ;;
         csv)
             echo "name,created,description"
-            find "$TEMPLATE_DIR" -name "*.template" -type f | sort | while read template_file; do
-                local name=$(basename "$template_file" .template)
-                local created=$(python3 -c "import json; d=json.load(open('$template_file')); print(d.get('metadata',{}).get('created',''))" 2>/dev/null)
-                local description=$(python3 -c "import json; d=json.load(open('$template_file')); print(d.get('metadata',{}).get('description',''))" 2>/dev/null)
-                
+            find "$TEMPLATE_DIR" -name "*.template" -type f | sort | while read -r template_file; do
+                local name created description
+                name=$(basename "$template_file" .template)
+                created=$(jq -r '.metadata.created // ""' "$template_file" 2>/dev/null)
+                description=$(jq -r '.metadata.description // ""' "$template_file" 2>/dev/null)
                 echo "\"$name\",\"$created\",\"$description\""
             done
             ;;
         *)
-            # Table format
             echo ""
             echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
             echo -e "${CYAN}                    AVAILABLE TEMPLATES${NC}"
             echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
             echo ""
-            
+
             printf "%-25s %-30s %s\n" "NAME" "CREATED" "DESCRIPTION"
             echo -e "${CYAN}───────────────────────────────────────────────────────────────${NC}"
-            
-            find "$TEMPLATE_DIR" -name "*.template" -type f | sort | while read template_file; do
-                local name=$(basename "$template_file" .template)
-                local created=$(python3 -c "import json; d=json.load(open('$template_file')); print(d.get('metadata',{}).get('created',''))" 2>/dev/null)
-                local description=$(python3 -c "import json; d=json.load(open('$template_file')); print(d.get('metadata',{}).get('description',''))" 2>/dev/null)
-                
+
+            find "$TEMPLATE_DIR" -name "*.template" -type f | sort | while read -r template_file; do
+                local name created description
+                name=$(basename "$template_file" .template)
+                created=$(jq -r '.metadata.created // ""' "$template_file" 2>/dev/null)
+                description=$(jq -r '.metadata.description // ""' "$template_file" 2>/dev/null)
                 printf "%-25s %-30s %s\n" "$name" "$created" "$description"
             done
             
