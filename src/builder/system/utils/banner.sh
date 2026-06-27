@@ -18,23 +18,25 @@ fi
 print_demasy_banner() {
     local title="${1:-Banner}"
     
+    {
     clear 2>/dev/null || true
     echo ""
     echo -e "\e[0;33m ____  _____ __  __    _    ______   __\e[0m"
     echo -e "\e[0;33m|  _ \| ____|  \/  |  / \  / ___\ \ / /\e[0m"
-    echo -e "\e[0;33m| | | |  _| | |\/| | / _ \ \___ \\\\ V /\e[0m" 
+    echo -e "\e[0;33m| | | |  _| | |\/| | / _ \ \___ \\\\ V /\e[0m"
     echo -e "\e[0;33m| |_| | |___| |  | |/ ___ \ ___) || |\e[0m"
     echo -e "\e[0;33m|____/|_____|_|  |_/_/   \_\____/ |_|\e[0m"
     echo ""
     echo -e "                             \e[0;33m\e[5mL A B S\e[0m"
     echo ""
     echo -e "\e[0;33mDeveloped by: \e[1m\e[0;33mDemasy Labs\e[0m\e[0;33m 🚀\e[0m"
-    echo -e "\e[0;33m-----------------------------------------------------\e[0m"    
+    echo -e "\e[0;33m-----------------------------------------------------\e[0m"
     echo -e "\e[0;33m        Code with love ❤️  in Egypt \e[0m"
     echo ""
     echo ""
     echo -e "\e[1m************* ${title} ************* \e[0m"
     echo ""
+    } >&2
 }
 
 # Usage in scripts:

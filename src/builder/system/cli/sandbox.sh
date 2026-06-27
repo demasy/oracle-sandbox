@@ -222,19 +222,10 @@ else
     PARAMS="$*"
 fi
 
-# Auto-suppress banner for machine-readable formats
-if [[ "$PARAMS" == *"--format json"* || "$PARAMS" == *"--format csv"* ]]; then
-    SANDBOX_QUIET=1
+# ─── Print banner ─────────────────────────────────────────────────────────────
+if [[ "${SANDBOX_QUIET:-0}" != "1" && "$ACTION" != "help" ]]; then
+    print_demasy_banner "Sandbox CLI"
 fi
-
-# ─── Print banner (defer clear for non-help actions to preserve banner) ──────
-_suppress_banner=0
-[[ "${SANDBOX_QUIET:-0}" == "1" ]] && _suppress_banner=1
-if [[ "$ACTION" != "help" ]]; then
-    clear
-fi
-[[ "$_suppress_banner" == "0" ]] && print_demasy_banner "Sandbox CLI"
-unset _suppress_banner
 
 # ─── Help intercept ──────────────────────────────────────────────────────────
 if [[ "$ACTION" == "-h" || "$ACTION" == "--help" ]]; then

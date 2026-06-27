@@ -22,7 +22,7 @@ get_timestamp() {
 # Verbose mode: no effect on logging itself; action scripts check SANDBOX_VERBOSE
 
 log_success() {
-    echo -e "${GREEN}✓ $(get_timestamp)${NC} $1"
+    echo -e "${GREEN}✓ $(get_timestamp)${NC} $1" >&2
 }
 
 log_error() {
@@ -31,7 +31,7 @@ log_error() {
 
 log_warning() {
     [[ "${SANDBOX_QUIET:-0}" == "1" ]] && return
-    echo -e "${YELLOW}⚠ $(get_timestamp)${NC} $1"
+    echo -e "${YELLOW}⚠ $(get_timestamp)${NC} $1" >&2
 }
 
 log_warn() {
@@ -40,12 +40,12 @@ log_warn() {
 
 log_info() {
     [[ "${SANDBOX_QUIET:-0}" == "1" ]] && return
-    echo -e "${BLUE}ℹ $(get_timestamp)${NC} $1"
+    echo -e "${BLUE}ℹ $(get_timestamp)${NC} $1" >&2
 }
 
 log_progress() {
     [[ "${SANDBOX_QUIET:-0}" == "1" ]] && return
-    echo -e "${CYAN}⏳ $(get_timestamp)${NC} $1"
+    echo -e "${CYAN}⏳ $(get_timestamp)${NC} $1" >&2
 }
 
 log_step() {
@@ -54,9 +54,9 @@ log_step() {
 
 log_section() {
     [[ "${SANDBOX_QUIET:-0}" == "1" ]] && return
-    echo ""
-    echo -e "${PURPLE}=== $1 ===${NC}"
-    echo ""
+    echo "" >&2
+    echo -e "${PURPLE}=== $1 ===${NC}" >&2
+    echo "" >&2
 }
 
 # Elapsed time helper — usage: elapsed_since <start_epoch_seconds>
