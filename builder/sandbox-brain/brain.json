@@ -15,7 +15,7 @@
     "issues": "https://github.com/demasy/oracle-sandbox/issues",
     "copyright": "Copyright © 2026 Demasy Labs. Licensed under the MIT License.",
     "created": "2026-01-19",
-    "last_updated": "2026-03-10"
+    "last_updated": "2026-06-27"
   },
   "rules": {
     "critical": [
@@ -93,10 +93,10 @@
           "8080": "ORDS/APEX Web Interface"
         },
         "includes": [
-          "SQLcl 25.2.2",
+          "SQLcl 26.1",
           "Oracle Instant Client 23.7",
-          "APEX 24.2.0",
-          "ORDS 26.1"
+          "APEX 26.1.0",
+          "ORDS 26.1.2"
         ]
       }
     },
@@ -226,7 +226,8 @@
         },
         "oracle/mcp": {
           "purpose": "Model Context Protocol server",
-          "status": "stable"
+          "status": "stable",
+          "docs": "docs/mcp/README.md"
         },
         "docker": {
           "purpose": "Container operations — hot deploy and Docker Hub publishing",

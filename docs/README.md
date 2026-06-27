@@ -23,12 +23,22 @@ Welcome to the Oracle Sandbox documentation. Use the sections below to find guid
 
 ---
 
+## API & Integrations
+
+| Document | Description |
+|----------|-------------|
+| [Management API](./api/README.md) | REST health and status endpoints (`/health`, `/`) exposed by the Node.js server |
+| [MCP Integration Guide](./mcp/README.md) ⭐ | Connect AI assistants (Claude, Copilot) directly to Oracle via the SQLcl MCP server |
+
+---
+
 ## Database
 
 | Document | Description |
 |----------|-------------|
 | [APEX Installation](./database/apex-installation.md) | APEX + ORDS setup, endpoints, and management commands |
 | [Database Connectivity](./database/connectivity.md) | SQLcl, SQL*Plus, connection string formats |
+| [ORDS REST API](./database/ords-rest-api.md) | ORDS endpoints, auto-REST, custom modules, and curl examples |
 | [External Access](./database/external-access.md) | Connecting from host tools (SQL Developer, DBeaver, DataGrip) |
 
 ---
