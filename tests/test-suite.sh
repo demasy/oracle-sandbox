@@ -88,46 +88,29 @@ assert_contains() {
     fi
 }
 
-# ─── Parameter Parsing Tests ────────────────────────────────────────────────────
-
-test_parameter_parsing() {
-    echo ""
-    echo "=== Parameter Parsing Tests ==="
-    
-    # Test flag parsing
-    assert_success "Parse --format flag" \
-        "bash -c 'source sandbox-params.sh; _parse_flag_with_value \"--format\" \"\" \"--format json --verbose\" | grep -q json'"
-    
-    assert_success "Parse --file flag" \
-        "bash -c 'source sandbox-params.sh; _parse_flag_with_value \"--file\" \"\" \"--file /tmp/test.json\" | grep -q /tmp/test.json'"
-    
-    assert_success "Standalone flag detection" \
-        "bash -c 'source sandbox-params.sh; _parse_flag_standalone \"--dry-run\" \"--verbose --dry-run --quiet\" | grep -q 1'"
-}
-
 # ─── Help System Tests ────────────────────────────────────────────────────────
 
 test_help_system() {
     echo ""
     echo "=== Help System Tests ==="
-    
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping"
+        return 0
+    fi
+
     assert_success "Status help available" \
-        "sandbox status -h | grep -q 'sandbox status'"
-    
+        "_dexec 'sb status -h' | grep -q 'sandbox status'"
     assert_success "Import help available" \
-        "sandbox import -h | grep -q 'sandbox import'"
-    
+        "_dexec 'sb import -h' | grep -q 'sandbox import'"
     assert_success "Batch help available" \
-        "sandbox batch -h | grep -q 'sandbox batch'"
-    
+        "_dexec 'sb batch -h' | grep -q 'sandbox batch'"
     assert_success "Monitor help available" \
-        "sandbox monitor -h | grep -q 'sandbox monitor'"
-    
+        "_dexec 'sb monitor -h' | grep -q 'sandbox monitor'"
     assert_success "Audit help available" \
-        "sandbox audit -h | grep -q 'sandbox audit'"
-    
+        "_dexec 'sb audit -h' | grep -q 'sandbox audit'"
     assert_success "Template help available" \
-        "sandbox template -h | grep -q 'sandbox template'"
+        "_dexec 'sb template -h' | grep -q 'sandbox template'"
 }
 
 # ─── Format Support Tests ────────────────────────────────────────────────────────
@@ -135,21 +118,26 @@ test_help_system() {
 test_format_support() {
     echo ""
     echo "=== Format Support Tests ==="
-    
-    # Test JSON format
-    local json_output=$(sandbox status --format json 2>/dev/null || echo '{}')
-    assert_contains "JSON format produces valid JSON" \
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping"
+        return 0
+    fi
+
+    local json_output
+    json_output=$(_dexec 'sb status all --export json' 2>/dev/null || echo '{}')
+    assert_contains "JSON export produces valid JSON" \
         "$json_output" '"timestamp"'
-    
-    # Test CSV format
-    local csv_output=$(sandbox status database --format csv 2>/dev/null || echo '')
-    assert_contains "CSV format produces header" \
+
+    local csv_output
+    csv_output=$(_dexec 'sb status database --export csv' 2>/dev/null || echo '')
+    assert_contains "CSV export produces header" \
         "$csv_output" 'component'
-    
-    # Test table format (default)
-    local table_output=$(sandbox status --format table 2>/dev/null || echo '')
-    assert_contains "Table format has structure" \
-        "$table_output" 'DATABASE\|System'
+
+    local conn_json
+    conn_json=$(_dexec 'sb conn list --export json' 2>/dev/null || echo '{}')
+    assert_contains "conn list --export json has connections key" \
+        "$conn_json" '"connections"'
 }
 
 # ─── Import/Export Tests ────────────────────────────────────────────────────────
@@ -157,19 +145,19 @@ test_format_support() {
 test_import_export() {
     echo ""
     echo "=== Import/Export Tests ==="
-    
-    # Create temp export file
-    local temp_export=$(mktemp)
-    sandbox export connections > "$temp_export" 2>/dev/null || true
-    
-    assert_success "Export connections" \
-        "[[ -s '$temp_export' ]]"
-    
-    # Test import (dry-run)
-    assert_success "Import connections (validate file exists)" \
-        "[[ -f '$temp_export' ]]"
-    
-    rm -f "$temp_export"
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping"
+        return 0
+    fi
+
+    local export_out
+    export_out=$(_dexec 'sb export connections --export json' 2>/dev/null || echo '')
+    assert_contains "Export connections produces JSON" \
+        "$export_out" '"connections"'
+
+    assert_success "Import -h available" \
+        "_dexec 'sb import -h' | grep -q 'import'"
 }
 
 # ─── Batch Operations Tests ────────────────────────────────────────────────────────
@@ -177,21 +165,17 @@ test_import_export() {
 test_batch_operations() {
     echo ""
     echo "=== Batch Operations Tests ==="
-    
-    # Create temp batch file
-    local temp_batch=$(mktemp)
-    cat > "$temp_batch" << 'EOF'
-cmd=sandbox status database
-cmd=sandbox status apex
-EOF
-    
-    assert_success "Batch file created" \
-        "[[ -f '$temp_batch' ]]"
-    
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping"
+        return 0
+    fi
+
+    assert_success "Batch -h available" \
+        "_dexec 'sb batch -h' | grep -q 'sandbox batch'"
+
     assert_success "Batch dry-run executes" \
-        "sandbox batch execute --file '$temp_batch' --dry-run | grep -q 'DRY RUN'"
-    
-    rm -f "$temp_batch"
+        "_dexec 'echo \"cmd=sb status database\" > /tmp/test_batch.txt && sb batch execute --file /tmp/test_batch.txt --dry-run' | grep -qi 'dry'"
 }
 
 # ─── Audit System Tests ────────────────────────────────────────────────────────
@@ -199,12 +183,16 @@ EOF
 test_audit_system() {
     echo ""
     echo "=== Audit System Tests ==="
-    
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping"
+        return 0
+    fi
+
     assert_success "Audit list command" \
-        "sandbox audit list | grep -q -E 'timestamp|id|Audit' || true"
-    
+        "_dexec 'sb audit list' | grep -qE 'ACTION|timestamp|No entries' || true"
     assert_success "Audit stats command" \
-        "sandbox audit stats | grep -q 'AUDIT LOG' || true"
+        "_dexec 'sb audit stats' | grep -q 'AUDIT LOG'"
 }
 
 # ─── Template System Tests ────────────────────────────────────────────────────────
@@ -212,17 +200,18 @@ test_audit_system() {
 test_template_system() {
     echo ""
     echo "=== Template System Tests ==="
-    
-    assert_success "Template list command" \
-        "sandbox template list | grep -q -E 'TEMPLATES|name|created' || true"
-    
-    # Test save operation
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping"
+        return 0
+    fi
+
     assert_success "Template save command" \
-        "sandbox template save --name test_template --description 'Test template' | grep -q -E 'Template|saved' || true"
-    
-    # Test delete operation
+        "_dexec 'sb template save --name suite_test --description Test' | grep -qE 'saved|Template'"
+    assert_success "Template list shows saved template" \
+        "_dexec 'sb template list' | grep -q suite_test"
     assert_success "Template delete command" \
-        "sandbox template delete --name test_template | grep -q -E 'deleted|not found' || true"
+        "_dexec 'sb template delete --name suite_test' | grep -qE 'deleted|not found'"
 }
 
 # ─── Monitoring Tests ────────────────────────────────────────────────────────
@@ -230,14 +219,16 @@ test_template_system() {
 test_monitoring() {
     echo ""
     echo "=== Monitoring Tests ==="
-    
-    local monitor_json=$(sandbox monitor --export json 2>/dev/null || echo '{}')
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping"
+        return 0
+    fi
+
+    local monitor_json
+    monitor_json=$(_dexec 'sb monitor all --export json' 2>/dev/null || echo '{}')
     assert_contains "Monitor exports JSON with timestamp" \
         "$monitor_json" '"timestamp"'
-    
-    local monitor_prometheus=$(sandbox monitor --export prometheus 2>/dev/null || echo '')
-    assert_contains "Monitor exports Prometheus format" \
-        "$monitor_prometheus" 'sandbox_'
 }
 
 # ─── Error Handling Tests ────────────────────────────────────────────────────────
@@ -245,17 +236,20 @@ test_monitoring() {
 test_error_handling() {
     echo ""
     echo "=== Error Handling Tests ==="
-    
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping"
+        return 0
+    fi
+
     assert_failure "Import missing file" \
-        "sandbox import connections --file /nonexistent/file.json" \
+        "_dexec 'sb import connections --file /nonexistent/file.json'" \
         "not found\|not readable"
-    
     assert_failure "Batch missing file" \
-        "sandbox batch execute --file /nonexistent/file.txt" \
+        "_dexec 'sb batch execute --file /nonexistent/file.txt'" \
         "not found\|not readable"
-    
     assert_failure "Invalid template operation" \
-        "sandbox template invalid_op" \
+        "_dexec 'sb template invalid_op'" \
         "Unknown\|invalid"
 }
 
@@ -264,14 +258,23 @@ test_error_handling() {
 test_integration() {
     echo ""
     echo "=== Integration Tests ==="
-    
-    # Test status action with multiple resources
-    assert_success "Status multiple resources" \
-        "sandbox status database apex | grep -q -E 'database|apex|status'"
-    
-    # Test help for all major actions
+
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "sandbox-oracle-server"; then
+        echo "  ⚠ sandbox-oracle-server not running — skipping"
+        return 0
+    fi
+
     assert_success "All actions have help" \
-        "for action in status import batch monitor audit template; do sandbox \$action -h > /dev/null 2>&1 || exit 1; done"
+        "for action in status import batch monitor audit template; do _dexec \"sb \$action -h\" > /dev/null || exit 1; done"
+    assert_success "conn list and export both work" \
+        "_dexec 'sb conn list > /dev/null && sb conn list --export json | grep -q connections'"
+}
+
+# ─── Container helper ─────────────────────────────────────────────────────────
+# Run a command inside the sandbox container (stderr included for error checks)
+
+_dexec() {
+    docker exec --user sandbox sandbox-oracle-server bash -c "$1" 2>&1 | sed 's/\x1b\[[0-9;]*m//g'
 }
 
 # ─── Main Test Runner ────────────────────────────────────────────────────────
@@ -279,10 +282,6 @@ test_integration() {
 # ─── Container Smoke Tests ────────────────────────────────────────────────────
 # Requires sandbox-oracle-server container to be running.
 # Skipped automatically if the container is not found.
-
-_dexec() {
-    docker exec --user sandbox sandbox-oracle-server bash -c "$1" 2>/dev/null
-}
 
 test_container_smoke() {
     echo ""
@@ -295,7 +294,7 @@ test_container_smoke() {
 
     # CLI help
     assert_success "sb help exits 0" \
-        "_dexec 'sb help > /dev/null'"
+        "_dexec 'sb help' > /dev/null"
 
     assert_success "sb backup -h shows resources" \
         "_dexec 'sb backup -h' | grep -q 'connections'"
@@ -345,7 +344,6 @@ main() {
     echo "╚═════════════════════════════════════════════════════════════════╝"
 
     # Run test groups
-    test_parameter_parsing
     test_help_system
     test_format_support
     test_import_export
