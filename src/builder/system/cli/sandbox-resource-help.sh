@@ -1,616 +1,440 @@
 # ─── sandbox resource help ────────────────────────────────────────────────────
 # Sourced by sandbox.sh — handles: sandbox <action> <resource> -h | --help
-# Variables inherited: ACTION, RESOURCE, logging/color functions
+# Variables inherited: ACTION, RESOURCE, logging/color functions, SANDBOX_HELP_SHORT
 # ─────────────────────────────────────────────────────────────────────────────
+
+# ─── Renderer ─────────────────────────────────────────────────────────────────
+
+_rh_print() {
+    local key="${ACTION}/${RESOURCE}"
+    local desc="${SANDBOX_HELP_SHORT[${ACTION}:${RESOURCE}]:-${SANDBOX_HELP_SHORT[${ACTION}]:-}}"
+
+    echo ""
+    echo -e "  ${CYAN}sandbox ${ACTION} ${RESOURCE}${NC} — ${desc}"
+    echo ""
+    echo -e "  ${WHITE}Usage:${NC}     sandbox ${ACTION} ${RESOURCE}${*:+ $*}"
+    echo ""
+}
+
+_rh_params() {
+    echo -e "  ${YELLOW}Parameters:${NC}"
+}
+
+_rh_p() {
+    local flag="$1" meta="$2" desc="$3"
+    printf "    ${CYAN}%-20s${NC}  %s\n" "${flag} ${meta}" "${desc}"
+}
+
+_rh_examples() {
+    echo ""
+    echo -e "  ${YELLOW}Examples:${NC}"
+}
+
+_rh_e() {
+    echo -e "    $*"
+}
+
+_rh_note() {
+    echo -e "  ${WHITE}Note:${NC}      $*"
+}
+
+_rh_end() {
+    echo ""
+}
+
+# ─── Shared param blocks ──────────────────────────────────────────────────────
+
+_rh_params_logs() {
+    _rh_params
+    _rh_p "-f, --follow"  ""      "Stream log output"
+    _rh_p "-n, --lines"   "<N>"   "Lines to show (default: 50)"
+}
+
+_rh_params_export() {
+    _rh_params
+    _rh_p "--export" "<format>" "Output format: json|csv (default: table)"
+}
+
+_rh_params_from() {
+    _rh_params
+    _rh_p "--from" "<backup-id>" "Backup ID (e.g. 20260627-120000). Default: latest."
+}
+
+# ─── Dispatch ─────────────────────────────────────────────────────────────────
 
 case "${ACTION}/${RESOURCE}" in
 
-    # ── conn ─────────────────────────────────────────────────────────────────
+    # ── conn ──────────────────────────────────────────────────────────────────
 
     conn/list)
-        echo ""
-        echo -e "  ${CYAN}sandbox conn list${NC} — List all saved MCP connections"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox conn list [parameters]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--format${NC}  <format>   Output format: json|csv|table (default: table)"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox conn list"
-        echo -e "    sandbox conn list --format json"
-        echo -e "    sandbox conn list --format csv"
-        echo ""
-        ;;
+        _rh_print "[--export json|csv]"
+        _rh_params_export
+        _rh_examples
+        _rh_e "sandbox conn list"
+        _rh_e "sandbox conn list --export json"
+        _rh_e "sandbox conn list --export csv"
+        _rh_end ;;
 
     conn/add)
-        echo ""
-        echo -e "  ${CYAN}sandbox conn add${NC} — Add a new saved MCP connection"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox conn add [parameters]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--name${NC}  <name>       Required. Connection name"
-        echo -e "    ${CYAN}--user${NC}  <user>       Required. Database user"
-        echo -e "    ${CYAN}--pass${NC}  <password>   Optional. Default: env password"
-        echo -e "    ${CYAN}--host${NC}  <host>       Optional. Default: env host"
-        echo -e "    ${CYAN}--port${NC}  <port>       Optional. Default: env port"
-        echo -e "    ${CYAN}--pdb${NC}   <PDB name>   Optional. Default: env service"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox conn add --name sandbox-mcp --user demasy_ai --pdb SANDBOX_PDB"
-        echo -e "    sandbox conn add --name sandbox-mcp --user sandbox_ai --pdb SANDBOX_PDB"
-        echo ""
-        ;;
+        _rh_print "[parameters]"
+        _rh_params
+        _rh_p "--name, -n" "<name>"      "Required. Connection name [a-zA-Z0-9_-], max 64"
+        _rh_p "--user"     "<user>"      "Required. Database user"
+        _rh_p "--pass"     "<password>"  "Optional. Default: env password"
+        _rh_p "--host"     "<host>"      "Optional. Default: \$SANDBOX_DB_HOST"
+        _rh_p "--port"     "<port>"      "Optional. Default: \$SANDBOX_DB_PORT"
+        _rh_p "--pdb"      "<PDB name>"  "Optional. Default: \$SANDBOX_DB_SERVICE"
+        _rh_examples
+        _rh_e "sandbox conn add --name sandbox-mcp --user sandbox_ai --pdb SANDBOX_PDB"
+        _rh_end ;;
 
     conn/delete)
-        echo ""
-        echo -e "  ${CYAN}sandbox conn delete${NC} — Delete a saved MCP connection"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox conn delete --name <name>"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--name${NC}  <name>   Required. Connection name to delete"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox conn delete --name sandbox-mcp"
-        echo ""
-        ;;
+        _rh_print "--name <name>"
+        _rh_params
+        _rh_p "--name, -n" "<name>" "Required. Connection name to delete"
+        _rh_examples
+        _rh_e "sandbox conn delete --name sandbox-mcp"
+        _rh_end ;;
 
     conn/rename)
-        echo ""
-        echo -e "  ${CYAN}sandbox conn rename${NC} — Rename a saved MCP connection"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox conn rename --from <name> --to <name>"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--from${NC}  <name>   Required. Current connection name"
-        echo -e "    ${CYAN}--to${NC}    <name>   Required. New connection name"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox conn rename --from sandbox-mcp --to demasy-mcp"
-        echo ""
-        ;;
+        _rh_print "--from <name> --to <name>"
+        _rh_params
+        _rh_p "--from" "<name>" "Required. Current connection name"
+        _rh_p "--to"   "<name>" "Required. New connection name"
+        _rh_examples
+        _rh_e "sandbox conn rename --from sandbox-mcp --to demasy-mcp"
+        _rh_end ;;
 
     conn/test)
-        echo ""
-        echo -e "  ${CYAN}sandbox conn test${NC} — Test a saved MCP connection"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox conn test --name <name>"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--name${NC}  <name>   Required. Connection name to test"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox conn test --name sandbox-mcp"
-        echo ""
-        ;;
+        _rh_print "--name <name>"
+        _rh_params
+        _rh_p "--name, -n" "<name>" "Required. Connection name to test"
+        _rh_examples
+        _rh_e "sandbox conn test --name sandbox-mcp"
+        _rh_end ;;
 
-    # ── logs ─────────────────────────────────────────────────────────────────
+    # ── logs ──────────────────────────────────────────────────────────────────
 
-    logs/apex)
-        echo ""
-        echo -e "  ${CYAN}sandbox logs apex${NC} — View APEX installation logs"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox logs apex [parameters]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
-        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox logs apex"
-        echo -e "    sandbox logs apex --follow"
-        echo ""
-        ;;
-
-    logs/install)
-        echo ""
-        echo -e "  ${CYAN}sandbox logs install${NC} — View all installation logs (APEX + ORDS)"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox logs install [parameters]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
-        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox logs install"
-        echo -e "    sandbox logs install --lines 100"
-        echo ""
-        ;;
-
-    logs/ords)
-        echo ""
-        echo -e "  ${CYAN}sandbox logs ords${NC} — View ORDS runtime log"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox logs ords [parameters]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
-        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox logs ords"
-        echo -e "    sandbox logs ords --follow"
-        echo ""
-        ;;
-
-    logs/startup)
-        echo ""
-        echo -e "  ${CYAN}sandbox logs startup${NC} — View container startup / user-setup log"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox logs startup [parameters]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
-        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox logs startup"
-        echo -e "    sandbox logs startup --follow"
-        echo ""
-        ;;
+    logs/apex|logs/install|logs/ords|logs/startup|logs/all)
+        _rh_print "[--follow] [--lines N]"
+        _rh_params_logs
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE}"
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --follow"
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --lines 100"
+        _rh_end ;;
 
     logs/mcp)
-        echo ""
-        echo -e "  ${CYAN}sandbox logs mcp${NC} — View MCP server log"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox logs mcp"
-        echo ""
-        echo -e "  ${WHITE}Note:${NC}      MCP server does not write a log file."
-        echo -e "             Use ${CYAN}sandbox run mcp${NC} to see output in the foreground."
-        echo ""
-        ;;
+        _rh_print
+        _rh_note "MCP log file: /tmp/sqlcl_mcp.log (written when started via 'sandbox start mcp')"
+        _rh_params_logs
+        _rh_examples
+        _rh_e "sandbox logs mcp"
+        _rh_e "sandbox logs mcp --follow"
+        _rh_end ;;
 
-    logs/all)
-        echo ""
-        echo -e "  ${CYAN}sandbox logs all${NC} — View all sandbox log files"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox logs all [parameters]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}-f${NC}, ${CYAN}--follow${NC}        Stream log output"
-        echo -e "    ${CYAN}-n${NC}, ${CYAN}--lines${NC} <N>     Lines to show (default: 50)"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox logs all"
-        echo -e "    sandbox logs all --lines 20"
-        echo ""
-        ;;
-
-    # ── run ──────────────────────────────────────────────────────────────────
+    # ── run ───────────────────────────────────────────────────────────────────
 
     run/sqlcl)
-        echo ""
-        echo -e "  ${CYAN}sandbox run sqlcl${NC} — Open an interactive SQLcl session"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox run sqlcl [parameters]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}-u${NC}, ${CYAN}--user${NC} <user>       Required. Database user to connect as"
-        echo -e "    ${CYAN}-p${NC}, ${CYAN}--pass${NC} <password>   Optional. Default: Default Password"
-        echo -e "    ${CYAN}--pdb${NC} <PDB name>          Optional. Override the default PDB for the user"
+        _rh_print "[--user <user>] [--pass <pass>] [--pdb <pdb>]"
+        _rh_params
+        _rh_p "-u, --user" "<user>"     "Required. Database user"
+        _rh_p "-p, --pass" "<password>" "Optional. Default: env password"
+        _rh_p "--pdb"      "<PDB name>" "Optional. Override default PDB"
         echo ""
         echo -e "  ${YELLOW}Valid users:${NC}"
-        echo -e "    ${CYAN}sys${NC}          SYS (sysdba) — CDB root          (default: CDB service)"
-        echo -e "    ${CYAN}system${NC}       SYSTEM — CDB root                (default: CDB service)"
-        echo -e "    ${CYAN}sandbox${NC}      SANDBOX — application user       (default: SANDBOX_PDB)"
-        echo -e "    ${CYAN}sandbox_ai${NC}   SANDBOX_AI — AI/MCP user         (default: SANDBOX_PDB)"
-        echo -e "    ${CYAN}demasy${NC}       DEMASY — application user        (default: SANDBOX_PDB)"
-        echo -e "    ${CYAN}demasy_ai${NC}    DEMASY_AI — AI/MCP user          (default: SANDBOX_PDB)"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox run sqlcl --user system"
-        echo -e "    sandbox run sqlcl --user demasy"
-        echo -e "    sandbox run sqlcl -u sandbox"
-        echo -e "    sandbox run sqlcl --user demasy --pass mypassword"
-        echo -e "    sandbox run sqlcl --user demasy --pdb SANDBOX_PDB"
-        echo -e "    sandbox run sqlcl -u sandbox --pdb SANDBOX_PDB"
-        echo -e "    sandbox run sqlcl --user demasy --pdb SANDBOX_PDB"
-        echo -e "    sandbox run sqlcl -u sandbox --pdb SANDBOX_PDB"
-        echo ""
-        ;;
+        _rh_e "${CYAN}sys${NC}         SYS (sysdba) — CDB root"
+        _rh_e "${CYAN}system${NC}      SYSTEM — CDB root"
+        _rh_e "${CYAN}sandbox${NC}     SANDBOX — application user       (default PDB: SANDBOX_PDB)"
+        _rh_e "${CYAN}sandbox_ai${NC}  SANDBOX_AI — AI/MCP user         (default PDB: SANDBOX_PDB)"
+        _rh_e "${CYAN}demasy${NC}      DEMASY — application user        (default PDB: SANDBOX_PDB)"
+        _rh_e "${CYAN}demasy_ai${NC}   DEMASY_AI — AI/MCP user          (default PDB: SANDBOX_PDB)"
+        _rh_examples
+        _rh_e "sandbox run sqlcl --user system"
+        _rh_e "sandbox run sqlcl -u sandbox_ai --pdb SANDBOX_PDB"
+        _rh_end ;;
 
     run/healthcheck)
-        echo ""
-        echo -e "  ${CYAN}sandbox run healthcheck${NC} — Run the Oracle sandbox healthcheck"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox run healthcheck"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox run healthcheck"
-        echo ""
-        ;;
+        _rh_print "[--export json|csv]"
+        _rh_params_export
+        _rh_examples
+        _rh_e "sandbox run healthcheck"
+        _rh_e "sandbox run healthcheck --export json"
+        _rh_end ;;
 
     run/mcp)
-        echo ""
-        echo -e "  ${CYAN}sandbox run mcp${NC} — Run the MCP server"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox run mcp"
-        echo ""
-        echo -e "  ${WHITE}Note:${NC}      Not yet implemented. Use ${CYAN}sandbox start mcp${NC} instead."
-        echo ""
-        ;;
+        _rh_print
+        _rh_note "Runs MCP in foreground. Use ${CYAN}sandbox start mcp${NC} to run as daemon."
+        _rh_examples
+        _rh_e "sandbox run mcp"
+        _rh_end ;;
 
     run/script)
-        echo ""
-        echo -e "  ${CYAN}sandbox run script${NC} — Execute an Oracle admin script"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox run script <script-name>"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox run script cleanup"
-        echo -e "    sandbox run script report"
-        echo ""
-        ;;
+        _rh_print "<script-name>"
+        _rh_examples
+        _rh_e "sandbox run script cleanup"
+        _rh_e "sandbox run script report"
+        _rh_end ;;
 
+    # ── start / stop / restart ────────────────────────────────────────────────
 
-    # ── start ─────────────────────────────────────────────────────────────────
-
-    start/apex)
-        echo ""
-        echo -e "  ${CYAN}sandbox start apex${NC} — Start Oracle APEX (ORDS)"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox start apex"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox start apex"
-        echo ""
-        ;;
+    start/apex|stop/apex|restart/apex)
+        _rh_print
+        _rh_examples
+        _rh_e "sandbox ${ACTION} apex"
+        _rh_end ;;
 
     start/mcp)
-        echo ""
-        echo -e "  ${CYAN}sandbox start mcp${NC} — Start the MCP server"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox start mcp [parameters]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}-d${NC}, ${CYAN}--default${NC}                       Use the default saved connection"
-        echo -e "    ${CYAN}-c${NC}, ${CYAN}--conn${NC} <name>  Use the specified saved connection"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox start mcp -d"
-        echo -e "    sandbox start mcp --default"
-        echo -e "    sandbox start mcp -c sandbox-mcp-conn"
-        echo -e "    sandbox start mcp --conn sandbox-mcp-conn"
-        echo -e "    sandbox start mcp --conn demasy-mcp-conn"
-        echo ""
-        ;;
+        _rh_print "[-d | --conn <name>]"
+        _rh_params
+        _rh_p "-d, --default" ""       "Use the default saved connection"
+        _rh_p "-c, --conn"    "<name>" "Use specified saved connection"
+        _rh_examples
+        _rh_e "sandbox start mcp -d"
+        _rh_e "sandbox start mcp --conn sandbox-ai-conn"
+        _rh_end ;;
 
-    # ── stop ──────────────────────────────────────────────────────────────────
+    stop/mcp|restart/mcp)
+        _rh_print
+        _rh_examples
+        _rh_e "sandbox ${ACTION} mcp"
+        _rh_end ;;
 
-    stop/apex)
-        echo ""
-        echo -e "  ${CYAN}sandbox stop apex${NC} — Stop Oracle APEX (ORDS)"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox stop apex"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox stop apex"
-        echo ""
-        ;;
+    # ── install / uninstall / download ────────────────────────────────────────
 
-    stop/mcp)
-        echo ""
-        echo -e "  ${CYAN}sandbox stop mcp${NC} — Stop the MCP server"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox stop mcp"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox stop mcp"
-        echo ""
-        ;;
+    install/apex|uninstall/apex|download/apex)
+        _rh_print
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE}"
+        _rh_end ;;
 
-    # ── restart ───────────────────────────────────────────────────────────────
-
-    restart/apex)
-        echo ""
-        echo -e "  ${CYAN}sandbox restart apex${NC} — Restart Oracle APEX (ORDS)"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox restart apex"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox restart apex"
-        echo ""
-        ;;
-
-    restart/mcp)
-        echo ""
-        echo -e "  ${CYAN}sandbox restart mcp${NC} — Restart the MCP server"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox restart mcp"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox restart mcp"
-        echo ""
-        ;;
-
-    # ── install ───────────────────────────────────────────────────────────────
-
-    install/oracle)
-        echo ""
-        echo -e "  ${CYAN}sandbox install oracle${NC} — Install Oracle Instant Client"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox install oracle"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox install oracle"
-        echo ""
-        ;;
-
-    install/client)
-        echo ""
-        echo -e "  ${CYAN}sandbox install client${NC} — Install Oracle Instant Client"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox install client"
-        echo ""
-        echo -e "  ${WHITE}Note:${NC}      Alias for ${CYAN}sandbox install oracle${NC}"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox install client"
-        echo ""
-        ;;
-
-    install/sqlcl)
-        echo ""
-        echo -e "  ${CYAN}sandbox install sqlcl${NC} — Install Oracle SQLcl"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox install sqlcl"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox install sqlcl"
-        echo ""
-        ;;
-
-    install/sqlplus)
-        echo ""
-        echo -e "  ${CYAN}sandbox install sqlplus${NC} — Install Oracle SQL*Plus"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox install sqlplus"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox install sqlplus"
-        echo ""
-        ;;
-
-    install/apex)
-        echo ""
-        echo -e "  ${CYAN}sandbox install apex${NC} — Install Oracle APEX + ORDS"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox install apex"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox install apex"
-        echo ""
-        ;;
-
-    # ── uninstall ─────────────────────────────────────────────────────────────
-
-    uninstall/apex)
-        echo ""
-        echo -e "  ${CYAN}sandbox uninstall apex${NC} — Uninstall Oracle APEX + ORDS"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox uninstall apex"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox uninstall apex"
-        echo ""
-        ;;
-
-    # ── download ──────────────────────────────────────────────────────────────
-
-    download/apex)
-        echo ""
-        echo -e "  ${CYAN}sandbox download apex${NC} — Download Oracle APEX + ORDS"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox download apex"
-        echo ""
-        echo -e "  ${WHITE}Note:${NC}      Downloads both APEX and ORDS together."
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox download apex"
-        echo ""
-        ;;
+    install/oracle|install/client|install/sqlcl|install/sqlplus)
+        _rh_print
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE}"
+        _rh_end ;;
 
     # ── export ────────────────────────────────────────────────────────────────
 
-    export/config)
-        echo ""
-        echo -e "  ${CYAN}sandbox export config${NC} — Export all sandbox settings"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox export config [--format json|csv|table]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--format${NC}  <format>   Output format: json|csv|table (default: table)"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox export config"
-        echo -e "    sandbox export config --format json"
-        echo -e "    sandbox export config --format csv"
-        echo ""
-        ;;
+    export/config|export/connections|export/all)
+        _rh_print "[--export json|csv]"
+        _rh_params_export
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE}"
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --export json"
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --export csv > output.csv"
+        _rh_end ;;
 
-    export/connections)
-        echo ""
-        echo -e "  ${CYAN}sandbox export connections${NC} — Export saved database connections"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox export connections [--format json|csv|table]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--format${NC}  <format>   Output format: json|csv|table (default: table)"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox export connections"
-        echo -e "    sandbox export connections --format json"
-        echo -e "    sandbox export connections --format csv > connections.csv"
-        echo ""
-        ;;
+    # ── import ────────────────────────────────────────────────────────────────
 
-    export/all)
-        echo ""
-        echo -e "  ${CYAN}sandbox export all${NC} — Export all settings and connections"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox export all [--format json|csv|table]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--format${NC}  <format>   Output format: json|csv|table (default: table)"
-        echo ""
-        echo -e "  ${WHITE}Note:${NC}      Same as ${CYAN}sandbox export config${NC}"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox export all"
-        echo -e "    sandbox export all --format json > config.json"
-        echo ""
-        ;;
+    import/config|import/connections)
+        _rh_print "--file <path>"
+        _rh_params
+        _rh_p "--file" "<path>" "Required. Path to import file"
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --file ./backup.json"
+        _rh_end ;;
 
-    # ── backup ───────────────────────────────────────────────────────────────
+    # ── backup ────────────────────────────────────────────────────────────────
 
-    backup/full)
-        echo ""
-        echo -e "  ${CYAN}sandbox backup full${NC} — Backup everything (connections, ORDS config, env config, schemas)"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox backup full"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox backup full"
-        echo ""
-        ;;
-
-    backup/connections)
-        echo ""
-        echo -e "  ${CYAN}sandbox backup connections${NC} — Backup saved connection files"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox backup connections"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox backup connections"
-        echo ""
-        ;;
-
-    backup/ords)
-        echo ""
-        echo -e "  ${CYAN}sandbox backup ords${NC} — Backup ORDS configuration directory"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox backup ords"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox backup ords"
-        echo ""
-        ;;
-
-    backup/config)
-        echo ""
-        echo -e "  ${CYAN}sandbox backup config${NC} — Backup sandbox environment configuration"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox backup config"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox backup config"
-        echo ""
-        ;;
+    backup/full|backup/connections|backup/ords|backup/config)
+        _rh_print
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE}"
+        _rh_end ;;
 
     backup/schemas)
-        echo ""
-        echo -e "  ${CYAN}sandbox backup schemas${NC} — Backup Oracle schemas via Data Pump (expdp)"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox backup schemas"
-        echo ""
-        echo -e "  ${WHITE}Note:${NC}      Requires SANDBOX_DB_HOST and SANDBOX_DB_PASS environment variables."
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox backup schemas"
-        echo ""
-        ;;
+        _rh_print
+        _rh_note "Requires \$SANDBOX_DB_HOST and \$SANDBOX_DB_PASS. Uses Oracle Data Pump (expdp)."
+        _rh_examples
+        _rh_e "sandbox backup schemas"
+        _rh_end ;;
 
     backup/list)
-        echo ""
-        echo -e "  ${CYAN}sandbox backup list${NC} — List all available backups"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox backup list"
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox backup list"
-        echo ""
-        ;;
+        _rh_print
+        _rh_examples
+        _rh_e "sandbox backup list"
+        _rh_end ;;
 
-    # ── restore ──────────────────────────────────────────────────────────────
+    # ── restore ───────────────────────────────────────────────────────────────
 
-    restore/full)
-        echo ""
-        echo -e "  ${CYAN}sandbox restore full${NC} — Restore everything from a backup"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox restore full [--from <backup-id>]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID (e.g. 20260626-214354). Default: latest."
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox restore full"
-        echo -e "    sandbox restore full --from 20260626-214354"
-        echo ""
-        ;;
-
-    restore/connections)
-        echo ""
-        echo -e "  ${CYAN}sandbox restore connections${NC} — Restore saved connections from a backup"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox restore connections [--from <backup-id>]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID. Default: latest."
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox restore connections"
-        echo -e "    sandbox restore connections --from 20260626-214354"
-        echo ""
-        ;;
-
-    restore/ords)
-        echo ""
-        echo -e "  ${CYAN}sandbox restore ords${NC} — Restore ORDS configuration from a backup"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox restore ords [--from <backup-id>]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID. Default: latest."
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox restore ords"
-        echo -e "    sandbox restore ords --from 20260626-214354"
-        echo ""
-        ;;
-
-    restore/config)
-        echo ""
-        echo -e "  ${CYAN}sandbox restore config${NC} — Restore sandbox environment configuration from a backup"
-        echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox restore config [--from <backup-id>]"
-        echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID. Default: latest."
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox restore config"
-        echo -e "    sandbox restore config --from 20260626-214354"
-        echo ""
-        ;;
+    restore/full|restore/connections|restore/ords|restore/config)
+        _rh_print "[--from <backup-id>]"
+        _rh_params_from
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE}"
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --from 20260627-120000"
+        _rh_end ;;
 
     restore/schemas)
+        _rh_print "[--from <backup-id>]"
+        _rh_params_from
+        _rh_note "Requires \$SANDBOX_DB_HOST and \$SANDBOX_DB_PASS. TABLE_EXISTS_ACTION=REPLACE."
+        _rh_examples
+        _rh_e "sandbox restore schemas"
+        _rh_e "sandbox restore schemas --from 20260627-120000"
+        _rh_end ;;
+
+    # ── audit ─────────────────────────────────────────────────────────────────
+
+    audit/list)
+        _rh_print "[--limit N] [--search <term>]"
+        _rh_params
+        _rh_p "--limit"  "<N>"    "Number of entries to show (default: 50)"
+        _rh_p "--search" "<term>" "Filter entries by keyword"
+        _rh_examples
+        _rh_e "sandbox audit list"
+        _rh_e "sandbox audit list --limit 20"
+        _rh_e "sandbox audit list --search conn"
+        _rh_end ;;
+
+    audit/search)
+        _rh_print "--search <term>"
+        _rh_params
+        _rh_p "--search" "<term>"   "Required. Search keyword"
+        _rh_p "--export" "<format>" "Optional. json|csv"
+        _rh_examples
+        _rh_e "sandbox audit search --search conn"
+        _rh_e "sandbox audit search --search backup --export json"
+        _rh_end ;;
+
+    audit/export)
+        _rh_print "[--export json|csv]"
+        _rh_params_export
+        _rh_examples
+        _rh_e "sandbox audit export --export json > audit.json"
+        _rh_e "sandbox audit export --export csv  > audit.csv"
+        _rh_end ;;
+
+    audit/stats)
+        _rh_print
+        _rh_examples
+        _rh_e "sandbox audit stats"
+        _rh_end ;;
+
+    audit/rollback)
+        _rh_print "--search <entry-id>"
+        _rh_params
+        _rh_p "--search" "<entry-id>" "Required. Audit entry ID to rollback"
+        _rh_examples
+        _rh_e "sandbox audit rollback --search 1750000000.12345"
+        _rh_end ;;
+
+    audit/show)
+        _rh_print "--search <entry-id>"
+        _rh_params
+        _rh_p "--search" "<entry-id>" "Required. Audit entry ID to display"
+        _rh_examples
+        _rh_e "sandbox audit show --search 1750000000.12345"
+        _rh_end ;;
+
+    # ── batch ─────────────────────────────────────────────────────────────────
+
+    batch/execute|batch/apply-commands)
+        _rh_print "--file <path> [--dry-run]"
+        _rh_params
+        _rh_p "--file"    "<path>" "Required. File with one 'cmd=sandbox ...' per line"
+        _rh_p "--dry-run" ""       "Preview commands without executing"
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --file commands.txt"
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --file commands.txt --dry-run"
+        _rh_end ;;
+
+    batch/apply-connections)
+        _rh_print "--file <path>"
+        _rh_params
+        _rh_p "--file" "<path>" "Required. CSV file: name,user,password,host,port,pdb"
+        _rh_examples
+        _rh_e "sandbox batch apply-connections --file connections.csv"
+        _rh_end ;;
+
+    # ── monitor ───────────────────────────────────────────────────────────────
+
+    monitor/system|monitor/database|monitor/apex|monitor/all)
+        _rh_print "[--export json|prometheus]"
+        _rh_params
+        _rh_p "--export" "<format>" "Output format: json|prometheus (default: table)"
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE}"
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --export json"
+        _rh_end ;;
+
+    # ── template ──────────────────────────────────────────────────────────────
+
+    template/save)
+        _rh_print "--name <name> [--description <text>]"
+        _rh_params
+        _rh_p "--name"        "<name>" "Required. Template name"
+        _rh_p "--description" "<text>" "Optional. Short description"
+        _rh_examples
+        _rh_e "sandbox template save --name production --description 'Production config'"
+        _rh_end ;;
+
+    template/load)
+        _rh_print "--name <name> [--apply]"
+        _rh_params
+        _rh_p "--name"  "<name>" "Required. Template name to load"
+        _rh_p "--apply" ""       "Apply environment variables from template"
+        _rh_examples
+        _rh_e "sandbox template load --name production"
+        _rh_e "sandbox template load --name production --apply"
+        _rh_end ;;
+
+    template/list)
+        _rh_print "[--format json|csv]"
+        _rh_params
+        _rh_p "--format" "<format>" "Output format: json|csv|table (default: table)"
+        _rh_examples
+        _rh_e "sandbox template list"
+        _rh_e "sandbox template list --format json"
+        _rh_end ;;
+
+    template/delete)
+        _rh_print "--name <name>"
+        _rh_params
+        _rh_p "--name" "<name>" "Required. Template name to delete"
+        _rh_examples
+        _rh_e "sandbox template delete --name production"
+        _rh_end ;;
+
+    template/export)
+        _rh_print "--name <name> [--file <path>]"
+        _rh_params
+        _rh_p "--name" "<name>" "Required. Template name"
+        _rh_p "--file" "<path>" "Optional. Output path (default: current dir)"
+        _rh_examples
+        _rh_e "sandbox template export --name production --file ./production.template"
+        _rh_end ;;
+
+    template/import)
+        _rh_print "--file <path> [--name <name>]"
+        _rh_params
+        _rh_p "--file" "<path>" "Required. Template file to import"
+        _rh_p "--name" "<name>" "Optional. Override template name"
+        _rh_examples
+        _rh_e "sandbox template import --file ./production.template"
+        _rh_end ;;
+
+    # ── status ────────────────────────────────────────────────────────────────
+
+    status/database|status/apex|status/mcp|status/network|status/all)
+        _rh_print "[--export json|csv]"
+        _rh_params_export
+        _rh_examples
+        _rh_e "sandbox ${ACTION} ${RESOURCE}"
+        _rh_e "sandbox ${ACTION} ${RESOURCE} --export json"
+        _rh_end ;;
+
+    # ── fallback ──────────────────────────────────────────────────────────────
+
+    *)
         echo ""
-        echo -e "  ${CYAN}sandbox restore schemas${NC} — Restore Oracle schemas via Data Pump (impdp)"
+        echo -e "  ${CYAN}sandbox ${ACTION} ${RESOURCE}${NC}"
         echo ""
-        echo -e "  ${WHITE}Usage:${NC}     sandbox restore schemas [--from <backup-id>]"
+        desc="${SANDBOX_HELP_SHORT[${ACTION}:${RESOURCE}]:-${SANDBOX_HELP_SHORT[${ACTION}]:-No description available}}"
+        echo -e "  ${desc}"
         echo ""
-        echo -e "  ${YELLOW}Parameters:${NC}"
-        echo -e "    ${CYAN}--from${NC}  <backup-id>   Backup ID. Default: latest."
-        echo ""
-        echo -e "  ${WHITE}Note:${NC}      Requires SANDBOX_DB_HOST and SANDBOX_DB_PASS. TABLE_EXISTS_ACTION=REPLACE."
-        echo ""
-        echo -e "  ${YELLOW}Examples:${NC}"
-        echo -e "    sandbox restore schemas"
-        echo -e "    sandbox restore schemas --from 20260626-214354"
+        echo -e "  ${YELLOW}Tip:${NC} Use ${CYAN}sandbox help search ${ACTION}${NC} to find related commands"
         echo ""
         ;;
-
 esac
