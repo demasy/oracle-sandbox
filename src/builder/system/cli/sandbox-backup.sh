@@ -138,13 +138,13 @@ case "${RESOURCE:-full}" in
             echo ""
             for d in "$BACKUP_BASE"/*/; do
                 [[ -d "$d" ]] || continue
-                local bname=$(basename "$d")
-                local manifest="$d/manifest.json"
-                if [[ -f "$manifest" ]]; then
-                    local comps=$(jq -r '.components | join(", ")' "$manifest" 2>/dev/null || echo "unknown")
-                    echo -e "    ${GREEN}•${NC} ${CYAN}${bname}${NC}  [${comps}]"
+                _bname=$(basename "$d")
+                _manifest="$d/manifest.json"
+                if [[ -f "$_manifest" ]]; then
+                    _comps=$(jq -r '.components | join(", ")' "$_manifest" 2>/dev/null || echo "unknown")
+                    echo -e "    ${GREEN}•${NC} ${CYAN}${_bname}${NC}  [${_comps}]"
                 else
-                    echo -e "    ${GREEN}•${NC} ${CYAN}${bname}${NC}"
+                    echo -e "    ${GREEN}•${NC} ${CYAN}${_bname}${NC}"
                 fi
             done
             echo ""
